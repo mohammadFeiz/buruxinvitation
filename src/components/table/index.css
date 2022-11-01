@@ -103,6 +103,7 @@
       margin:0 3px;
     }
     .aio-table-search input{
+      font-family:inherit;
       flex:1;
       border:none;
       outline:none;

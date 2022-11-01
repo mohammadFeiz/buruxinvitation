@@ -43,9 +43,25 @@ export default class Table extends Component {
       Group:Group(()=>this.props,()=>this.state,this.setColumns.bind(this)),
       columns:(props.columns || []).map((c)=>{return {...c}}),
       prevColumns:JSON.stringify(props.columns),
-      saveColumnInStorage:this.saveColumnInStorage.bind(this)
+      saveColumnInStorage:this.saveColumnInStorage.bind(this),
+      setColumn:this.setColumn.bind(this)
     }
     this.updateColumnsByStorageKey()
+  }
+  translate(text){
+    let {translate = (o)=>o,lang} = this.props;
+    if(lang){
+      if(lang === 'farsi'){
+        text = {
+          'Search':'جستجو','Contain':'شامل','Not Contain':'غیر شامل','Equal':'برابر','Not Equal':'مخالف','Greater Than':'بزرگتر از','Less Than':'کوچکتر از',
+          'and':'و','or':'یا','add':'افزودن','Inter Excel File Name':'نام فایل اکسل را وارد کنید','Sort By':'مرتب سازی بر اساس','Show Columns':'نمایش ستون ها',
+          'Group By':'گروه بندی بر اساس',
+        }[text];
+      }
+      else if(lang === 'english'){}
+      else {console.error('aio-table => lang props should be "english" or "farsi"');}
+    }
+    return translate(text) || text;
   }
   updateColumnsByStorageKey(){
     let {columns = []} = this.state;
@@ -63,17 +79,22 @@ export default class Table extends Component {
         width:column.resizable !== false?storageObj.width:column.width,//اگر ریسایزبل نبود از استوریج نمی خونیم چون ممکنه ریسایزبل فالس شده باشه و دیگه نشه اندازه ستون رو کنترل کرد
       }
       localStorage.setItem('tablecolumnstorage' + storageKey,JSON.stringify(storageObj));
-      column._storageObj = storageObj;
+      this.setColumn(column,{_storageObj:storageObj})
       for(let prop in storageObj){column[prop] = storageObj[prop]}
     }
   }
   saveColumnInStorage(column,key,value){
     if(!column.storageKey){return}
-    column._storageObj[key] = value;
+    let storageObj = {...column._storageObj};
+    storageObj[key] = value;
+    this.setColumn(column,{_storageObj:storageObj})
     localStorage.setItem('tablecolumnstorage' + column.storageKey,JSON.stringify(column._storageObj));
   }
   setColumns(columns){
     this.setState({columns})
+  }
+  setColumn(column,obj){
+    for(let prop in obj){column[prop] = obj[prop];}
   }
   getRowById(id){
     return {...this.rows_object[id],_detail:this.details_object[id]}
@@ -92,7 +113,6 @@ export default class Table extends Component {
     for(let j = 0; j < columns.length; j++){
       let column = columns[j];
       if(column.show === false){continue}
-      column.dataColumnId = column.dataColumnId || ('col' + Math.random())
       let value = getValueByField(row,column);
       values[column.dataColumnId] = value;
       json[column.title] = value === undefined?'':value;
@@ -295,11 +315,12 @@ export default class Table extends Component {
       getRowDetailById:this.getRowDetailById.bind(this),
       isRowOpen:this.isRowOpen.bind(this),
       SetState:(obj)=>this.setState(obj),
-      setColumns:this.setColumns.bind(this),   
+      setColumns:this.setColumns.bind(this),
       getSearchs:this.getSearchs.bind(this),
       toggleRow:this.toggleRow.bind(this),
       indent_layout:this.indent_layout.bind(this),
       toggle_layout:this.toggle_layout.bind(this),
+      translate:this.translate.bind(this),
       groups:this.groups
     }
   }
@@ -421,6 +442,14 @@ export default class Table extends Component {
       ]
     }
   }
+  setColumnIds(){
+    let {columns = []} = this.state;
+    for(let i = 0; i < columns.length; i++){
+      if(!columns[i].dataColumnId){
+        columns[i].dataColumnId = 'col' + Math.random()
+      }
+    }
+  }
   render() {
     let {model,columns,className,style} = this.props;
     let {prevColumns} = this.state;
@@ -429,6 +458,7 @@ export default class Table extends Component {
       let newColumns = JSON.parse(columnsStr);
       setTimeout(()=>this.setState({columns:newColumns,prevColumns:columnsStr},()=>this.updateColumnsByStorageKey()),0)
     }
+    this.setColumnIds()
     //پیجینگ را زود تر می سازیم که دیفالت هاش محاسبه بشه
     let pagingLayout = this.paging_layout();
     this.getModelDetails(model)
@@ -451,7 +481,7 @@ export default class Table extends Component {
   }
 }
 Table.defaultProps = {
-  indent:16,columnGap:1,rowGap:1,headerHeight:48,translate:(value)=>value
+  indent:16,columnGap:1,rowGap:1,headerHeight:48
 }
 class TableUnit extends Component{
   static contextType = TableContext;
@@ -514,12 +544,16 @@ class TableUnit extends Component{
     }
   }
   filter_layout(column){
+    let {translate,rtl,state,setColumns} = this.context;
+    let {setColumn} = state;
     let {filter,type = 'text'} = column;
     if(!filter){return false}
-    if(filter === true){filter = {}; column.filter = {}}
+    if(filter === true){
+      filter = {}; 
+      setColumn(column,{filter:{}})
+    }
     let {items = [],booleanType = 'or',add,operators,valueOptions} = filter;
     
-    let {translate,rtl,state,setColumns} = this.context;
     return {
       html:(
         <AIOButton
@@ -531,14 +565,17 @@ class TableUnit extends Component{
               <AIOTableFilterPopup 
                 translate={translate} type={type} items={items} booleanType={booleanType} add={add} operators={operators} valueOptions={valueOptions}
                 onChangeBooleanType={(booleanType)=>{
-                  column.filter.booleanType = booleanType;
+                  let {filter} = column;
+                  filter.booleanType = booleanType;
+                  setColumn(column,{filter})
                   state.saveColumnInStorage(column,'filter',column.filter)
                   setColumns(columns);
                   if(column.onChangeFilter){column.onChangeFilter(column)}
                 }}
                 onChange={async (items)=>{
-                  debugger;
-                  column.filter.items = items;
+                  let {filter} = column;
+                  filter.items = items;
+                  setColumn(column,{filter})
                   state.saveColumnInStorage(column,'filter',column.filter)
                   setColumns(columns);
                   if(column.onChangeFilter){column.onChangeFilter(column)}
@@ -684,20 +721,20 @@ class Toolbar extends Component{
     this.searchTimeout = setTimeout(()=>this.context.SetState({searchText:value}),time);
   }
   getSearchbox(){
-    let {searchPlaceholder = 'Search',getSearchs} = this.context;
+    let {translate,getSearchs} = this.context;
     let searchs = getSearchs()
     let {searchText} = this.state;
     if(!searchs.length){return false}
     return (
       <div className={TableCLS.searchBox} key='search'>
-        <input type='text' value={searchText} placeholder={searchPlaceholder} onChange={(e)=>this.changeSearch(e.target.value)}/>
+        <input type='text' value={searchText} placeholder={translate('Search')} onChange={(e)=>this.changeSearch(e.target.value)}/>
         <Icon path={searchText?mdiClose:mdiMagnify} size={0.7} onClick={()=>{if(!searchText){return} this.changeSearch('',0)}}/>
       </div>
     )
   }
   getToggleButton(){
-    let {state} = this.context;
-    let {columns} = state;
+    let {state,translate} = this.context;
+    let {columns,setColumn} = state;
     if(!columns || !columns.length){return false}
     let options = columns.filter(({toggle})=>toggle).map((column)=>{
       return {column,text:column.title,checked:column.show !== false}
@@ -705,21 +742,23 @@ class Toolbar extends Component{
     if(!options.length){return false}
     return (
       <AIOButton
+        popupHeader={<div className={TableCLS.toolbarPopupHeader}>{translate('Show Columns')}</div>}
         key='togglebutton' caret={false} type='select' options={options} className={TableCLS.toolbarIconButton}
         text={<Icon path={mdiEye} size={0.7}/>}
         onChange={(value,obj)=>{
           let {state,setColumns} = this.context;
           let {columns} = state;
-          let {show = true} = obj.option.column;
-          obj.option.column.show = !show;
-          state.saveColumnInStorage(obj.option.column,'show',obj.option.column.show)
+          let {column} = obj.option;
+          let {show = true} = column;
+          setColumn(column,{show:!show})
+          state.saveColumnInStorage(column,'show',obj.option.column.show)
           setColumns(columns)
         }}
       />
     )
   }
   getSortButton(){
-    let {state,model = []} = this.context;
+    let {state,model = [],translate} = this.context;
     let sorts = state.Sort.get();
     if(!sorts.length || !model.length){return false}
     let options = sorts.map((sort,i)=>{
@@ -739,7 +778,7 @@ class Toolbar extends Component{
     })
     return (
       <AIOButton
-        popupHeader={<div className={TableCLS.toolbarPopupHeader}>Sort By</div>}
+        popupHeader={<div className={TableCLS.toolbarPopupHeader}>{translate('Sort By')}</div>}
         key='sortbutton' caret={false} type='select' options={options} className={TableCLS.toolbarIconButton}
         text={<Icon path={mdiSort} size={0.7}/>}
         onChange={(value,obj)=>{
@@ -761,7 +800,7 @@ class Toolbar extends Component{
     )
   }
   getGroupButton(){
-    var {model,state,groups} = this.context;
+    var {model,state,groups,translate} = this.context;
     if(!groups.length || !model.length){return false}
     let options = groups.map((group)=>{
       return {
@@ -770,6 +809,7 @@ class Toolbar extends Component{
     })
     return (
       <AIOButton
+        popupHeader={<div className={TableCLS.toolbarPopupHeader}>{translate('Group By')}</div>}
         key='groupbutton' caret={false} type='select' options={options} className={TableCLS.toolbarIconButton}
         text={<Icon path={mdiFileTree} size={0.7}/>}
         onChange={(value,obj)=>{
@@ -1037,7 +1077,6 @@ class AIOTableFilterPopup extends Component{
           operator={item.operator} value={item.value} type={type} translate={translate} operators={operators}
           operatorOptions={this.operatorOptions} valueOptions={valueOptions} add={add}
           onChange={(key,value)=>{
-            debugger;
             onChange(items.map((o,i)=>{if(itemIndex === i){return {...o,[key]:value}} return o}))
           }}
           onRemove={add === false?undefined:()=>onChange(items.filter((o,i)=>i !== itemIndex))}
@@ -1138,11 +1177,14 @@ class AIOfilterItem extends Component{
 function Sort(getProps,getState,setColumns){
   let o = {
     get(){
-      let {columns = []} = getState();
+      let {columns = [],setColumn} = getState();
       let sorts = [];
       for(let i = 0; i < columns.length; i++){
         if(!columns[i].sort){continue}
-        if(typeof columns[i].sort !== 'object'){columns[i].sort = {};}
+        if(typeof columns[i].sort !== 'object'){
+          let column = columns[i];
+          setColumn(column,{sort:{}})
+        }
         let {sort,type = 'text',field,dataColumnId,title} = columns[i];
         let {dir = 'inc',order,active = true,toggle = true} = sort;
         if(order === undefined){
