@@ -175,7 +175,7 @@ class TarahiDavatname extends Component{
         return {
             size:48,gap:6,className:'margin-0-24 bgFFF round8 padding-0-12',align:'v',
             row:[
-                {html:'میز کاز',className:'color8C9CA3 size18',align:'v',attrs:{onClick:()=>onClose()}},
+                {html:'میز کار',className:'color8C9CA3 size18',align:'v',attrs:{onClick:()=>onClose()}},
                 {html:<Icon path={mdiChevronLeft} size={0.8}/>,align:'v'},
                 {html:'طراحی دعوتنامه',className:'size18 color108ABE bold',align:'v'},
                 {flex:1},                
@@ -406,7 +406,7 @@ class ErsaleDavatname extends Component{
         return {
             size:48,gap:6,className:'margin-0-24 bgFFF round8 padding-0-12',align:'v',
             row:[
-                {html:'میز کاز',className:'color8C9CA3 size18',align:'v',attrs:{onClick:()=>onClose()}},
+                {html:'میز کار',className:'color8C9CA3 size18',align:'v',attrs:{onClick:()=>onClose()}},
                 {html:<Icon path={mdiChevronLeft} size={0.8}/>,align:'v'},
                 {html:'ارسال دعوتنامه',className:'size18 color108ABE bold',align:'v'},
                 {flex:1},                
@@ -610,7 +610,7 @@ class DavatnameHa extends Component{
         return {
             size:48,gap:6,className:'margin-0-24 bgFFF round8 padding-0-12',align:'v',
             row:[
-                {html:'میز کاز',className:'color8C9CA3 size18',align:'v',attrs:{onClick:()=>onClose()}},
+                {html:'میز کار',className:'color8C9CA3 size18',align:'v',attrs:{onClick:()=>onClose()}},
                 {html:<Icon path={mdiChevronLeft} size={0.8}/>,align:'v'},
                 {html:'دعوتنامه ها',className:'size18 color108ABE bold',align:'v'}
             ]
