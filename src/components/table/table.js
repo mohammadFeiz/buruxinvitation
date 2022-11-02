@@ -1,5 +1,5 @@
 import React,{Component} from 'react';
-import Table from './index';
+import Table from 'aio-table';
 export default class TableInterface extends Component{
     render(){
         return (
