@@ -7,6 +7,7 @@ import {mdiDotsHorizontal,mdiChevronLeft, mdiChevronDoubleDown,mdiFileExcel,mdiF
 import GradientCard from '../gradient-card/gradient-card';
 import Form from '../form/form';
 import AIODate from 'aio-date';
+import Map from '../map/map';
 import AppContext from '../../app-context';
 export default class MizeKar extends Component {
     static contextType = AppContext;
@@ -146,6 +147,8 @@ class TarahiDavatname extends Component{
     initModel(){
         return {
             name_davatname:'',
+            lat:35.699739,
+            long:51.338097,
             tarikhe_etebar:false,
             landing_page:'',
             matne_payamak:'',
@@ -247,7 +250,13 @@ class TarahiDavatname extends Component{
                         {type:'html',html:()=>this.poster(),label:'تصویر پوستر :',rowKey:'2'},
                         {type:'checkbox',text:'ارسال مستقیم به لندینگ پیچ',field:'model.ersale_mostaghim',rowKey:'3'},
                         this.formGap('3'),
+                        {type:'text',field:'model.adrese_ghorfe',inlineLabel:false,label:'آدرس غرفه :'},
                         {type:'checkbox',text:'امکان دعوت از دوستان',field:'model.emkane_davat',rowKey:'3'},
+                        {
+                            type:'html',label:'موقعیت',inlineLabel:false,html:()=>{
+                                return <Map lat={model.lat} long={model.long} style={{width:'100%',height:160,resize:'vertical',minHeight:100}} onChange={(lat,long)=>this.setState({model:{...model,lat,long}})}/>
+                            }
+                        }
                         
                     ]}
                 />
@@ -525,9 +534,9 @@ class ErsaleDavatname extends Component{
         }
     }
     table_layout(){
-        let {niaz_be_taide_man,checks} = this.state;
+        let {niaz_be_taide_man,checks,tab} = this.state;
         this.order = 0;
-
+        if(tab !== '2'){return false}
         return {
             flex:1,
             html:(

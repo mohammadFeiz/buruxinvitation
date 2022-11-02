@@ -5,6 +5,7 @@ export default class FormInterface extends Component{
         return (
             <Form 
                 inputStyle={{background:'#f1f2f3',border:'none'}}
+                rowStyle={{marginBottom:12}}
                 {...this.props}
             />
         )

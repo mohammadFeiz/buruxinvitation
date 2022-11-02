@@ -12,6 +12,7 @@
     "aio-date": "^1.2.0",
     "aio-form-react": "^4.0.4",
     "aio-service": "^1.0.0",
+    "aio-table": "^8.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",

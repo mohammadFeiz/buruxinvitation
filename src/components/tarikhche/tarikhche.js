@@ -33,10 +33,12 @@ export default class Tarikhche extends Component{
     table_layout(){
         let {tarikhche,checks} = this.state;
         this.order = 0;
+        // if(!tarikhche.length){return false}
         return {
             flex:1,
             html:(
                 <Table
+                    rtl={true} lang='farsi'
                     model={tarikhche}
                     setModel={(tarikhche)=>this.setState({tarikhche})}
                     templates={{
