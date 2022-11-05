@@ -630,7 +630,7 @@ class DavatnameHa extends Component{
         return {
             flex:1,
             html:(
-                <div style={{display:'inline-block',padding:'0 12px'}}>
+                <div style={{display:'inline-block',padding:'0 12px',overflowY:'auto'}}>
                     {davatname_ha.map((o,i)=><DavatnameCard key={o.id} object={o}/>)}
                 </div>
             )
@@ -640,12 +640,13 @@ class DavatnameHa extends Component{
         return (
             <RVD
                 layout={{
+                    scroll:'v',
                     column:[
                         {size:12},
                         this.nav_layout(),
                         {size:12},
                         {
-                            flex:1,scroll:'v',
+                            flex:1,
                             column:[
                                 this.splitter_layout('لیست'),
                                 this.list_layout(),
@@ -696,8 +697,8 @@ class DavatnameCard extends Component{
     }
     days_layout(){
         let {object} = this.props;
-        let {tarikhe_etebar} = object;
-        let {days} = AIODate().getRemainingTime(tarikhe_etebar);
+        let {expiredDate} = object;
+        let {days} = AIODate().getRemainingTime(expiredDate);
         return {size:24,align:'v',html:`${days} روز اعتبار دارد`,className:'size10 color605E5C padding-0-6 bold'}
     }
     date_layout(type){

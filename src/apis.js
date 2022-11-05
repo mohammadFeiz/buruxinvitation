@@ -1,11 +1,14 @@
+import AIODate from "aio-date";
 
 const hostName = `http://localhost:8000`
 let url;
 let res;
+let user_name = 'm.shad' // یا 'm.shad'
+let user_name_role = 'admin'  // یا'user'
 //آدرس برای ساخت تمپلیت و ولیدیت کردن و همچنین بررسی اینکه آیا آن تمپلیت فعال است یا خیر
 const invitationTemplateUrl = `${hostName}/invitation/v1/template`
 
-const excellImport = `${hostName}/guest/` //
+const excellImport = `${hostName}/guest/` //ارسال گروهی
 
 const ersalTakiUrl = `${hostName}/guest/ersaletaki/` // ارسال تکی
 
@@ -16,7 +19,7 @@ const ShowAllNotVerified = `${hostName}/invitation/show/` //لیست نیاز ب
 const  InvitatonsConfirm = `${hostName}/invitation/v1/invitaton/` 
 
 
-export default function apis({Axios}){
+export default function apis({Axios,getDateAndTime}){
 
     return {
 
@@ -134,6 +137,7 @@ export default function apis({Axios}){
                     date: new Date(o.created_at).getTime()
                 }
             })
+            // debugger
             return resMapping
             
         },
@@ -160,33 +164,53 @@ export default function apis({Axios}){
             // ]
             let url = `${invitationTemplateUrl}`
             let res;
-            // debugger
             try{
                 res = await Axios.get(url)
             }
             catch(err){
-                // debugger
+                debugger
                 return []
             }
             let resMapping = res.data.map((o) =>{
+                let {date,time} = getDateAndTime(o.created_at);
+                // let expiration_date = AIODate().getByOffset({date:date.split('/').map((x)=>+x),offset:o.expiration,calendarType:'jalali'})
+                // let y;
+                // let tt = expiration_date.map((z) => {
+                //     if(z != undefined){
+                //         y += `${z}`
+                //         y += '/'
+                //     }
+                // })
+                //get create_at and expiration_date of template
                 let created_at = new Date(o.created_at).toISOString(o.created_at).replace('T', ' ').replace('Z', '')
-                created_at = `${new Date(created_at).toLocaleDateString('fa-IR')}`
+                let getMiladiDate = new Date(created_at).toLocaleDateString()
+                let getMiladiDateTime = new Date(getMiladiDate).getTime()
+                let addExpirationDate = getMiladiDateTime + o.expiration * 86400000
+                let expiration_date = new Date(addExpirationDate).toLocaleDateString('fa-IR')
+                // created_at = new Date(created_at).toLocaleDateString('fa-IR')
+
+                // برای تبدیل تاریخ میلادی به شمسی
                 // let expired_at = new Date(o.created_at).toISOString(o.created_at).replace('T', ' ').replace('Z', '')
                 // created_at = `${new Date(created_at).toLocaleDateString('fa-IR')}`
 
+                // اختلاف بازه بین تاریخ ایحاد و تاریخ اعتبار
+                // let tarikhe_ijad = new Date(o.created_at).getTime()
+                // let tarikhe_etebar = new Date().getTime()
+                // let  msBetweenDates = Math.abs(tarikhe_etebar - tarikhe_ijad);
+                // let hoursBetweenDates = msBetweenDates / (1000 * 3600 * 24);
+
                 return {
-                    name: o.name,
                     id: o.id,
-                    tarikhe_ijad: o.created_at,
-                    tarikhe_etebar: o.created_at,
-                    faal: true,
+                    name: o.name,
+                    tarikhe_ijad: date,
+                    tarikhe_etebar: expiration_date,
+                    expiredDate: expiration_date,
+                    faal: o.is_active,
                     dastresi_ha:[]
                 }
             })
             // debugger
             return resMapping
-
-            
 
         },
 
@@ -223,18 +247,23 @@ export default function apis({Axios}){
 
             let apiBody = {
                 name: model.name_davatname,
-                link: model.landing_page,
-                sms_template: model.matne_payamak,
-                text_template: model.matne_davatname,
-                expiration: diffDays,
+                // url: model.landing_page, // لینک 
+                sms_template: model.matne_payamak, // متن پیامک
+                text_template: model.matne_davatname, // متن دعوتنامه
+                expiration: diffDays, // تعداد روز اعتبار
                 is_draft: is_draft,
                 mobile_poster: model.poster,
                 desktop_poster: model.poster,
-                user: user ,
+                user: user,
                 // expiration_date: model.tarikhe_etebar,
                 can_others_invite: model.emkane_davat,
                 redirect_to_landing_page: model.ersale_mostaghim,
-                geo_data: `${model.lat},${model.long}`
+                geo_data: `${model.lat},${model.long}`, // موقعیت 
+                address_event: model.adrese_ghorfe,
+                start_event : '',
+                end_event: '',
+                landing_page_link: model.landing_page, // لینک لندینگ پیج
+
             }
             let formData = new FormData();
             for (const key in apiBody) {
@@ -280,18 +309,20 @@ export default function apis({Axios}){
                 //semat(string)
             //davatname_haye_entekhab_shode: آرایه ای از آی دی دعوتنامه های انتخاب شده
             url = `${ersalTakiUrl}`
+            let gender;
             let template_id = ''
             davatname_haye_entekhab_shode.map((o) =>{
                 template_id += o
                 template_id += ' '
             })
+            if(model.jensiat == 'male'){gender = 'M'}else{gender = 'F'}
 
             let urlParams = {
                 first_name: model.nam,
                 last_name: model.name_khanevadegi,
                 company_name: model.sherkat,
                 phone_number: model.shomare_tamas,
-                gender: model.jensiat,
+                gender: gender,
                 username: 'm.shad', //باید اطلاعات یوزر را بگیرم
                 template_id: template_id, //davatname_haye_entekhab_shode
                 role: 'admin' // نقش کاربری که ارسال میکند
@@ -302,6 +333,7 @@ export default function apis({Axios}){
                 debugger
             }
             catch(err){
+                debugger
                 return "خطایی در ثبت دیتا ها رخ داد"
             }
             //return 'خطایی رخ داد';
@@ -314,15 +346,20 @@ export default function apis({Axios}){
             //excel(فایل اکسل آپلود شده)
             //return 'خطایی رخ داد';
             url = `${excellImport}`
+            let res;
+            let successMessage;
+            let errorMessage;
             let template_id = ''
             davatname_haye_entekhab_shode.map((o) =>{
                 template_id += o
                 template_id += ' '
             })
+
             let formData = new FormData();
             formData.append('file', excel)
             formData.append('username', 'm.shad') // username باید از کاربر گرفته شود
             formData.append('template_id', template_id)
+            formData.append('role', 'admin') // با توجه به نقش کاربری که دارد ارسال گروهی را انجام می دهد.
             debugger
             try{
                 res = await Axios.post(url, formData, {
@@ -332,8 +369,20 @@ export default function apis({Axios}){
                 })
             }
             catch(err){
+                debugger
                 return 'خطایی رخ داد'
             }
+            if (res.data.number_of_falses != 0){
+                errorMessage = `${res.data.number_of_falses} مورد ناموفق ثبت شد `
+                successMessage = `${res.data.number_of_trues} مورد موفق ثبت شد`
+
+                return `${errorMessage}
+                و
+                ${successMessage}`
+            }
+            // if (res.data.number_of_falses == 0){
+                
+            // }
             debugger
             return true
         },
