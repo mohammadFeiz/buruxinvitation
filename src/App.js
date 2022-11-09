@@ -7,31 +7,45 @@ import getSvg from './getSvg';
 import AIODate from 'aio-date';
 import RVD from 'react-virtual-dom';
 import AIOService from 'aio-service';
+import RKS from 'react-keycloak-spa'
 import apis from './apis';
 import AppContext from './app-context';
 import './index.css';
 
 export default class App extends Component{
   render(){
-    return (
-      <Main/>
-    )
     // return (
-    //   <RKS
-    //     config={{
-    //       url: "https://iam.burux.com/auth",
-    //       realm: "master",
-    //       clientId: "invitation"
-    //     }}
-    //     component={Main}
-    //   />
+    //   <Main/>
     // )
+    return (
+      <RKS
+        config={{
+          url: "https://iam.burux.com/auth",
+          realm: "master",
+          clientId: "invitation"
+        }}
+        component={Main}
+      />
+    )
   }
 }
 class Main extends Component{
   constructor(props){
     super(props);
+    let {keycloak} = this.props;
+    let roles; 
+    if(keycloak.tokenParsed.resource_access.invitation){
+      roles = keycloak.tokenParsed.resource_access.invitation.roles
+    }
+    else{
+      roles = []
+    }
+    let userInformation = {
+      username: keycloak.tokenParsed.preferred_username,
+      roles: roles,
+    }
     this.state = {
+      userInformation,
       apis:AIOService({apis,getState:()=>this.state}),
       users:[],
       statuses:[
