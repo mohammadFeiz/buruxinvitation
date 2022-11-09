@@ -20,13 +20,19 @@ export default class Tarikhche extends Component{
         let tarikhche = await apis({type:'tarikhche'})
         this.setState({tarikhche})
     }
+    async ersale_mojadad(checks){
+        let {apis} = this.context;
+        let res = await apis({type:'ersale_mojadad',parameter:checks})
+    }
     toolbar_layout(){
+        let {checks} = this.state;
+        let checkeds = Object.keys(checks).filter((o)=>checks[o]);
         return {
             className:'padding-0-12',
             size:36,
             row:[
                 {flex:1},
-                {align:'v',html:<button className='button-2'>ارسال مجدد</button>}
+                {align:'v',html:<button onClick={()=>this.ersale_mojadad(checks)} disabled={checkeds.length === 0} className='button-2'>ارسال مجدد</button>}
             ]
         }
     }

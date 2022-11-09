@@ -17,6 +17,11 @@ button{
   border:1px solid #2BA4D8;
   border-radius:6px;
   font-weight: bold;
+  cursor:pointer;
+}
+.button-2:disabled{
+  cursor:not-allowed;
+  opacity:0.5;
 }
 .rsa{
   background:#eee;

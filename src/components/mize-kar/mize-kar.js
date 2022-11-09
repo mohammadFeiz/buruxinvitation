@@ -248,9 +248,13 @@ class TarahiDavatname extends Component{
                         {type:'textarea',field:'model.matne_davatname',label:'متن دعوتنامه :',rowKey:'2',inputStyle:style1},
                         this.formGap('2'),
                         {type:'html',html:()=>this.poster(),label:'تصویر پوستر :',rowKey:'2'},
+                        {type:'datepicker',label:'تاریخ برگزاری ایونت از',field:'model.az_tarikh',unit:'hour',calendarType:'jalali',rowKey:'3'},
+                        this.formGap('3'),
+                        {type:'datepicker',label:'تاریخ برگزاری ایونت تا',field:'model.ta_tarikh',unit:'hour',calendarType:'jalali',rowKey:'3'},
+                        this.formGap('3'),
                         {type:'checkbox',text:'ارسال مستقیم به لندینگ پیچ',field:'model.ersale_mostaghim',rowKey:'3'},
                         this.formGap('3'),
-                        {type:'text',field:'model.adrese_ghorfe',inlineLabel:false,label:'آدرس غرفه :'},
+                        {type:'text',field:'model.adrese_ghorfe',label:'آدرس غرفه :'},
                         {type:'checkbox',text:'امکان دعوت از دوستان',field:'model.emkane_davat',rowKey:'3'},
                         {
                             type:'html',label:'موقعیت',inlineLabel:false,html:()=>{
@@ -349,7 +353,7 @@ class ErsaleDavatname extends Component{
     initModel(){
         return {
             nam:'',
-            name_khanevadegi:false,
+            name_khanevadegi:'',
             shomare_tamas:'',
             jensiat:'',
             sherkat:'',

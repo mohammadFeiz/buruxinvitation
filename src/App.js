@@ -16,6 +16,16 @@ export default class App extends Component{
     return (
       <Main/>
     )
+    // return (
+    //   <RKS
+    //     config={{
+    //       url: "https://iam.burux.com/auth",
+    //       realm: "master",
+    //       clientId: "invitation"
+    //     }}
+    //     component={Main}
+    //   />
+    // )
   }
 }
 class Main extends Component{

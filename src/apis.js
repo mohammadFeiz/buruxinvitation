@@ -93,11 +93,15 @@ export default function apis({Axios}){
             //return 'خطایی رخ داد';
             return true
         },
-        taid({state,items}){
+        async taid({state,items}){
             //state (false | true) برای تایید یا عدم تایید
             //items (array of objects) دعوت نامه های انتخاب شده برای تایید یا عدم تایید 
             //return 'خطایی پیش آمده'
             return true
+        },
+        async ersale_mojadad(davatname_haye_entekhab_shode){
+            //davatname_haye_entekhab_shode: آرایه ای از آی دی دعوتنامه های انتخاب شده
+            
         }
     } 
 }
