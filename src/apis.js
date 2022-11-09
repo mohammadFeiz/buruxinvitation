@@ -58,14 +58,28 @@ export default function apis({Axios,getDateAndTime}){
             let resMapping = res.data.data.map((o) => {
                 created_at = new Date(o.created_at).toISOString(o.created_at).replace('T', ' ').replace('Z', '')
                 created_at = `${new Date(created_at).toLocaleTimeString('fa-IR')} ${new Date(created_at).toLocaleDateString('fa-IR')}`
+                let davat_shode;
+                let davat_konande;
+                let name_davatname;
+                if(o.guets != undefined || o.guest != null){
+                    davat_shode = `${o.guest.first_name} ${o.guest.last_name}`
+                }
+                if(o.user != undefined || o.user != null){
+                    davat_konande = `${o.user.first_name} ${o.user.last_name}`
+                }
+                if(o.template != undefined || o.template != null){
+                    name_davatname = `${o.template.name}`
+                }
+
                 return {
                     id: o.id,
-                    davat_shode: `${o.invited.first_name} ${o.invited.last_name}`,
-                    davat_konande: `${o.user.first_name} ${o.user.last_name}`,
-                    name_davatname: `${o.template.name}`,
-                    zamane_davat: created_at
+                    davat_shode: davat_shode, //`${o.guest.first_name} ${o.guest.last_name}`,
+                    davat_konande: davat_konande, //`${o.user.first_name} ${o.user.last_name}`,
+                    name_davatname: name_davatname, //`${o.template.name}`,
+                    zamane_davat: created_at,
                 }
             })
+            debugger
             return resMapping
         },
 
@@ -99,6 +113,7 @@ export default function apis({Axios,getDateAndTime}){
                 res = await Axios.get(url)
                 // debugger
             }
+
             catch(err){
                 debugger
                 return []
@@ -128,16 +143,15 @@ export default function apis({Axios,getDateAndTime}){
                 else{status = '3'} // منقضی شده 
                 return {
                     id: o.id,
-                    davat_shode: `${o.invited.first_name} ${o.invited.last_name}`,
+                    davat_shode: `${o.guest.first_name} ${o.guest.last_name}`,
                     davat_konande: `${o.user.first_name} ${o.user.last_name}`,
                     name_davatname: `${o.template.name}`,
-                    shomare_tamase_davat_shode: `${o.invited.phone_number}`,
+                    shomare_tamase_davat_shode: `${o.guest.phone_number}`,
                     zamane_davat: created_at,
                     status: status,
                     date: new Date(o.created_at).getTime()
                 }
             })
-            // debugger
             return resMapping
             
         },
@@ -229,6 +243,7 @@ export default function apis({Axios,getDateAndTime}){
             //karbarane_daraye_dastresi: آرایه ای از آی دی کاربران
             
             url = `${invitationTemplateUrl}`
+            let res;
             let is_draft;
             if(mode == 'draft'){is_draft = true}else{is_draft = false}
 
@@ -275,7 +290,7 @@ export default function apis({Axios,getDateAndTime}){
                 }
                 console.log(`${key}`, apiBody[key])
             }
-            
+             
             debugger
             try{
                 res = await Axios.post(url, formData, {
@@ -285,14 +300,24 @@ export default function apis({Axios,getDateAndTime}){
                 })
             }
             catch(err){
-                if(err.res.data){
-                    return 'فیلد های مورد نیاز را تکمیل کنید'
+                debugger
+                if(err.response){
+                    if(err.response.data){
+                        if(err.response.data.error){
+                            return err.response.data.error.errorMessage
+                        }
+                        else{
+                            return 'فیلد های مورد نیاز را تکمیل کنید'
+                        }
+                    }
+                    else {
+                        return 'خطای نامشخص'
+                    }
                 }
                 return 'خطایی در ثبت دعوتنامه رخ داد'
             }
             // debugger
             return true
-            
             //return 'خطایی رخ داد';
             return true
         },
@@ -311,6 +336,14 @@ export default function apis({Axios,getDateAndTime}){
             url = `${ersalTakiUrl}`
             let gender;
             let template_id = ''
+            let user = {
+                username: "a.moghimi",
+                roles: ["admin", "user"]
+            }
+            if (davatname_haye_entekhab_shode.length == 0){
+                return 'لیست دعوتنامه خالی است'
+            }
+
             davatname_haye_entekhab_shode.map((o) =>{
                 template_id += o
                 template_id += ' '
@@ -325,9 +358,10 @@ export default function apis({Axios,getDateAndTime}){
                 gender: gender,
                 username: 'm.shad', //باید اطلاعات یوزر را بگیرم
                 template_id: template_id, //davatname_haye_entekhab_shode
-                role: 'admin' // نقش کاربری که ارسال میکند
+                role: 'user', // نقش کاربری که ارسال میکند
+                user: user
             }
-
+            debugger
             try{
                 res = await Axios.post(url, urlParams)
                 debugger
@@ -349,7 +383,10 @@ export default function apis({Axios,getDateAndTime}){
             let res;
             let successMessage;
             let errorMessage;
-            let template_id = ''
+            let template_id = '';
+            if (davatname_haye_entekhab_shode.length == 0){
+                return 'لیست دعوتنامه خالی است'
+            }
             davatname_haye_entekhab_shode.map((o) =>{
                 template_id += o
                 template_id += ' '
@@ -373,6 +410,7 @@ export default function apis({Axios,getDateAndTime}){
                 return 'خطایی رخ داد'
             }
             if (res.data.number_of_falses != 0){
+                debugger
                 errorMessage = `${res.data.number_of_falses} مورد ناموفق ثبت شد `
                 successMessage = `${res.data.number_of_trues} مورد موفق ثبت شد`
 
