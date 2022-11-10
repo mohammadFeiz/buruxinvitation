@@ -700,8 +700,8 @@ class DavatnameCard extends Component{
     }
     days_layout(){
         let {object} = this.props;
-        let {expiredDate} = object;
-        let {days} = AIODate().getRemainingTime(expiredDate);
+        let {tarikhe_etebar} = object;
+        let {days} = AIODate().getRemainingTime(tarikhe_etebar);
         return {size:24,align:'v',html:`${days} روز اعتبار دارد`,className:'size10 color605E5C padding-0-6 bold'}
     }
     date_layout(type){

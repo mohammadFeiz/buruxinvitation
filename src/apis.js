@@ -14,7 +14,9 @@ const showAllInvitation = `${hostName}/invitation/show_all` //تاریخچه
 const ShowAllNotVerified = `${hostName}/invitation/show/` //لیست نیاز به تائید من 
 
 //با متد گت این ای پی آی تائید انجام می شود
-const  InvitatonsConfirm = `${hostName}/invitation/v1/invitaton/`
+const  InvitatonsConfirm = `${hostName}/invitation/v1/invitation/`
+
+const sendAgain = `${hostName}/invitation/v1/invitation/retry-invitation/`
 
 export default function apis({Axios, getDateAndTime, getState}){
     return {
@@ -133,10 +135,10 @@ export default function apis({Axios, getDateAndTime, getState}){
 
                 if(hoursBetweenDates > 0.001 && o.state == 'S'){status = '3'} // منقضی شده 
                 else if(o.state == 'N'){status = '0'} // در انتظار تائید
-                else if(o.state == 'S'){status = '1'} //ارسال شده
+                else if(o.state == 'S' || o.state == 's'){status = '1'} //ارسال شده
                 else if(o.state == 'O'){status = '2'} // مشاهده شده
                 else if(o.state == 'U'){status = '4'} // خطا
-                else{status = '3'} // منقضی شده 
+                // else{status = '3'} // منقضی شده 
                 return {
                     id: o.id,
                     davat_shode: `${o.guest.first_name} ${o.guest.last_name}`,
@@ -197,7 +199,14 @@ export default function apis({Axios, getDateAndTime, getState}){
                 let getMiladiDate = new Date(created_at).toLocaleDateString()
                 let getMiladiDateTime = new Date(getMiladiDate).getTime()
                 let addExpirationDate = getMiladiDateTime + o.expiration * 86400000
-                let expiration_date = new Date(addExpirationDate).toLocaleDateString('fa-IR')
+                // let sd = new Date(addExpirationDate).toLocaleDateString('fa-IR')
+                let expiration_date = new Date(addExpirationDate)
+                let year = expiration_date.getFullYear();
+                let month = expiration_date.getMonth() + 1;
+                let day = expiration_date.getDate();
+                let jalali_expiration = AIODate().gregorianToJalali([year,month,day]);
+                jalali_expiration = `${jalali_expiration[0]}/${jalali_expiration[1]}/${jalali_expiration[2]}`
+                // debugger
                 if(o.desktop_poster) {
                     o.desktop_poster = `${hostName}${o.desktop_poster}`
                   }
@@ -217,15 +226,15 @@ export default function apis({Axios, getDateAndTime, getState}){
                     id: o.id,
                     name: o.name,
                     tarikhe_ijad: date,
-                    tarikhe_etebar: expiration_date,
+                    // tarikhe_etebar: expiration_date,
+                    tarikhe_etebar: jalali_expiration,
                     expiredDate: expiration_date,
                     faal: o.is_active,
                     dastresi_ha:[],
                     url: o.desktop_poster,
-                    
                 }
             })
-            debugger
+
             return resMapping
         },
 
@@ -463,6 +472,7 @@ export default function apis({Axios, getDateAndTime, getState}){
                     debugger
                 }
                 catch(err){
+                    debugger
                     return 'خطایی در تائید موارد انتخاب شده رخ داده است'
                 }
                 if (res.data){
@@ -487,6 +497,23 @@ export default function apis({Axios, getDateAndTime, getState}){
                 if(davatname_haye_entekhab_shode[prop] == true){
                     ersale_mojadad_array.push(prop)
                 }
+            }
+            let res;
+            let url = `${sendAgain}`
+            debugger
+            let apiBody = {
+                invitation_ids: ersale_mojadad_array
+            }
+            try{
+                res = await Axios.post(url, apiBody)
+                if (res.data.is_success == true){
+                    return true
+                }
+                return true
+            }
+            catch(err){
+                debugger
+                return 'خطا در ارسال مجدد'
             }
         }
     } 
