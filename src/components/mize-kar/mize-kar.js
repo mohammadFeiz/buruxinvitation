@@ -349,7 +349,9 @@ class ErsaleDavatname extends Component{
             davatname_haye_entekhab_shode:[],
             niaz_be_taide_man:[],
             checks:[],
-            excel:false
+            excel:false,
+            successLength:false,
+            errorList:false
         }
     }
     initModel(){
@@ -385,8 +387,9 @@ class ErsaleDavatname extends Component{
             let res = await apis({type:'ersale_goroohi',parameter:{davatname_haye_entekhab_shode,excel}})
             if(typeof res === 'string'){setConfirm({type:'error',text:'ارسال دعوتنامه گروهی با خطا روبرو شد',subtext:res})}
             else{
-                setConfirm({type:'success',text:'ارسال دعوتنامه گروهی با موفقیت انجام شد'})
-                onClose()
+                let {successLength,errorList} = res;
+                setConfirm({type:'success',text:'ارسال دعوتنامه گروهی با موفقیت انجام شد'});
+                this.setState({successLength,errorList})
             }
         }
         
@@ -509,7 +512,8 @@ class ErsaleDavatname extends Component{
         }
     }
     excel_layout(){
-        let {excel,tab} = this.state;
+        let {excel,tab,successLength,errorList} = this.state;
+        let {addPopup,apis,removePopup,setConfirm} = this.context;
         if(tab !== '1'){return false}
         return {
             flex:1,
@@ -527,7 +531,7 @@ class ErsaleDavatname extends Component{
                         {html:(
                             <label>
                                 بارگذاری فایل اکسل
-                                <input type='file' style={{display:'none'}} onChange={(e)=>this.setState({excel:e.target.files[0]})}/>
+                                <input type='file' style={{display:'none'}} onChange={(e)=>this.setState({excel:e.target.files[0],successLength:false,errorList:false})}/>
                             </label>
                         )},
                         {html:<Icon path={mdiFile} size={1}/>}
@@ -535,9 +539,40 @@ class ErsaleDavatname extends Component{
                 },
                 {size:12},
                 {show:!!excel,className:'size14 color5897D2 bold',html:excel.name,align:'vh'},
+                {size:12},
+                {show:successLength !== false,html:this.getSuccessButton(`${successLength} مورد با موفقیت ثبت شد`,'#AAF2BE'),align:'h'},
+                {size:12},
+                {
+                    show:errorList !== false && errorList.length !== 0,
+                    html:this.getSuccessButton(`${errorList.length} مورد دارای خطا`,'#FFC5B9',()=>{
+                        addPopup({
+                            type:'fullscreen',
+                            title:`موارد خطا (${errorList.length} مورد)`,
+                            content:()=>{
+                                return (
+                                    <Khata_haye_ersal model={errorList} onSubmit={async (model)=>{
+                                        let res = await apis({type:'ersale_mojadade_khatahaye_excel',parameter:{model}});
+                                        if(res === true){removePopup()}
+                                        if(typeof res === 'string'){
+                                            setConfirm({type:'error',text:'خطا',subtext:res});
+                                            return;
+                                        }
+                                        let {errorList,successLength} = res;
+                                        this.setState({errorList,successLength});
+                                        removePopup();
+                                    }}/>
+                                )
+                            }
+                        })
+                    }),align:'h'},
                 {flex:1}
             ]
         }
+    }
+    getSuccessButton(text,color,onClick){
+        return (
+            <div className='excel-success-button' style={{background:color}} onClick={onClick}>{text}</div>
+        )
     }
     table_layout(){
         let {niaz_be_taide_man,checks,tab} = this.state;
@@ -608,7 +643,52 @@ class ErsaleDavatname extends Component{
         )
     }
 }
+class Khata_haye_ersal extends Component{
+    constructor(props){
+        super(props);
+        this.state = {model:props.model}
+    }
+    getTable(){
+        let {model} = this.state;
+        return (
+            <Table
+                model={model}
+                templates={{
+                    remove:(row)=>{
+                        return (
+                            <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 12.5C12 13.4474 11.4474 14 10.5 14H4.5C3.55263 14 3 13.4474 3 12.5V4.25H12V12.5ZM13.5 12.5V2.75H1.5V12.5C1.5 14.1842 2.81579 15.5 4.5 15.5H10.5C12.1842 15.5 13.5 14.1842 13.5 12.5ZM0.75 4.25H2.25C2.65789 4.25 3 3.90789 3 3.5C3 3.0921 2.65789 2.75 2.25 2.75H0.75C0.342105 2.75 4.47035e-08 3.0921 4.47035e-08 3.5C4.47035e-08 3.90789 0.342105 4.25 0.75 4.25ZM14.25 2.75H12.75C12.3421 2.75 12 3.0921 12 3.5C12 3.90789 12.3421 4.25 12.75 4.25H14.25C14.6579 4.25 15 3.90789 15 3.5C15 3.0921 14.6579 2.75 14.25 2.75ZM9.75 0.5H5.25C4.84211 0.5 4.5 0.842105 4.5 1.25C4.5 1.65789 4.84211 2 5.25 2H9.75C10.1579 2 10.5 1.65789 10.5 1.25C10.5 0.842105 10.1579 0.5 9.75 0.5ZM6.75 11.75V6.5C6.75 6.09211 6.40789 5.75 6 5.75C5.59211 5.75 5.25 6.09211 5.25 6.5V11.75C5.25 12.1579 5.59211 12.5 6 12.5C6.40789 12.5 6.75 12.1579 6.75 11.75ZM9.75 11.75V6.5C9.75 6.09211 9.40789 5.75 9 5.75C8.59211 5.75 8.25 6.09211 8.25 6.5V11.75C8.25 12.1579 8.59211 12.5 9 12.5C9.40789 12.5 9.75 12.1579 9.75 11.75Z" fill="#DC3838"/>
+</svg>
 
+                        )
+                    }
+                }}
+                columns={[
+                    {title:'نام',field:'row.name',titleJustify:false,inlineEdit:true},
+                    {title:'شماره تماس',field:'row.phone',titleJustify:false,inlineEdit:true},
+                    {title:'علت خطا',field:'row.error',titleJustify:false},
+                    {title:'',template:'remove',width:60}
+                ]}
+                setModel={(model)=>this.setState({model})}
+            />
+        )
+    }
+    render(){
+        let {onSubmit} = this.props;
+        let {model} = this.state;
+        return (
+            <RVD
+                layout={{
+                    style:{background:'#fff',height:'100%'},
+                    column:[
+                        {html:this.getTable(),flex:1},
+                        {align:'vh',size:48,html:<button onClick={()=>onSubmit(model)} className='button-1'>ارسال مجدد</button>}
+                    ]
+                }}
+            />    
+        )
+    }
+}
 class DavatnameHa extends Component{
     static contextType = AppContext;
     nav_layout(){

@@ -49,7 +49,7 @@ export default function apis({Axios, getDateAndTime, getState}){
                 // debugger
             }
             catch(err){
-                debugger
+                // debugger
                 return []
             }
 
@@ -78,7 +78,7 @@ export default function apis({Axios, getDateAndTime, getState}){
                     zamane_davat_time:new Date(o.created_at)
                 }
             })
-            debugger
+            // debugger
             resMapping = resMapping.sort(
                 (objA, objB) => Number(objB.zamane_davat_time) - Number(objA.zamane_davat_time)
             )
@@ -117,7 +117,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             }
 
             catch(err){
-                debugger
+                // debugger
                 return []
             }
             // debugger
@@ -190,7 +190,7 @@ export default function apis({Axios, getDateAndTime, getState}){
                 res = await Axios.get(url)
             }
             catch(err){
-                debugger
+                // debugger
                 return []
             }
             let resMapping = res.data.map((o) =>{
@@ -331,7 +331,7 @@ export default function apis({Axios, getDateAndTime, getState}){
                 })
             }
             catch(err){
-                debugger
+                // debugger
                 if(err.response){
                     if(err.response.data){
                         if(err.response.data.error){
@@ -395,13 +395,13 @@ export default function apis({Axios, getDateAndTime, getState}){
                 role: 'user', // نقش کاربری که ارسال میکند
                 user: userInformation
             }
-            debugger
+            // debugger
             try{
                 res = await Axios.post(url, urlParams)
-                debugger
+                // debugger
             }
             catch(err){
-                debugger
+                // debugger
                 return "خطایی در ثبت دیتا ها رخ داد"
             }
             //return 'خطایی رخ داد';
@@ -413,6 +413,20 @@ export default function apis({Axios, getDateAndTime, getState}){
             //davatname_haye_entekhab_shode: آرایه ای از آی دی دعوتنامه های انتخاب شده
             //excel(فایل اکسل آپلود شده)
             //return 'خطایی رخ داد';
+            
+            //////// ارسال لیست خطا و تعداد موفق آمیز///////////////
+            return {
+                successLength:12,
+                errorList:[
+                    {name:'محمد شریف فیض',phone:'09123534314',error:'خطایی رخ داد'},
+                    {name:'محمد شریف فیض',phone:'09123534314',error:'خطایی رخ داد'},
+                    {name:'محمد شریف فیض',phone:'09123534314',error:'خطایی رخ داد'},
+                    {name:'محمد شریف فیض',phone:'09123534314',error:'خطایی رخ داد'}
+                ]
+            }
+            ///////////////////////
+
+
             url = `${excellImport}`
             let res;
             let successMessage;
@@ -431,7 +445,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             formData.append('username', 'm.shad') // username باید از کاربر گرفته شود
             formData.append('template_id', template_id)
             formData.append('role', 'admin') // با توجه به نقش کاربری که دارد ارسال گروهی را انجام می دهد.
-            debugger
+            // debugger
             try{
                 res = await Axios.post(url, formData, {
                     headers: {
@@ -440,11 +454,11 @@ export default function apis({Axios, getDateAndTime, getState}){
                 })
             }
             catch(err){
-                debugger
+                // debugger
                 return 'خطایی رخ داد'
             }
             if (res.data.number_of_falses != 0){
-                debugger
+                // debugger
                 errorMessage = `${res.data.number_of_falses} مورد ناموفق ثبت شد `
                 successMessage = `${res.data.number_of_trues} مورد موفق ثبت شد`
 
@@ -455,7 +469,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             // if (res.data.number_of_falses == 0){
                 
             // }
-            debugger
+            // debugger
             return true
         },
 
@@ -464,7 +478,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             //state (false | true) برای تایید یا عدم تایید
             //items (array of objects) دعوت نامه های انتخاب شده برای تایید یا عدم تایید 
             //return 'خطایی پیش آمده'
-            debugger
+            // debugger
             let res;
             let invitation_ids;
             invitation_ids = ''
@@ -478,10 +492,10 @@ export default function apis({Axios, getDateAndTime, getState}){
                 
                 try {
                     res = await Axios.get(url)
-                    debugger
+                    // debugger
                 }
                 catch(err){
-                    debugger
+                    // debugger
                     return 'خطایی در تائید موارد انتخاب شده رخ داده است'
                 }
                 if (res.data){
@@ -497,7 +511,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             }
         },
         async taghire_davatname({object,state}){
-            debugger
+            // debugger
             let url = `${invitationTemplateUrl}/`
             let apiBody = {
                 template_id:'',
@@ -516,22 +530,26 @@ export default function apis({Axios, getDateAndTime, getState}){
             }
             let res;
             let url = `${sendAgain}`
-            debugger
+            // debugger
             let apiBody = {
                 invitation_ids: ersale_mojadad_array
             }
             try{
                 res = await Axios.post(url, apiBody)
-                debugger
+                // debugger
                 if (res.data.is_success == true){
                     return true
                 }
                 return true
             }
             catch(err){
-                debugger
+                // debugger
                 return 'خطا در ارسال مجدد'
             }
+        },
+        async ersale_mojadade_khatahaye_excel({model}){
+            //return 'مشکلی پیش آمده'
+            return {successLength:4,errorList:[]}
         }
     } 
 }
