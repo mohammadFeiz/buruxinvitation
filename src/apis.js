@@ -1,10 +1,10 @@
 import AIODate from "aio-date";
-const hostName = `http://localhost:8000`
+const hostName = `http://172.16.7.34:8000`
 let url;
 let user_name = 'm.shad' // یا 'm.shad'
 let user_name_role = 'admin'  // یا'user'
 //آدرس برای ساخت تمپلیت و ولیدیت کردن و همچنین بررسی اینکه آیا آن تمپلیت فعال است یا خیر
-const invitationTemplateUrl = `${hostName}/invitation/v1/template`
+const invitationTemplateUrl = `${hostName}/invitation/v1/template` // دعوتنامه ها
 
 const excellImport = `${hostName}/guest/` //ارسال گروهی
 
@@ -43,7 +43,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             // ]
             let url = `${ShowAllNotVerified}`
             let res;
-            let created_at;
+            let jalali_created_at;
             try {
                 res = await Axios.get(url)
                 // debugger
@@ -54,8 +54,8 @@ export default function apis({Axios, getDateAndTime, getState}){
             }
 
             let resMapping = res.data.data.map((o) => {
-                created_at = new Date(o.created_at).toISOString(o.created_at).replace('T', ' ').replace('Z', '')
-                created_at = `${new Date(created_at).toLocaleTimeString('fa-IR')} ${new Date(created_at).toLocaleDateString('fa-IR')}`
+                jalali_created_at = new Date(o.created_at).toISOString(o.created_at).replace('T', ' ').replace('Z', '')
+                jalali_created_at = `${new Date(jalali_created_at).toLocaleTimeString('fa-IR')} ${new Date(jalali_created_at).toLocaleDateString('fa-IR')}`
                 let davat_shode;
                 let davat_konande;
                 let name_davatname;
@@ -74,10 +74,14 @@ export default function apis({Axios, getDateAndTime, getState}){
                     davat_shode: davat_shode, //`${o.guest.first_name} ${o.guest.last_name}`,
                     davat_konande: davat_konande, //`${o.user.first_name} ${o.user.last_name}`,
                     name_davatname: name_davatname, //`${o.template.name}`,
-                    zamane_davat: created_at,
+                    zamane_davat: jalali_created_at,
+                    zamane_davat_time:new Date(o.created_at)
                 }
             })
             debugger
+            resMapping = resMapping.sort(
+                (objA, objB) => Number(objB.zamane_davat_time) - Number(objA.zamane_davat_time)
+            )
             return resMapping
         },
 
@@ -133,7 +137,7 @@ export default function apis({Axios, getDateAndTime, getState}){
                 const msBetweenDates = Math.abs(created - now);
                 const hoursBetweenDates = msBetweenDates / (60 * 60 * 1000);
 
-                if(hoursBetweenDates > 0.001 && o.state == 'S'){status = '3'} // منقضی شده 
+                if(hoursBetweenDates > 24 && (o.state == 'S' || o.state == 's')){status = '3'} // منقضی شده 
                 else if(o.state == 'N'){status = '0'} // در انتظار تائید
                 else if(o.state == 'S' || o.state == 's'){status = '1'} //ارسال شده
                 else if(o.state == 'O'){status = '2'} // مشاهده شده
@@ -146,12 +150,17 @@ export default function apis({Axios, getDateAndTime, getState}){
                     name_davatname: `${o.template.name}`,
                     shomare_tamase_davat_shode: `${o.guest.phone_number}`,
                     zamane_davat: created_at,
+                    zamane_davat_time: new Date(o.created_at).getTime(),
                     status: status,
                     date: new Date(o.created_at).getTime()
                 }
             })
-            return resMapping
 
+            resMapping = resMapping.sort(
+                (objA, objB) => Number(objB.zamane_davat_time) - Number(objA.zamane_davat_time),
+            ) 
+
+            return resMapping 
         },
 
         // ********************* لیست کاربران **********************
@@ -487,7 +496,14 @@ export default function apis({Axios, getDateAndTime, getState}){
                 // return 'این موارد در حال حاظر عدم تائید هستند'
             }
         },
-
+        async taghire_davatname({object,state}){
+            debugger
+            let url = `${invitationTemplateUrl}/`
+            let apiBody = {
+                template_id:'',
+            }
+            return true
+        },
         // ********************* ارسال مجدد **********************
         async ersale_mojadad(davatname_haye_entekhab_shode){
             //davatname_haye_entekhab_shode: آرایه ای از آی دی دعوتنامه های انتخاب شده
@@ -506,6 +522,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             }
             try{
                 res = await Axios.post(url, apiBody)
+                debugger
                 if (res.data.is_success == true){
                     return true
                 }

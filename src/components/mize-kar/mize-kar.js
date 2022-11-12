@@ -3,7 +3,7 @@ import AIOButton from 'aio-button';
 import Table from './../table/table';
 import RVD from 'react-virtual-dom';
 import {Icon} from '@mdi/react';
-import {mdiDotsHorizontal,mdiChevronLeft, mdiChevronDoubleDown,mdiFileExcel,mdiFile,mdiAccountCircleOutline, mdiDelete} from '@mdi/js';
+import { mdiToggleSwitch,mdiToggleSwitchOffOutline,mdiDotsHorizontal,mdiChevronLeft, mdiChevronDoubleDown,mdiFileExcel,mdiFile,mdiAccountCircleOutline, mdiDelete} from '@mdi/js';
 import GradientCard from '../gradient-card/gradient-card';
 import Form from '../form/form';
 import AIODate from 'aio-date';
@@ -255,6 +255,8 @@ class TarahiDavatname extends Component{
                         {type:'checkbox',text:'ارسال مستقیم به لندینگ پیچ',field:'model.ersale_mostaghim',rowKey:'3'},
                         this.formGap('3'),
                         {type:'text',field:'model.adrese_ghorfe',label:'آدرس غرفه :'},
+                        {type:'text',field:'model.nazdik_tarin_brt',label:'آدرس نزدیک ترین بی آر تی :'},
+                        {type:'text',field:'model.nazdik_tarin_metro',label:'آدرس نزدیک ترین مترو :'},
                         {type:'checkbox',text:'امکان دعوت از دوستان',field:'model.emkane_davat',rowKey:'3'},
                         {
                             type:'html',label:'موقعیت',inlineLabel:false,html:()=>{
@@ -532,7 +534,7 @@ class ErsaleDavatname extends Component{
                     ]
                 },
                 {size:12},
-                {show:!!excel,className:'size14 color5897D2 bold',html:excel.name,align:'v'},
+                {show:!!excel,className:'size14 color5897D2 bold',html:excel.name,align:'vh'},
                 {flex:1}
             ]
         }
@@ -666,8 +668,13 @@ class DavatnameHa extends Component{
 
 
 class DavatnameCard extends Component{
+    static contextType = AppContext;
+    constructor(props){
+        super(props);
+        this.state = {object:props.object}
+    }
     poster(){
-        let {object} = this.props;
+        let {object} = this.state;
         let {poster} = object;
         return (
             <label style={{width:'100%',background:'#ddd',display:'flex',alignItems:'center',justifyContent:'center'}}>
@@ -692,20 +699,20 @@ class DavatnameCard extends Component{
         }
     }
     name_layout(){
-        let {object} = this.props;
+        let {object} = this.state;
         let {name} = object;
         return {
             size:36,html:name,align:'vh',className:'size14 bold'
         }
     }
     days_layout(){
-        let {object} = this.props;
+        let {object} = this.state;
         let {tarikhe_etebar} = object;
         let {days} = AIODate().getRemainingTime(tarikhe_etebar);
         return {size:24,align:'v',html:`${days} روز اعتبار دارد`,className:'size10 color605E5C padding-0-6 bold'}
     }
     date_layout(type){
-        let {object} = this.props;
+        let {object} = this.state;
         let value = object[type];
         let text = {'tarikhe_ijad':'تاریخ ایجاد:','tarikhe_etebar':'تاریخ اعتبار:'}[type];
         return {
@@ -718,13 +725,39 @@ class DavatnameCard extends Component{
         }
     }
     active_layout(){
-        let {object} = this.props;
+        let {object} = this.state;
+        let {apis} = this.context;
         return {
-            html:object.faal?'فعال':'غیر فعال',className:'color005478 size10 bold padding-0-6'
+            row:[
+                {
+                    size:48,html:object.faal?'فعال':'غیر فعال',className:'color005478 size10 bold padding-0-6',align:'v'
+                },
+                {
+                    html:(
+                        <Icon 
+                            path={object.faal?mdiToggleSwitch:mdiToggleSwitchOffOutline} 
+                            size={1}
+                            style={{
+                                color:object.faal?'dodgerblue':'#ccc',
+                                cursor:'pointer'
+                            }}
+                        />
+                    ),align:'v',
+                    attrs:{
+                        onClick:async ()=>{
+                            let res = await apis({type:'taghire_davatname',parameter:{object,state:!object.faal}})
+                            if(res === true){
+                                object.faal = !object.faal;
+                                this.setState({object})
+                            }
+                        }
+                    }
+                }
+            ]
         }
     }
     footer_layout(){
-        let {object} = this.props;
+        let {object} = this.state;
         let {dastresi_ha} = object;
         return {
              className:'size10 color005478 bold padding-0-6',align:'v',
