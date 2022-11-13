@@ -47,10 +47,8 @@ export default function apis({Axios, getDateAndTime, getState}){
             let jalali_created_at;
             try {
                 res = await Axios.get(url)
-                // debugger
             }
             catch(err){
-                // debugger
                 return []
             }
 
@@ -79,7 +77,6 @@ export default function apis({Axios, getDateAndTime, getState}){
                     zamane_davat_time:new Date(o.created_at)
                 }
             })
-            // debugger
             resMapping = resMapping.sort(
                 (objA, objB) => Number(objB.zamane_davat_time) - Number(objA.zamane_davat_time)
             )
@@ -106,22 +103,20 @@ export default function apis({Axios, getDateAndTime, getState}){
             //     {davat_shode:'علی احمدی',davat_konande:'حسین رحمتی',name_davatname:'نمایشگاه صنعت برق',zamane_davat:'1401/08/10 ساعت 10:42',id:14,status:'4',shomare_tamase_davat_shode:'09123534314',date:new Date().getTime() - (60 * 60 * 60 * 1000)},
             //     {davat_shode:'علی احمدی',davat_konande:'حسین رحمتی',name_davatname:'نمایشگاه صنعت برق',zamane_davat:'1401/08/10 ساعت 10:42',id:15,status:'0',shomare_tamase_davat_shode:'09123534314',date:new Date().getTime() - (60 * 60 * 60 * 1000)},
             // ]
+            let userInformation = getState().userInformation
 
-            url = `${showAllInvitation}?username=m.shad`
+            url = `${showAllInvitation}?username=${userInformation.username}`
             let status;
             let created_at;
             let res;
             
             try{
                 res = await Axios.get(url)
-                // debugger
             }
 
             catch(err){
-                // debugger
                 return []
             }
-            // debugger
                         // {davat_shode:'علی احمدی',
             // davat_konande:'حسین رحمتی',
             // name_davatname:'نمایشگاه صنعت برق',
@@ -191,7 +186,6 @@ export default function apis({Axios, getDateAndTime, getState}){
                 res = await Axios.get(url)
             }
             catch(err){
-                // debugger
                 return []
             }
             let resMapping = res.data.map((o) =>{
@@ -218,7 +212,6 @@ export default function apis({Axios, getDateAndTime, getState}){
                 let day = expiration_date.getDate();
                 let jalali_expiration = AIODate().gregorianToJalali([year,month,day]);
                 jalali_expiration = `${jalali_expiration[0]}/${jalali_expiration[1]}/${jalali_expiration[2]}`
-                // debugger
                 if(o.desktop_poster) {
                     o.desktop_poster = `${hostName}${o.desktop_poster}`
                   }
@@ -247,6 +240,7 @@ export default function apis({Axios, getDateAndTime, getState}){
                     url: o.desktop_poster,
                 }
             })
+            
 
             return resMapping
         },
@@ -271,6 +265,10 @@ export default function apis({Axios, getDateAndTime, getState}){
             url = `${invitationTemplateUrl}`
             let res;
             let is_draft;
+            let jalali_start_event;
+            let miladi_start_event;
+            let jalali_end_event;
+            let miladi_end_event
             if(mode == 'draft'){is_draft = true}else{is_draft = false}
 
             // به دست آوردن اختلاف روز بین امروز و تاریخ اعتبار
@@ -282,16 +280,21 @@ export default function apis({Axios, getDateAndTime, getState}){
             const expiration_date = new Date(model.tarikhe_etebar).toLocaleDateString('en-US') //todo
 
             //تبدیل تاریخ و ساعت شروع و پایان کار رویداد به فرمت میلادی 
-            let jalali_start_event = model.az_tarikh.split('/')
-            jalali_start_event = jalali_start_event.map((o) =>{ return +o})
-            let miladi_start_event = AIODate().jalaliToGregorian(`${jalali_start_event[0]}/${jalali_start_event[1]}/${jalali_start_event[2]}`)
-            miladi_start_event = `${miladi_start_event[0]}-${miladi_start_event[1]}-${miladi_start_event[2]} ${jalali_start_event[3]}:00:00` // convert to datetime field
-            
-            let jalali_end_event = model.ta_tarikh.split('/')
-            jalali_end_event = jalali_end_event.map((o) => { return +o })
-            let miladi_end_event = AIODate().jalaliToGregorian(`${jalali_end_event[0]}/${jalali_end_event[1]}/${jalali_end_event[2]}`)
-            miladi_end_event = `${miladi_end_event[0]}-${miladi_end_event[1]}-${miladi_end_event[2]} ${jalali_end_event[3]}:00:00`
-            
+            try{
+                jalali_start_event = model.az_tarikh.split('/')
+                jalali_start_event = jalali_start_event.map((o) =>{ return +o})
+                miladi_start_event = AIODate().jalaliToGregorian(`${jalali_start_event[0]}/${jalali_start_event[1]}/${jalali_start_event[2]}`)
+                miladi_start_event = `${miladi_start_event[0]}-${miladi_start_event[1]}-${miladi_start_event[2]} ${jalali_start_event[3]}:00:00` // convert to datetime field
+                
+                jalali_end_event = model.ta_tarikh.split('/')
+                jalali_end_event = jalali_end_event.map((o) => { return +o })
+                miladi_end_event = AIODate().jalaliToGregorian(`${jalali_end_event[0]}/${jalali_end_event[1]}/${jalali_end_event[2]}`)
+                miladi_end_event = `${miladi_end_event[0]}-${miladi_end_event[1]}-${miladi_end_event[2]} ${jalali_end_event[3]}:00:00`
+                
+            }
+            catch{
+                return 'لطفا فیلد های مورد نیاز را تکمیل کنید'
+            }
             // let user = {
             //     username: "a.moghimi",
             //     roles: ["admin", "user"]
@@ -317,6 +320,7 @@ export default function apis({Axios, getDateAndTime, getState}){
                 brt_station: model.nazdik_tarin_brt,
                 metro_station: model.nazdik_tarin_metro,
             }
+            debugger
             let formData = new FormData();
             for (const key in apiBody) {
                 if(apiBody[key] != undefined){
@@ -330,7 +334,6 @@ export default function apis({Axios, getDateAndTime, getState}){
                 console.log(`${key}`, apiBody[key])
             }
              
-            // debugger
             try{
                 res = await Axios.post(url, formData, {
                     headers: {
@@ -339,7 +342,6 @@ export default function apis({Axios, getDateAndTime, getState}){
                 })
             }
             catch(err){
-                debugger
                 if(err.response){
                     if(err.response.data){
                         if(err.response.data.error){
@@ -358,7 +360,6 @@ export default function apis({Axios, getDateAndTime, getState}){
                 }
                 return 'خطایی در ثبت دعوتنامه رخ داد'
             }
-            debugger
             return true
             //return 'خطایی رخ داد';
             return true
@@ -379,6 +380,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             let userInformation = getState().userInformation
             url = `${ersalTakiUrl}`
             let res;
+            let role
             let gender;
             let template_id = ''
             // let user = {
@@ -394,6 +396,12 @@ export default function apis({Axios, getDateAndTime, getState}){
                 template_id += ' '
             })
             if(model.jensiat == 'male'){gender = 'M'}else{gender = 'F'}
+            if(userInformation.roles.indexOf('admin') !== -1){
+                role = 'admin'
+            }
+            else{
+                role = 'user'
+            } 
 
             let urlParams = {
                 first_name: model.nam,
@@ -401,18 +409,16 @@ export default function apis({Axios, getDateAndTime, getState}){
                 company_name: model.sherkat,
                 phone_number: model.shomare_tamas,
                 gender: gender,
-                username: 'm.shad', //باید اطلاعات یوزر را بگیرم
+                username: userInformation.username, //باید اطلاعات یوزر را بگیرم
                 template_id: template_id, //davatname_haye_entekhab_shode
-                role: 'user', // نقش کاربری که ارسال میکند
+                role: role, // نقش کاربری که ارسال میکند
                 user: userInformation
             }
-            // debugger
             try{
                 res = await Axios.post(url, urlParams)
-                // debugger
             }
             catch(err){
-                // debugger
+
                 return "خطایی در ثبت دیتا ها رخ داد"
             }
             //return 'خطایی رخ داد';
@@ -421,7 +427,6 @@ export default function apis({Axios, getDateAndTime, getState}){
 
         // ********************* ارسال گروهی **********************
         async ersale_goroohi({excel,davatname_haye_entekhab_shode}){
-
             //davatname_haye_entekhab_shode: آرایه ای از آی دی دعوتنامه های انتخاب شده
             //excel(فایل اکسل آپلود شده)
             //return 'خطایی رخ داد';
@@ -438,7 +443,6 @@ export default function apis({Axios, getDateAndTime, getState}){
             // }
             ///////////////////////
             let userInformation = getState().userInformation
-            
 
 
             url = `${excellImport}`
@@ -454,10 +458,11 @@ export default function apis({Axios, getDateAndTime, getState}){
                 template_id += o
                 template_id += ' '
             })
+
             if(userInformation.roles.indexOf('admin') !== -1){
                 role = 'admin'
             }
-            if(userInformation.roles.indexOf('admin') == -1){
+            else{
                 role = 'user'
             } 
 
@@ -466,21 +471,17 @@ export default function apis({Axios, getDateAndTime, getState}){
             formData.append('template_id', template_id)
             formData.append('username', userInformation.username) // username باید از کاربر گرفته شود
             formData.append('role', role) // با توجه به نقش کاربری که دارد ارسال گروهی را انجام می دهد.
-            debugger
             try{
                 res = await Axios.post(url, formData, {
                     headers: {
                       "Content-Type": "multipart/form-data",
                     }
                 })
-                debugger
             }
             catch(err){
-                // debugger
                 return 'خطایی رخ داد'
             }
             if (res.data.number_of_falses != 0){
-                // debugger
                 errorMessage = `${res.data.number_of_falses} مورد ناموفق ثبت شد `
                 successMessage = `${res.data.number_of_trues} مورد موفق ثبت شد`
 
@@ -501,7 +502,6 @@ export default function apis({Axios, getDateAndTime, getState}){
                 errorList: errorList,
             }
 
-            debugger
             return resMapping
         },
 
@@ -510,7 +510,6 @@ export default function apis({Axios, getDateAndTime, getState}){
             //state (false | true) برای تایید یا عدم تایید
             //items (array of objects) دعوت نامه های انتخاب شده برای تایید یا عدم تایید 
             //return 'خطایی پیش آمده'
-            // debugger
             let res;
             let invitation_ids;
             invitation_ids = ''
@@ -524,10 +523,8 @@ export default function apis({Axios, getDateAndTime, getState}){
                 
                 try {
                     res = await Axios.get(url)
-                    // debugger
                 }
                 catch(err){
-                    // debugger
                     return 'خطایی در تائید موارد انتخاب شده رخ داده است'
                 }
                 if (res.data){
@@ -562,7 +559,6 @@ export default function apis({Axios, getDateAndTime, getState}){
                 return true
             }
             catch(err){
-                debugger
                 return 'خطایی در تغییر این دعوتنامه رخ داد'
             } 
         },
@@ -570,7 +566,6 @@ export default function apis({Axios, getDateAndTime, getState}){
         // ********************* ارسال مجدد **********************
         async ersale_mojadad(davatname_haye_entekhab_shode){
             //davatname_haye_entekhab_shode: آرایه ای از آی دی دعوتنامه های انتخاب شده
-            // debugger
             let ersale_mojadad_array = []
             for(let prop in davatname_haye_entekhab_shode){
                 if(davatname_haye_entekhab_shode[prop] == true){
@@ -579,20 +574,17 @@ export default function apis({Axios, getDateAndTime, getState}){
             }
             let res;
             let url = `${sendAgain}`
-            // debugger
             let apiBody = {
                 invitation_ids: ersale_mojadad_array
             }
             try{
                 res = await Axios.post(url, apiBody)
-                // debugger
                 if (res.data.is_success == true){
                     return true
                 }
                 return true
             }
             catch(err){
-                // debugger
                 return 'خطا در ارسال مجدد'
             }
         },

@@ -35,7 +35,10 @@ export default class MizeKar extends Component {
                 {flex:1},
                 {html:<GradientCard type={'1'} onClick={(mode)=>this.setState({mode})}/>},
                 {size:24},
-                {html:<GradientCard type={'2'} onClick={(mode)=>this.setState({mode})}/>},
+                {html:<GradientCard type={'2'} onClick={async (mode)=>{
+                    await this.davatname_ha()
+                    this.setState({mode})
+                }}/>},
                 {size:24},
                 {html:<GradientCard type={'3'} onClick={(mode)=>this.setState({mode})}/>},
                 {flex:1}
@@ -490,7 +493,7 @@ class ErsaleDavatname extends Component{
         }
     }
     entekhab_layout(){
-        let {davatname_ha} = this.props;
+        let {davatname_ha = [] } = this.props;
         let {davatname_haye_entekhab_shode,tab} = this.state;
         if(tab === '2'){return false}
         return {
@@ -506,6 +509,7 @@ class ErsaleDavatname extends Component{
                     options={davatname_ha}
                     optionText='option.name'
                     optionValue='option.id'
+                    popupAttrs={{style:{maxHeight:300}}}
                     onChange={(davatname_haye_entekhab_shode)=>this.setState({davatname_haye_entekhab_shode})}
                 />
             )
@@ -516,7 +520,7 @@ class ErsaleDavatname extends Component{
         let {addPopup,apis,removePopup,setConfirm} = this.context;
         if(tab !== '1'){return false}
         return {
-            flex:1,
+            flex:1,scroll:'v',
             column:[
                 {flex:1},
                 {html:<Icon path={mdiFileExcel} size={1}/>,align:'vh',className:'color5897D2'},
@@ -550,7 +554,7 @@ class ErsaleDavatname extends Component{
                             title:`موارد خطا (${errorList.length} مورد)`,
                             content:()=>{
                                 return (
-                                    <Khata_haye_ersal model={errorList} onSubmit={async (model)=>{
+                                    <Khata_haye_ersal model={JSON.parse(JSON.stringify(errorList))} onSubmit={async (model)=>{
                                         let res = await apis({type:'ersale_mojadade_khatahaye_excel',parameter:{model}});
                                         if(res === true){removePopup()}
                                         if(typeof res === 'string'){
