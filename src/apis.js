@@ -1,6 +1,6 @@
 import AIODate from "aio-date";
-// const hostName = `http://172.16.7.34:8000`
-const hostName = `http://192.168.10.51:8075`
+const hostName = `http://172.16.7.34:8000`
+// const hostName = `http://192.168.10.51:8075`
 let url;
 let user_name = 'm.shad' // یا 'm.shad'
 let user_name_role = 'admin'  // یا'user'
@@ -421,6 +421,7 @@ export default function apis({Axios, getDateAndTime, getState}){
 
         // ********************* ارسال گروهی **********************
         async ersale_goroohi({excel,davatname_haye_entekhab_shode}){
+
             //davatname_haye_entekhab_shode: آرایه ای از آی دی دعوتنامه های انتخاب شده
             //excel(فایل اکسل آپلود شده)
             //return 'خطایی رخ داد';
@@ -436,10 +437,13 @@ export default function apis({Axios, getDateAndTime, getState}){
             //     ]
             // }
             ///////////////////////
+            let userInformation = getState().userInformation
+            
 
 
             url = `${excellImport}`
             let res;
+            let role;
             let successMessage;
             let errorMessage;
             let template_id = '';
@@ -450,13 +454,19 @@ export default function apis({Axios, getDateAndTime, getState}){
                 template_id += o
                 template_id += ' '
             })
+            if(userInformation.roles.indexOf('admin') !== -1){
+                role = 'admin'
+            }
+            if(userInformation.roles.indexOf('admin') == -1){
+                role = 'user'
+            } 
 
             let formData = new FormData();
             formData.append('file', excel)
-            formData.append('username', 'm.shad') // username باید از کاربر گرفته شود
             formData.append('template_id', template_id)
-            formData.append('role', 'admin') // با توجه به نقش کاربری که دارد ارسال گروهی را انجام می دهد.
-            // debugger
+            formData.append('username', userInformation.username) // username باید از کاربر گرفته شود
+            formData.append('role', role) // با توجه به نقش کاربری که دارد ارسال گروهی را انجام می دهد.
+            debugger
             try{
                 res = await Axios.post(url, formData, {
                     headers: {
