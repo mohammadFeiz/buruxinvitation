@@ -255,8 +255,8 @@ class TarahiDavatname extends Component{
                         {type:'checkbox',text:'ارسال مستقیم به لندینگ پیچ',field:'model.ersale_mostaghim',rowKey:'3'},
                         this.formGap('3'),
                         {type:'text',field:'model.adrese_ghorfe',label:'آدرس غرفه :'},
-                        {type:'text',field:'model.nazdik_tarin_brt',label:'آدرس نزدیک ترین بی آر تی :'},
-                        {type:'text',field:'model.nazdik_tarin_metro',label:'آدرس نزدیک ترین مترو :'},
+                        {type:'text',field:'model.nazdik_tarin_brt',label:' نزدیک ترین ایستگاه بی آر تی :'},
+                        {type:'text',field:'model.nazdik_tarin_metro',label:'نزدیک ترین ایستگاه مترو :'},
                         {type:'checkbox',text:'امکان دعوت از دوستان',field:'model.emkane_davat',rowKey:'3'},
                         {
                             type:'html',label:'موقعیت',inlineLabel:false,html:()=>{
@@ -787,8 +787,7 @@ class DavatnameCard extends Component{
     }
     days_layout(){
         let {object} = this.state;
-        let {tarikhe_etebar} = object;
-        let {days} = AIODate().getRemainingTime(tarikhe_etebar);
+        let {days} = AIODate().getRemainingTime(object.tarikhe_etebar_js);
         return {size:24,align:'v',html:`${days} روز اعتبار دارد`,className:'size10 color605E5C padding-0-6 bold'}
     }
     date_layout(type){

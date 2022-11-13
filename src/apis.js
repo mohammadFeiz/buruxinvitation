@@ -1,5 +1,6 @@
 import AIODate from "aio-date";
-const hostName = `http://172.16.7.34:8000`
+// const hostName = `http://172.16.7.34:8000`
+const hostName = `http://192.168.10.51:8075`
 let url;
 let user_name = 'm.shad' // یا 'm.shad'
 let user_name_role = 'admin'  // یا'user'
@@ -208,6 +209,8 @@ export default function apis({Axios, getDateAndTime, getState}){
                 let getMiladiDate = new Date(created_at).toLocaleDateString()
                 let getMiladiDateTime = new Date(getMiladiDate).getTime()
                 let addExpirationDate = getMiladiDateTime + o.expiration * 86400000
+                let tarikhe_etebar_js = addExpirationDate + 86400000
+                tarikhe_etebar_js = new Date(tarikhe_etebar_js)
                 // let sd = new Date(addExpirationDate).toLocaleDateString('fa-IR')
                 let expiration_date = new Date(addExpirationDate)
                 let year = expiration_date.getFullYear();
@@ -237,6 +240,7 @@ export default function apis({Axios, getDateAndTime, getState}){
                     tarikhe_ijad: date,
                     // tarikhe_etebar: expiration_date,
                     tarikhe_etebar: jalali_expiration,
+                    tarikhe_etebar_js: tarikhe_etebar_js,//برای محاسبات لازم داریم
                     expiredDate: expiration_date,
                     faal: o.is_active,
                     dastresi_ha:[],
@@ -310,14 +314,18 @@ export default function apis({Axios, getDateAndTime, getState}){
                 end_event: miladi_end_event, 
                 landing_page_link: model.landing_page, // لینک لندینگ پیج
                 is_active: true,
+                brt_station: model.nazdik_tarin_brt,
+                metro_station: model.nazdik_tarin_metro,
             }
             let formData = new FormData();
             for (const key in apiBody) {
-                if(key === 'user'){
-                    formData.append(key, JSON.stringify(apiBody[key]))    
-                }
-                else{
-                    formData.append(key, apiBody[key])
+                if(apiBody[key] != undefined){
+                    if(key === 'user'){
+                        formData.append(key, JSON.stringify(apiBody[key]))    
+                    }
+                    else{
+                        formData.append(key, apiBody[key])
+                    }
                 }
                 console.log(`${key}`, apiBody[key])
             }
@@ -331,11 +339,14 @@ export default function apis({Axios, getDateAndTime, getState}){
                 })
             }
             catch(err){
-                // debugger
+                debugger
                 if(err.response){
                     if(err.response.data){
                         if(err.response.data.error){
                             return err.response.data.error.errorMessage
+                        }
+                        if(err.response.data.message){
+                            return err.response.data.message
                         }
                         else{
                             return 'فیلد های مورد نیاز را تکمیل کنید'
@@ -347,7 +358,7 @@ export default function apis({Axios, getDateAndTime, getState}){
                 }
                 return 'خطایی در ثبت دعوتنامه رخ داد'
             }
-            // debugger
+            debugger
             return true
             //return 'خطایی رخ داد';
             return true
@@ -415,15 +426,15 @@ export default function apis({Axios, getDateAndTime, getState}){
             //return 'خطایی رخ داد';
             
             //////// ارسال لیست خطا و تعداد موفق آمیز///////////////
-            return {
-                successLength:12,
-                errorList:[
-                    {name:'محمد شریف فیض',phone:'09123534314',error:'خطایی رخ داد'},
-                    {name:'محمد شریف فیض',phone:'09123534314',error:'خطایی رخ داد'},
-                    {name:'محمد شریف فیض',phone:'09123534314',error:'خطایی رخ داد'},
-                    {name:'محمد شریف فیض',phone:'09123534314',error:'خطایی رخ داد'}
-                ]
-            }
+            // return {
+            //     successLength:12,
+            //     errorList:[
+            //         {name:'محمد شریف فیض',phone:'09123534314',error:'خطایی رخ داد'},
+            //         {name:'محمد شریف فیض',phone:'09123534314',error:'خطایی رخ داد'},
+            //         {name:'محمد شریف فیض',phone:'09123534314',error:'خطایی رخ داد'},
+            //         {name:'محمد شریف فیض',phone:'09123534314',error:'خطایی رخ داد'}
+            //     ]
+            // }
             ///////////////////////
 
 
@@ -452,6 +463,7 @@ export default function apis({Axios, getDateAndTime, getState}){
                       "Content-Type": "multipart/form-data",
                     }
                 })
+                debugger
             }
             catch(err){
                 // debugger
@@ -462,15 +474,25 @@ export default function apis({Axios, getDateAndTime, getState}){
                 errorMessage = `${res.data.number_of_falses} مورد ناموفق ثبت شد `
                 successMessage = `${res.data.number_of_trues} مورد موفق ثبت شد`
 
-                return `${errorMessage}
-                و
-                ${successMessage}`
+                // return `${errorMessage}
+                // و
+                // ${successMessage}`
             }
-            // if (res.data.number_of_falses == 0){
-                
-            // }
-            // debugger
-            return true
+            let errorList = []
+            res.data.data.map((o) => {
+                errorList.push({
+                    name: `${o.first_name} ${o.last_name}`,
+                    phone: o.phone_number,
+                    error: o.message_erorr,
+                })
+            })
+            let resMapping={
+                successLength: res.data.number_of_trues,
+                errorList: errorList,
+            }
+
+            debugger
+            return resMapping
         },
 
         // ********************* تائید  **********************
@@ -510,14 +532,31 @@ export default function apis({Axios, getDateAndTime, getState}){
                 // return 'این موارد در حال حاظر عدم تائید هستند'
             }
         },
+
+        // ****************تغییر دعوتنامه ************************
         async taghire_davatname({object,state}){
-            // debugger
-            let url = `${invitationTemplateUrl}/`
+            //state -> نشان دهنده این است که قالب را فعال یا غیر فعال کرده است.
+            let userInformation = getState().userInformation
+
+            
+            let url = `${invitationTemplateUrl}`
+            let res
             let apiBody = {
-                template_id:'',
+                template_id: object.id,
+                is_active: state,
+                user: userInformation,
             }
-            return true
+
+            try{
+                res = await Axios.put(url, apiBody)
+                return true
+            }
+            catch(err){
+                debugger
+                return 'خطایی در تغییر این دعوتنامه رخ داد'
+            } 
         },
+
         // ********************* ارسال مجدد **********************
         async ersale_mojadad(davatname_haye_entekhab_shode){
             //davatname_haye_entekhab_shode: آرایه ای از آی دی دعوتنامه های انتخاب شده
@@ -547,9 +586,12 @@ export default function apis({Axios, getDateAndTime, getState}){
                 return 'خطا در ارسال مجدد'
             }
         },
+
+        // ************ارسال مجدد *****************
         async ersale_mojadade_khatahaye_excel({model}){
             //return 'مشکلی پیش آمده'
-            return {successLength:4,errorList:[]}
+            // return {successLength:4,errorList:[]}
+            return ' در حال حاضر امکان استفاده از ارسال مجدد موجود نمیباشد،فایل را اصلاح کرده و دوباره ارسال کنید'
         }
     } 
 }
