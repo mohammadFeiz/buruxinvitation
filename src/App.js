@@ -85,7 +85,7 @@ class Main extends Component{
     return (
       <AppContext.Provider value={this.getContext()}>
         <RSA
-          navId='tarikhche'
+          navId='mize_kar'
           navs={[
             {text:'دسترسی',id:'dastresi',icon:()=>getSvg('dastresi')},
             {text:'میز‌کار',id:'mize_kar',icon:()=>getSvg('mize_kar')},
