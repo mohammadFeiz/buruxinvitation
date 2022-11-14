@@ -7,7 +7,10 @@ import getSvg from './getSvg';
 import AIODate from 'aio-date';
 import RVD from 'react-virtual-dom';
 import AIOService from 'aio-service';
-import RKS from 'react-keycloak-spa'
+import RKS from 'react-keycloak-spa';
+import AIOButton from 'aio-button';
+import {Icon} from '@mdi/react';
+import {mdiAccount} from '@mdi/js';
 import apis from './apis';
 import AppContext from './app-context';
 import './index.css';
@@ -42,7 +45,7 @@ class Main extends Component{
     }
     let userInformation = {
       username: keycloak.tokenParsed.preferred_username,
-      roles: roles,
+      roles: roles,logout:keycloak.logout,name:keycloak.tokenParsed.name
     }
     this.state = {
       userInformation,
@@ -78,6 +81,7 @@ class Main extends Component{
     return {...this.state}
   }
   render(){
+    let {userInformation} = this.state;
     return (
       <AppContext.Provider value={this.getContext()}>
         <RSA
@@ -92,9 +96,30 @@ class Main extends Component{
             if(navId === 'dastresi'){return <Dastresi/>}
             if(navId === 'tarikhche'){return <Tarikhche/>}
           }}
-          header={()=>{
-            return <DateAndTime/>
-          }}
+          header={()=>(
+            <RVD
+              layout={{
+                gap:3,
+                row:[
+                  {html:<DateAndTime/>},
+                  {html:(
+                    <AIOButton
+                      type='select'
+                      before={<Icon path={mdiAccount} size={0.9}/>}
+                      style={{background:'none'}}
+                      options={[
+                        {text:'خروج از سیستم',value:'logout'}
+                      ]}
+                      text={userInformation.name}
+                      onChange={(value)=>{
+                        if(value === 'logout'){this.state.userInformation.logout()}
+                      }}
+                    />
+                  )}
+                ]
+              }}
+            />
+          )}
           getActions={(obj)=>this.setState(obj)}
         />
       </AppContext.Provider>
