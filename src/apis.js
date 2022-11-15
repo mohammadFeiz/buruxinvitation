@@ -182,6 +182,9 @@ export default function apis({Axios, getDateAndTime, getState}){
 
             let url = `${invitationTemplateUrl}`
             let res;
+            let lat;
+            let long;
+            let geoData;
             try{
                 res = await Axios.get(url)
             }
@@ -214,7 +217,16 @@ export default function apis({Axios, getDateAndTime, getState}){
                 jalali_expiration = `${jalali_expiration[0]}/${jalali_expiration[1]}/${jalali_expiration[2]}`
                 if(o.desktop_poster) {
                     o.desktop_poster = `${hostName}${o.desktop_poster}`
-                  }
+                }
+                try{
+                // geoData = o.geo_data.split(',')
+                lat = geoData[0]
+                long = geoData[1]
+                }
+                catch(err){
+                    lat = '35.715298'
+                    long = '51.404343'
+                }
                 // created_at = new Date(created_at).toLocaleDateString('fa-IR')
 
                 // برای تبدیل تاریخ میلادی به شمسی
@@ -238,10 +250,20 @@ export default function apis({Axios, getDateAndTime, getState}){
                     faal: o.is_active,
                     dastresi_ha:[],
                     poster: o.desktop_poster,
+                    name_davatname: o.name,
+                    matne_payamak: o.sms_template,
+                    matne_davatname: o.text_template,
+                    emkane_davat: o.can_others_invite,
+                    ersale_mostaghim: o.redirect_to_landing_page,
+                    lat: lat,
+                    long: long,
+                    adrese_ghorfe: o.address_event,
+                    landing_page: o.landing_page_link,
+                    nazdik_tarin_brt: o.brt_station,
+                    nazdik_tarin_metro: o.metro_station,
                 }
             })
-            
-
+            debugger
             return resMapping
         },
 
@@ -268,7 +290,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             let jalali_start_event;
             let miladi_start_event;
             let jalali_end_event;
-            let miladi_end_event
+            let miladi_end_event;
             if(mode == 'draft'){is_draft = true}else{is_draft = false}
 
             // به دست آوردن اختلاف روز بین امروز و تاریخ اعتبار
@@ -320,7 +342,6 @@ export default function apis({Axios, getDateAndTime, getState}){
                 brt_station: model.nazdik_tarin_brt,
                 metro_station: model.nazdik_tarin_metro,
             }
-            debugger
             let formData = new FormData();
             for (const key in apiBody) {
                 if(apiBody[key] != undefined){
