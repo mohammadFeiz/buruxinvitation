@@ -117,9 +117,17 @@ export default class MizeKar extends Component {
     }
     render() {
         let {mode,davatname_ha} = this.state;
+        let {addPopup} = this.context;
         if(mode === 'tarahi_davatname'){return <TarahiDavatname onClose={()=>this.setState({mode:false})}/>}
         if(mode === 'ersale_davatname'){return <ErsaleDavatname onClose={()=>this.setState({mode:false})} davatname_ha={davatname_ha}/>}
-        if(mode === 'davatname_ha'){return <DavatnameHa onClose={()=>this.setState({mode:false})} davatname_ha={davatname_ha}/>}
+        if(mode === 'davatname_ha'){
+            return (
+                <DavatnameHa 
+                    onClose={()=>this.setState({mode:false})} 
+                    davatname_ha={davatname_ha} 
+                />
+            )
+        }
         return (
             <RVD
                 layout={{
@@ -148,6 +156,8 @@ class TarahiDavatname extends Component{
         }
     }
     initModel(){
+        let {model} = this.props;
+        if(model){return JSON.parse(JSON.stringify(model))}
         return {
             name_davatname:'',
             lat:35.699739,
@@ -174,7 +184,19 @@ class TarahiDavatname extends Component{
         }
     }
     nav_layout(){
-        let {onClose} = this.props;
+        let {onClose,model} = this.props;
+        if(model){
+            return {
+                size:48,gap:6,className:'margin-0-24 bgFFF round8 padding-0-12',align:'v',
+                row:[
+                    {flex:1},
+                    {html:'ذخیره',className:'color0094D4 size14 bold',attrs:{onClick:()=>this.save('edit')}},
+                    {html:<div style={{width:1,height:20}} className='bg0094D4'></div>,align:'vh'},
+                    {html:'خروج',className:'colorC92828 size14 bold',attrs:{onClick:()=>onClose()}},
+                    
+                ]
+            }    
+        }
         return {
             size:48,gap:6,className:'margin-0-24 bgFFF round8 padding-0-12',align:'v',
             row:[
@@ -188,7 +210,7 @@ class TarahiDavatname extends Component{
                 {html:<div style={{width:1,height:20}} className='bg0094D4'></div>,align:'vh'},
                 {html:'پاک کردن فرم',className:'color0094D4 size14 bold',attrs:{onClick:()=>this.setState({model:this.initModel()})}},
                 {html:<div style={{width:1,height:20}} className='bg0094D4'></div>,align:'vh'},
-                {html:'خروج',className:'colorC92828 size14 bold'},
+                {html:'خروج',className:'colorC92828 size14 bold',attrs:{onClick:()=>onClose()}},
                 
             ]
         }
@@ -223,7 +245,7 @@ class TarahiDavatname extends Component{
                 }
                 {
                     model.poster &&
-                    <img src={URL.createObjectURL(model.poster)} alt='' style={{width:'100%',height:'100%'}}/>
+                    <img src={typeof model.poster === 'string'?model.poster:URL.createObjectURL(model.poster)} alt='' style={{width:'100%',height:'100%'}}/>
                 }
             </label>
         )
@@ -315,6 +337,7 @@ class TarahiDavatname extends Component{
         return (
             <RVD
                 layout={{
+                    style:{height:'100%'},
                     column:[
                         {size:12},
                         this.nav_layout(),
@@ -809,12 +832,9 @@ class DavatnameCard extends Component{
     }
     active_layout(){
         let {object} = this.state;
-        let {apis} = this.context;
+        let {apis,addPopup} = this.context;
         return {
             row:[
-                {
-                    size:48,html:object.faal?'فعال':'غیر فعال',className:'color005478 size10 bold padding-0-6',align:'v'
-                },
                 {
                     html:(
                         <Icon 
@@ -835,7 +855,23 @@ class DavatnameCard extends Component{
                             }
                         }
                     }
-                }
+                },
+                {
+                    html:object.faal?'فعال':'غیر فعال',className:'color005478 size10 bold padding-0-6',align:'v'
+                },
+                {flex:1},
+                {html:'ویرایش',className:'color005478 size10 bold padding-0-6',attrs:{onClick:()=>{
+                    addPopup({
+                        title:'ویرایش دعوتنامه',
+                        content:()=>{
+                            return (
+                                <div style={{background:'#f8f8f8',overflow:'hidden',height:'100%'}} className='msf'>
+                                    <TarahiDavatname onClose={()=>this.setState({mode:false})} model={object}/>
+                                </div>
+                            )
+                        }
+                    })
+                }}}
             ]
         }
     }
