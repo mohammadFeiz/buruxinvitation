@@ -219,7 +219,7 @@ export default function apis({Axios, getDateAndTime, getState}){
                     o.desktop_poster = `${hostName}${o.desktop_poster}`
                 }
                 try{
-                // geoData = o.geo_data.split(',')
+                geoData = o.geo_data.split(',')
                 lat = geoData[0]
                 long = geoData[1]
                 }
@@ -227,6 +227,11 @@ export default function apis({Axios, getDateAndTime, getState}){
                     lat = '35.715298'
                     long = '51.404343'
                 }
+                //به دست آوردن تاریخ های 
+                let az_tarikh = getDateAndTime(o.start_event);
+                az_tarikh = `${az_tarikh.date}/${az_tarikh.time.replace('Z', '').replace(/:/g, '').replace(/00/g, '')}`;
+                let ta_tarikh = getDateAndTime(o.end_event);
+                ta_tarikh = `${ta_tarikh.date}/${ta_tarikh.time.replace('Z','').replace(/:/g, '').replace(/00/g, '')}`;
                 // created_at = new Date(created_at).toLocaleDateString('fa-IR')
 
                 // برای تبدیل تاریخ میلادی به شمسی
@@ -261,9 +266,10 @@ export default function apis({Axios, getDateAndTime, getState}){
                     landing_page: o.landing_page_link,
                     nazdik_tarin_brt: o.brt_station,
                     nazdik_tarin_metro: o.metro_station,
+                    az_tarikh: az_tarikh,
+                    ta_tarikh: ta_tarikh,
                 }
             })
-            debugger
             return resMapping
         },
 
@@ -284,8 +290,9 @@ export default function apis({Axios, getDateAndTime, getState}){
             
             //return 'خطایی رخ داد';
             let userInformation = getState().userInformation
-            url = `${invitationTemplateUrl}`
+
             let res;
+            url = `${invitationTemplateUrl}`
             let is_draft;
             let jalali_start_event;
             let miladi_start_event;
@@ -322,6 +329,8 @@ export default function apis({Axios, getDateAndTime, getState}){
             //     roles: ["admin", "user"]
             // }
             let apiBody = {
+                id: model.id,
+                template_id: model.id,
                 name: model.name_davatname,
                 // url: model.landing_page, // لینک 
                 sms_template: model.matne_payamak, // متن پیامک
@@ -353,6 +362,26 @@ export default function apis({Axios, getDateAndTime, getState}){
                     }
                 }
                 console.log(`${key}`, apiBody[key])
+            }
+
+            // تغییر دعوتنامه
+            if(mode == 'edit'){  // تمامی اطلاعاتی که سمت کلاین رفته دریافت می گردد
+                let check_desktop_poster = formData.get('desktop_poster')
+                if(!check_desktop_poster.name){ // اگر فایلی آپبود نشود باید تصویر موجود از قبل را از فرم دیتا پاک کرد تا به اررور نخوریم
+                    formData.delete('desktop_poster')
+                    formData.delete('mobile_poster')
+                }
+                try{
+                    res = await Axios.put(url, formData, {
+                        headers: {
+                          "Content-Type": "multipart/form-data",
+                        }
+                    })
+                }
+                catch(err){
+                    return 'خطایی در تغییر این دعوتنامه رخ داد'
+                } 
+                return true
             }
              
             try{
