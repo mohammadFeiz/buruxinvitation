@@ -1,6 +1,9 @@
 import AIODate from "aio-date";
-const hostName = `http://172.16.7.34:8000`
-// const hostName = `http://192.168.10.51:8075`
+const hostName = `http://172.16.7.34:8001`
+// const hostName = `http://localhost:8001`
+// const hostName =  process.env.BACKEND_URL
+// const hostName = `http://192.168.10.51:8076`
+// const hostName = `u.davat.app`
 let url;
 let user_name = 'm.shad' // یا 'm.shad'
 let user_name_role = 'admin'  // یا'user'
@@ -383,34 +386,35 @@ export default function apis({Axios, getDateAndTime, getState}){
                 } 
                 return true
             }
-             
-            try{
-                res = await Axios.post(url, formData, {
-                    headers: {
-                      "Content-Type": "multipart/form-data",
-                    }
-                })
-            }
-            catch(err){
-                if(err.response){
-                    if(err.response.data){
-                        if(err.response.data.error){
-                            return err.response.data.error.errorMessage
+            else{
+                try{
+                    res = await Axios.post(url, formData, {
+                        headers: {
+                          "Content-Type": "multipart/form-data",
                         }
-                        if(err.response.data.message){
-                            return err.response.data.message
-                        }
-                        else{
-                            return 'فیلد های مورد نیاز را تکمیل کنید'
-                        }
-                    }
-                    else {
-                        return 'خطای نامشخص'
-                    }
+                    })
                 }
-                return 'خطایی در ثبت دعوتنامه رخ داد'
+                catch(err){
+                    if(err.response){
+                        if(err.response.data){
+                            if(err.response.data.error){
+                                return err.response.data.error.errorMessage
+                            }
+                            if(err.response.data.message){
+                                return err.response.data.message
+                            }
+                            else{
+                                return 'فیلد های مورد نیاز را تکمیل کنید'
+                            }
+                        }
+                        else {
+                            return 'خطای نامشخص'
+                        }
+                    }
+                    return 'خطایی در ثبت دعوتنامه رخ داد'
+                }
+                return true
             }
-            return true
             //return 'خطایی رخ داد';
             return true
         },
