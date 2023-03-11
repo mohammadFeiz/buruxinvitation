@@ -1,9 +1,10 @@
 import AIODate from "aio-date";
-const hostName = `http://172.16.7.34:8001`
+// const hostName = `http://172.16.7.34:8001`
+// const hostName = `http://192.168.211.136:8001`
 // const hostName = `http://localhost:8001`
 // const hostName =  process.env.BACKEND_URL
 // const hostName = `http://192.168.10.51:8076`
-// const hostName = `u.davat.app`
+const hostName = `https://u.davat.app`
 let url;
 let user_name = 'm.shad' // یا 'm.shad'
 let user_name_role = 'admin'  // یا'user'
@@ -54,7 +55,9 @@ export default function apis({Axios, getDateAndTime, getState}){
             catch(err){
                 return []
             }
-
+            if(res.data.data == undefined || res.data.data == null){
+                return []
+            }
             let resMapping = res.data.data.map((o) => {
                 jalali_created_at = new Date(o.created_at).toISOString(o.created_at).replace('T', ' ').replace('Z', '')
                 jalali_created_at = `${new Date(jalali_created_at).toLocaleTimeString('fa-IR')} ${new Date(jalali_created_at).toLocaleDateString('fa-IR')}`
@@ -220,7 +223,7 @@ export default function apis({Axios, getDateAndTime, getState}){
                 jalali_expiration = `${jalali_expiration[0]}/${jalali_expiration[1]}/${jalali_expiration[2]}`
                 if(o.desktop_poster) {
                     o.desktop_poster = `${hostName}${o.desktop_poster}`
-                }
+                } 
                 try{
                 geoData = o.geo_data.split(',')
                 lat = geoData[0]
