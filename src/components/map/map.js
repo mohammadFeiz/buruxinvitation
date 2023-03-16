@@ -82,17 +82,17 @@ export default class Map extends Component {
                             row: [
                                 { size: 48, html: <Icon path={mdiCrosshairsGps} size={1} onClick={() => this.goToCurrentPoint()} />, align: 'vh' },
                                 { flex: 1, html: <button style={{ border: 'none', background: 'dodgerblue', color: '#fff' }} className='w-100 h-30 br-4' onClick={async () => {
-                                    let param = {
-                                        headers:{
-                                            'Api-Key':'service.05feac099b574f18a11b8fce31f7382f',
-                                            'Authorization':undefined
-                                        }
-                                    }
-                                    let url = `https://api.neshan.org/v5/reverse?lat=${latitude}&lng=${longitude}`;
-                                    let res = await Axios.get(url,param);
-                                    if(res.status !== 200){return}
-                                    let address = res.data.formatted_address;
-                                    onChange(latitude, longitude,address)
+                                    // let param = {
+                                    //     headers:{
+                                    //         'Api-Key':'service.1ac247f7230a4187888368840677c4d6',
+                                    //         'Authorization':undefined
+                                    //     }
+                                    // }
+                                    // let url = `https://api.neshan.org/v5/reverse?lat=${latitude}&lng=${longitude}`;
+                                    // let res = await Axios.get(url,param);
+                                    // if(res.status !== 200){return}
+                                    // let address = res.data.formatted_address;
+                                    onChange(latitude, longitude)
                                 }}>تایید موقعیت</button> }
                             ]
                         },

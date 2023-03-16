@@ -158,7 +158,8 @@ class TarahiDavatname extends Component{
         super(props);
         this.state = {
             model:{...this.initModel()},
-            karbarane_daraye_dastresi:[]
+            karbarane_daraye_dastresi:[],
+            showMap:false
         }
     }
     initModel(){
@@ -293,7 +294,16 @@ class TarahiDavatname extends Component{
                         {
                             type:'html',label:'موقعیت',inlineLabel:false,html:()=>{
                                 //return <Map lat={model.lat} long={model.long} style={{width:'100%',height:160,resize:'vertical',minHeight:100}} onChange={(lat,long)=>this.setState({model:{...model,lat,long}})}/>
-                                return <Map latitude={model.lat} longitude={model.long} style={{width:'100%',height:160,resize:'vertical',minHeight:100}}/>
+                                return (
+                                    <Map 
+                                        latitude={model.lat} longitude={model.long} 
+                                        style={{width:'100%',height:160,resize:'vertical',minHeight:100}} 
+                                        changeView={false}
+                                        onClick={()=>{
+                                            this.setState({showMap:true})
+                                        }}
+                                    />
+                                )
                             }
                         }
                         
@@ -342,30 +352,48 @@ class TarahiDavatname extends Component{
         }
     }
     render(){
+        let {showMap,model} = this.state;
         return (
-            <RVD
-                layout={{
-                    style:{height:'100%'},
-                    column:[
-                        {size:12},
-                        this.nav_layout(),
-                        {size:12},
-                        {
-                            flex:1,scroll:'v',
-                            column:[
-                                this.splitter_layout('موضوع'),
-                                this.form_layout(),
-                                this.splitter_layout('دسترسی ها'),
-                                this.dastresi_layout(),
-                                this.splitter_layout('قواعد و توضیحات'),
-                                this.ghavaed_layout(),
-                                {size:60}
-                            ]
-                        }
-                        
-                    ]
-                }}
-            />
+            <>
+                <RVD
+                    layout={{
+                        style:{height:'100%'},
+                        column:[
+                            {size:12},
+                            this.nav_layout(),
+                            {size:12},
+                            {
+                                flex:1,scroll:'v',
+                                column:[
+                                    this.splitter_layout('موضوع'),
+                                    this.form_layout(),
+                                    this.splitter_layout('دسترسی ها'),
+                                    this.dastresi_layout(),
+                                    this.splitter_layout('قواعد و توضیحات'),
+                                    this.ghavaed_layout(),
+                                    {size:60}
+                                ]
+                            }
+                            
+                        ]
+                    }}
+                />
+                {
+                    showMap && 
+                    <div style={{position:'fixed',width:'100%',height:'100%',left:0,top:0,zIndex:100}}>
+                        <Map
+                            latitude={model.lat} longitude={model.long} 
+                            style={{width:'100%',height:'160%'}} 
+                            onChange={(lat,long)=>{
+                                model.lat = lat;
+                                model.long = long;
+                                this.setState({showMap:false,model})
+                            }}
+                            search={true}
+                        />
+                    </div>
+                }
+            </>
         )
     }
 }
