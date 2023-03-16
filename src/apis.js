@@ -1,10 +1,10 @@
 import AIODate from "aio-date";
-// const hostName = `http://172.16.7.34:8001`
+const hostName = `http://172.16.7.34:8001`
 // const hostName = `http://192.168.211.136:8001`
 // const hostName = `http://localhost:8001`
 // const hostName =  process.env.BACKEND_URL
 // const hostName = `http://192.168.10.51:8076`
-const hostName = `https://u.davat.app`
+// const hostName = `https://u.davat.app`
 let url;
 let user_name = 'm.shad' // یا 'm.shad'
 let user_name_role = 'admin'  // یا'user'
@@ -154,6 +154,7 @@ export default function apis({Axios, getDateAndTime, getState}){
                     zamane_davat: created_at,
                     zamane_davat_time: new Date(o.created_at).getTime(),
                     status: status,
+                    dafaate_ersal: 20,
                     date: new Date(o.created_at).getTime()
                 }
             })
@@ -161,7 +162,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             resMapping = resMapping.sort(
                 (objA, objB) => Number(objB.zamane_davat_time) - Number(objA.zamane_davat_time),
             ) 
-
+            //dafaate_ersal
             return resMapping 
         },
 
@@ -651,6 +652,9 @@ export default function apis({Axios, getDateAndTime, getState}){
             //return 'مشکلی پیش آمده'
             // return {successLength:4,errorList:[]}
             return ' در حال حاضر امکان استفاده از ارسال مجدد موجود نمیباشد،فایل را اصلاح کرده و دوباره ارسال کنید'
+        },
+        async hazfe_davatname(obj){
+            return true
         }
     } 
 }

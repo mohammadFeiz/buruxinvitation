@@ -115,6 +115,11 @@ export default class MizeKar extends Component {
             ]
         }
     }
+    onRemove(o){
+        let {davatname_ha} = this.state;
+        davatname_ha = davatname_ha.filter(({id})=>id !== o.id);
+        this.setState({davatname_ha});
+    }
     render() {
         let {mode,davatname_ha} = this.state;
         let {addPopup} = this.context;
@@ -124,7 +129,8 @@ export default class MizeKar extends Component {
             return (
                 <DavatnameHa 
                     onClose={()=>this.setState({mode:false})} 
-                    davatname_ha={davatname_ha} 
+                    davatname_ha={davatname_ha}
+                    onRemove={this.onRemove.bind(this)} 
                 />
             )
         }
@@ -257,20 +263,21 @@ class TarahiDavatname extends Component{
         return {
             html:(
                 <Form
+                    lang='fa'
                     style={{background:'#fff',margin:'0 24px',borderRadius:8}}
                     model={model}
                     inlineLabel={true}
                     labelStyle={{width:106,justifyContent:'end'}}
                     onChange={(model)=>this.setState({model})}
                     inputs={[
-                        {type:'text',field:'model.name_davatname',label:'نام دعوتنامه :',rowKey:'1'},
+                        {type:'text',field:'model.name_davatname',label:'نام دعوتنامه :',rowKey:'1',validations:[['required']]},
                         this.formGap('1'),
-                        {type:'datepicker',field:'model.tarikhe_etebar',label:'تاریخ اعتبار دعوتنامه :',calendarType:'jalali',rowKey:'1'},
+                        {type:'datepicker',field:'model.tarikhe_etebar',label:'تاریخ اعتبار دعوتنامه :',calendarType:'jalali',rowKey:'1',validations:[['required']]},
                         this.formGap('1'),
                         {type:'text',field:'model.landing_page',label:'لندینگ پیج :',rowKey:'1'},
-                        {type:'textarea',field:'model.matne_payamak',label:'متن پیامک :',rowKey:'2',inputStyle:style1},
+                        {type:'textarea',field:'model.matne_payamak',label:'متن پیامک :',rowKey:'2',inputStyle:style1,validations:[['required']]},
                         this.formGap('2'),
-                        {type:'textarea',field:'model.matne_davatname',label:'متن دعوتنامه :',rowKey:'2',inputStyle:style1},
+                        {type:'textarea',field:'model.matne_davatname',label:'متن دعوتنامه :',rowKey:'2',inputStyle:style1,validations:[['required']]},
                         this.formGap('2'),
                         {type:'html',html:()=>this.poster(),label:'تصویر پوستر :',rowKey:'2'},
                         {type:'datepicker',label:'تاریخ برگزاری ایونت از',field:'model.az_tarikh',unit:'hour',calendarType:'jalali',rowKey:'3'},
@@ -285,7 +292,8 @@ class TarahiDavatname extends Component{
                         {type:'checkbox',text:'امکان دعوت از دوستان',field:'model.emkane_davat',rowKey:'3'},
                         {
                             type:'html',label:'موقعیت',inlineLabel:false,html:()=>{
-                                return <Map lat={model.lat} long={model.long} style={{width:'100%',height:160,resize:'vertical',minHeight:100}} onChange={(lat,long)=>this.setState({model:{...model,lat,long}})}/>
+                                //return <Map lat={model.lat} long={model.long} style={{width:'100%',height:160,resize:'vertical',minHeight:100}} onChange={(lat,long)=>this.setState({model:{...model,lat,long}})}/>
+                                return <Map latitude={model.lat} longitude={model.long} style={{width:'100%',height:160,resize:'vertical',minHeight:100}}/>
                             }
                         }
                         
@@ -400,7 +408,7 @@ class ErsaleDavatname extends Component{
         let {onClose} = this.props;
         let {model,davatname_haye_entekhab_shode,excel,tab} = this.state;
         if(tab === '0'){
-            if(!model.nam || !model.name_khanevadegi|| !model.sherkat|| !model.semat|| !model.jensiat){alert('اطلاعات مورد نیاز را وارد کنید'); return;}
+            if(!model.nam || !model.name_khanevadegi || !model.jensiat){alert('اطلاعات مورد نیاز را وارد کنید'); return;}
             let res = await apis({type:'ersale_taki',parameter:{model,davatname_haye_entekhab_shode}})
             if(typeof res === 'string'){setConfirm({type:'error',text:'ارسال دعوتنامه تکی با خطا روبرو شد',subtext:res})}
             else{
@@ -495,15 +503,16 @@ class ErsaleDavatname extends Component{
                 <Form
                     style={{background:'#fff',margin:'0 24px',borderRadius:8}}
                     model={model}
+                    lang='fa'
                     inlineLabel={true}
                     labelStyle={{width:106,justifyContent:'end'}}
                     onChange={(model)=>this.setState({model})}
                     inputs={[
-                        {type:'text',field:'model.nam',label:'نام:',rowKey:'1'},
+                        {type:'text',field:'model.nam',label:'نام:',rowKey:'1',validations:[['required']]},
                         this.formGap('1'),
-                        {type:'text',field:'model.name_khanevadegi',label:'نام خانوادگی :',rowKey:'1'},
+                        {type:'text',field:'model.name_khanevadegi',label:'نام خانوادگی :',rowKey:'1',validations:[['required']]},
                         this.formGap('1'),
-                        {type:'text',field:'model.shomare_tamas',label:'شماره تماس :',rowKey:'1'},
+                        {type:'text',field:'model.shomare_tamas',label:'شماره تماس :',rowKey:'1',validations:[['required']]},
                         
                         {type:'text',field:'model.sherkat',label:'شرکت/فروشگاه :',rowKey:'2'},
                         this.formGap('2'),
@@ -680,6 +689,7 @@ class Khata_haye_ersal extends Component{
         return (
             <Table
                 model={model}
+                excel={true}
                 templates={{
                     remove:(row)=>{
                         return (
@@ -694,7 +704,6 @@ class Khata_haye_ersal extends Component{
                     {title:'نام',field:'row.name',titleJustify:false,inlineEdit:true},
                     {title:'شماره تماس',field:'row.phone',titleJustify:false,inlineEdit:true},
                     {title:'علت خطا',field:'row.error',titleJustify:false},
-                    {title:'',template:'remove',width:60}
                 ]}
                 setModel={(model)=>this.setState({model})}
             />
@@ -709,7 +718,7 @@ class Khata_haye_ersal extends Component{
                     style:{background:'#fff',height:'100%'},
                     column:[
                         {html:this.getTable(),flex:1},
-                        {align:'vh',size:48,html:<button onClick={()=>onSubmit(model)} className='button-1'>ارسال مجدد</button>}
+                        
                     ]
                 }}
             />    
@@ -739,12 +748,12 @@ class DavatnameHa extends Component{
         }
     }
     list_layout(){
-        let {davatname_ha} = this.props;
+        let {davatname_ha,onRemove} = this.props;
         return {
             flex:1,
             html:(
                 <div style={{display:'inline-block',padding:'0 12px', overflowY:'auto'}}>
-                    {davatname_ha.map((o,i)=><DavatnameCard key={o.id} object={o}/>)}
+                    {davatname_ha.map((o,i)=><DavatnameCard key={o.id} object={o} onRemove={()=>onRemove(o)}/>)}
                 </div>
             )
         }
@@ -876,8 +885,10 @@ class DavatnameCard extends Component{
         }
     }
     footer_layout(){
+        let {apis} = this.context;
         let {object} = this.state;
         let {dastresi_ha} = object;
+        let {onRemove} = this.props;
         return {
              className:'size10 color005478 bold padding-0-6',align:'v',
             row:[
@@ -887,7 +898,12 @@ class DavatnameCard extends Component{
                 {size:4},
                 {html:'نفر دسترسی'},
                 {flex:1},
-                {html:<Icon path={mdiDelete} size={0.7}/>,className:'bgC92828 colorFFF round4'}
+                {html:<Icon path={mdiDelete} size={0.7}/>,className:'bgC92828 colorFFF round4',attrs:{
+                    onClick:async ()=>{
+                        let res = await apis({type:'hazfe_davatname',parameter:object})
+                        if(res === true){onRemove()}
+                    }
+                }}
             ]
         }
     }
