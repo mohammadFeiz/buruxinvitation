@@ -47,14 +47,13 @@ function AIOServiceShowAlert(obj = {}){
 }
 export default function services({getState,apis,token,loader,baseUrl}) {
   function getDateAndTime(value){
-    let dateCalculator = AIODate();
     let adate,atime;
     try {
       if (value.indexOf("T") !== -1) {atime = value.split("T")[1].split(".")[0];} 
       else {atime = value.split(" ")[1];}
     } 
     catch {atime = undefined;}
-    try {adate = dateCalculator.toJalali({date:value}).join("/");
+    try {adate = AIODate().toJalali({date:value}).join("/");
     } 
     catch {adate = "";}
     return {date:adate,time:atime}

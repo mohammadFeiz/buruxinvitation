@@ -4,7 +4,7 @@ import MizeKar from './components/mize-kar/mize-kar';
 import Dastresi from './components/dastresi/dastresi';
 import Tarikhche from './components/tarikhche/tarikhche';
 import getSvg from './getSvg';
-import AIODate from 'aio-date';
+import AIODate from './npm/aio-date/aio-date';
 import RVD from 'react-virtual-dom';
 import AIOService from 'aio-service';
 import RKS from 'react-keycloak-spa';
@@ -133,14 +133,13 @@ class DateAndTime extends Component{
     setInterval(()=>this.setState({value:this.getToday()}),60000)
   }
   getToday(){
-    let date = AIODate();
-    let months = date.getMonths('jalali');
-    let [y,mo,d,h,mi] = date.getToday('jalali');
+    let months = AIODate().getMonths({calendarType: 'jalali'});
+    let [y,mo,d,h,mi] = AIODate().getToday({calendarType: 'jalali'});
     h = h.toString();
     mi = mi.toString();
     if(h.length === 1){h = '0' + h}
     if(mi.length === 1){mi = '0' + mi}
-    let {weekDay} = date.getWeekDay([y,mo,d],'jalali')
+    let {weekDay} = AIODate().getWeekDay({date: [y,mo,d]})
     //return `${weekDay} ${d} ${months[mo - 1]} ${y} ${h}:${mi}`;
     return (
       <RVD

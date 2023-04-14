@@ -5,7 +5,7 @@ import AIOButton from 'aio-button';
 import {Icon} from '@mdi/react';
 import { mdiDotsHorizontal } from '@mdi/js';
 import AppContext from '../../app-context';
-import AIODate from 'aio-date';
+import AIODate from './../../npm/aio-date/aio-date';
 export default class Tarikhche extends Component{
     static contextType = AppContext;
     constructor(props){
@@ -81,9 +81,9 @@ export default class Tarikhche extends Component{
                         {title:'نام دعوتنامه',field:'row.name_davatname',justify:true,width:120,resizable:true,sort:true},
                         {title:'وضعیت',field:'row.status',template:'status',sort:true},
                         {title:'زمان دعوت',field:'row.zamane_davat',justify:true,width:140,resizable:true,subtext:(row)=>{
-                            let {hours,days} = AIODate().getPassedTime(row.date);
-                            if(days){return `${days} روز و ${hours} ساعت قبل`}
-                            return `${hours} ساعت قبل`
+                            let {hour,day} = AIODate().getDelta({date: row.date});
+                            if(day){return `${day} روز و ${hour} ساعت قبل`}
+                            return `${hour} ساعت قبل`
                         }},
                         {title:'تعداد دفعات ارسال',field:'row.dafaate_ersal',justify:true}
                     ]}

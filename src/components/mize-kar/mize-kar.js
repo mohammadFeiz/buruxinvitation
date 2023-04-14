@@ -6,7 +6,7 @@ import {Icon} from '@mdi/react';
 import { mdiToggleSwitch,mdiToggleSwitchOffOutline,mdiDotsHorizontal,mdiChevronLeft, mdiChevronDoubleDown,mdiFileExcel,mdiFile,mdiAccountCircleOutline, mdiDelete} from '@mdi/js';
 import GradientCard from '../gradient-card/gradient-card';
 import Form from '../form/form';
-import AIODate from 'aio-date';
+import AIODate from './../../npm/aio-date/aio-date';
 import Map from '../map/map';
 import AppContext from '../../app-context';
 export default class MizeKar extends Component {
@@ -851,8 +851,8 @@ class DavatnameCard extends Component{
     }
     days_layout(){
         let {object} = this.state;
-        let {days} = AIODate().getRemainingTime(object.tarikhe_etebar_js);
-        return {size:24,align:'v',html:`${days} روز اعتبار دارد`,className:'size10 color605E5C padding-0-6 bold'}
+        let {day} = AIODate().getDelta({date: object.tarikhe_etebar_js});
+        return {size:24,align:'v',html:`${day} روز اعتبار دارد`,className:'size10 color605E5C padding-0-6 bold'}
     }
     date_layout(type){
         let {object} = this.state;
