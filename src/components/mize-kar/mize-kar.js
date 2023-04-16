@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import AIOButton from 'aio-button';
 import Table from './../table/table';
-import RVD from 'react-virtual-dom';
+import RVD from './../../npm/react-virtual-dom/react-virtual-dom';
 import {Icon} from '@mdi/react';
 import { mdiToggleSwitch,mdiToggleSwitchOffOutline,mdiDotsHorizontal,mdiChevronLeft, mdiChevronDoubleDown,mdiFileExcel,mdiFile,mdiAccountCircleOutline, mdiDelete} from '@mdi/js';
 import GradientCard from '../gradient-card/gradient-card';
@@ -380,18 +380,53 @@ class TarahiDavatname extends Component{
                 />
                 {
                     showMap && 
-                    <div style={{position:'fixed',width:'100%',height:'100%',left:0,top:0,zIndex:100}}>
-                        <Map
-                            latitude={model.lat} longitude={model.long} 
-                            style={{width:'100%',height:'160%'}} 
-                            onChange={(lat,long)=>{
-                                model.lat = lat;
-                                model.long = long;
-                                this.setState({showMap:false,model})
-                            }}
-                            search={true}
+                    
+                        <RVD
+                            layout = {{
+                                style: {
+                                    position: 'fixed', 
+                                    width:'100%', 
+                                    height:'100%', 
+                                    left:0, 
+                                    top:0, 
+                                    background:"#FFF"
+                                },
+                                column:[
+                                    {
+                                        size: 36, 
+                                        row: [
+                                            {
+                                                flex: 1,
+                                                html: 'نقشه'
+                                            },
+                                            {
+                                                size: 48,
+                                                align: 'vh',
+                                                html: 'X',
+                                                onClick: () => {
+                                                    this.setState({showMap: false})
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        flex: 1,
+                                        html: (
+                                            <Map
+                                            latitude={model.lat} longitude={model.long} 
+                                            style={{width:'100%',height:'160%'}} 
+                                            onChange={(lat,long)=>{
+                                                model.lat = lat;
+                                                model.long = long;
+                                                this.setState({showMap:false,model})
+                                            }}
+                                            search={true}
+                                            />
+                                        )
+                                    }
+                                ]
+                            }} 
                         />
-                    </div>
                 }
             </>
         )
@@ -851,7 +886,7 @@ class DavatnameCard extends Component{
     }
     days_layout(){
         let {object} = this.state;
-        let {day} = AIODate().getDelta({date: object.tarikhe_etebar_js});
+        let {day} = AIODate().getDelta({date: new Date().getTime(), otherDate: object.tarikhe_etebar_js});
         return {size:24,align:'v',html:`${day} روز اعتبار دارد`,className:'size10 color605E5C padding-0-6 bold'}
     }
     date_layout(type){

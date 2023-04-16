@@ -1,6 +1,7 @@
 import AIODate from "./npm/aio-date/aio-date";
 // const hostName = `http://172.16.7.34:8001`
-const hostName = `http://localhost:8002`
+const hostName = `http://172.16.7.34:8002`
+// const hostName = `http://localhost:8002`
 // const hostName = `http://192.168.211.136:8001`
 // const hostName = `http://localhost:8001`
 // const hostName =  process.env.BACKEND_URL
@@ -222,7 +223,7 @@ export default function apis({Axios, getDateAndTime, getState}){
                 let getMiladiDateTime = new Date(getMiladiDate).getTime()
                 let addExpirationDate = getMiladiDateTime + o.expiration * 86400000
                 let tarikhe_etebar_js = addExpirationDate + 86400000
-                tarikhe_etebar_js = new Date(tarikhe_etebar_js)
+                tarikhe_etebar_js = new Date(o.created_at)
                 // let sd = new Date(addExpirationDate).toLocaleDateString('fa-IR')
                 let expiration_date = new Date(addExpirationDate)
                 let year = expiration_date.getFullYear();
@@ -243,6 +244,9 @@ export default function apis({Axios, getDateAndTime, getState}){
                 // created_at = new Date(created_at).toLocaleDateString('fa-IR')
                 }
 
+                let tarikhe_ijad = AIODate().toJalali({date: o.created_at, pattern:'{year}/{month}/{day}'})
+                let tarikhe_etebar = AIODate().toJalali({date: o.expiration_date, pattern:'{year}/{month}/{day}'})
+
 
                 // برای تبدیل تاریخ میلادی به شمسی
                 // let expired_at = new Date(o.created_at).toISOString(o.created_at).replace('T', ' ').replace('Z', '')
@@ -256,10 +260,10 @@ export default function apis({Axios, getDateAndTime, getState}){
                 return {
                     id: o.id,
                     name: o.name,
-                    tarikhe_ijad: date,
+                    tarikhe_ijad: tarikhe_ijad,
                     // tarikhe_etebar: expiration_date,
-                    tarikhe_etebar: jalali_expiration,
-                    tarikhe_etebar_js: tarikhe_etebar_js,//برای محاسبات لازم داریم
+                    tarikhe_etebar: tarikhe_etebar,
+                    tarikhe_etebar_js: o.expiration_date,//برای محاسبات لازم داریم
                     expiredDate: expiration_date,
                     faal: o.is_active,
                     dastresi_ha:[],
@@ -540,8 +544,6 @@ export default function apis({Axios, getDateAndTime, getState}){
             else{
                 role = 'user'
             } 
-            let we = davatname_haye_entekhab_shode
-            debugger
             let formData = new FormData();
             formData.append('file', excel)
             // formData.append('template_ids', template_id)
