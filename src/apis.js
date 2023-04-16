@@ -1,6 +1,7 @@
 import AIODate from "./npm/aio-date/aio-date";
 // const hostName = `http://172.16.7.34:8001`
-const hostName = `http://172.16.7.34:8002`
+// const hostName = `http://172.16.7.34:8002`
+const hostName = `https://uu.davat.app`
 // const hostName = `http://localhost:8002`
 // const hostName = `http://192.168.211.136:8001`
 // const hostName = `http://localhost:8001`
@@ -376,7 +377,6 @@ export default function apis({Axios, getDateAndTime, getState}){
             if (model.poster != false){
                 apiBody["mobile_poster"] = model.poster
             }
-            debugger
             let formData = new FormData();
             for (const key in apiBody) {
                 if(apiBody[key] != undefined){
