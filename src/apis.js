@@ -359,7 +359,7 @@ export default function apis({Axios, getDateAndTime, getState}){
                 expiration_date: isoDate(model.tarikhe_etebar), // تاریخ اعتبار
                 latitude: model.lat.toFixed(6), // latitude
                 longitude: model.long.toFixed(6), // longitude
-                // mobile_poster: model.poster,
+                mobile_poster: model.poster,
                 event_address: model.adrese_ghorfe,
                 event_start_date : miladi_start_event, 
                 // event_start_date : isoDate(model.az_tarikh), 
