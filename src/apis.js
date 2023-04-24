@@ -330,15 +330,15 @@ export default function apis({Axios, getDateAndTime, getState}){
                     if(model.az_tarikh){
                         
                         miladi_start_event = isoDate(model.az_tarikh)
-                        debugger
+                        // debugger
                     }
                     if(model.ta_tarikh){
-                        debugger
+                        // debugger
                         miladi_end_event = isoDate(model.ta_tarikh)
                     }
                 }
                 catch{
-                    debugger
+                    // debugger
                     return 'لطفا فیلد های مورد نیاز را تکمیل کنید'
                 }
             
@@ -352,7 +352,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             
             let apiBody
             try{
-                debugger
+                // debugger
                 let ss = parseFloat(model.lat)
                 let we = ss.toFixed(6)
                 apiBody = {
@@ -382,10 +382,10 @@ export default function apis({Axios, getDateAndTime, getState}){
                 }
             }
             catch(err){
-                debugger
+                // debugger
                 return "در فراخوانی دیتا مشکلی پیش آمده است"
             }
-            debugger
+            // debugger
             if (model.poster !== false){
                 apiBody["mobile_poster"] = model.poster
             }
@@ -405,11 +405,11 @@ export default function apis({Axios, getDateAndTime, getState}){
             // تغییر دعوتنامه
             if(mode === 'edit'){  
                 // تمامی اطلاعاتی که سمت کلاین رفته دریافت می گردد
-                debugger
+                // debugger
                 let check_mobile_poster = formData.get('mobile_poster')
-                debugger
+                // debugger
                 if(!check_mobile_poster.name){ // اگر فایلی آپبود نشود باید تصویر موجود از قبل را از فرم دیتا پاک کرد تا به اررور نخوریم
-                    debugger
+                    // debugger
                     formData.delete('desktop_poster')
                     formData.delete('mobile_poster')
                 }
@@ -421,7 +421,7 @@ export default function apis({Axios, getDateAndTime, getState}){
                     })
                 }
                 catch(err){
-                    debugger
+                    // debugger
                     return 'خطایی در تغییر این دعوتنامه رخ داد'
                 } 
                 return true
@@ -444,7 +444,7 @@ export default function apis({Axios, getDateAndTime, getState}){
                                 return err.response.data.message
                             }
                             else{
-                                debugger
+                                // debugger
                                 return 'فیلد های مورد نیاز را تکمیل کنید'
                             }
                         }
@@ -575,7 +575,7 @@ export default function apis({Axios, getDateAndTime, getState}){
                 })
             }
             catch(err){
-                debugger
+                // debugger
                 return 'خطایی رخ داد'
             }
             if (res.data.invalid_count !== 0){
