@@ -1,7 +1,8 @@
 import AIODate from "./npm/aio-date/aio-date";
 // const hostName = `http://172.16.7.34:8001`
-// const hostName = `http://172.16.7.34:8002`
-const hostName = `https://uu.davat.app`
+const hostName = `http://172.16.7.34:8002`
+// const hostName = `http://localhost:8002`
+// const hostName = `https://uu.davat.app`
 // const hostName = `http://localhost:8002`
 // const hostName = `http://192.168.211.136:8001`
 // const hostName = `http://localhost:8001`
@@ -64,7 +65,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             catch(err){
                 return []
             }
-            if(res.data.data == undefined || res.data.data == null){
+            if(res.data.data === undefined || res.data.data === null){
                 return []
             }
             let resMapping = res.data.data.map((o) => {
@@ -73,13 +74,13 @@ export default function apis({Axios, getDateAndTime, getState}){
                 let davat_shode;
                 let davat_konande;
                 let name_davatname;
-                if(o.guets != undefined || o.guest != null){
+                if(o.guets !== undefined || o.guest !== null){
                     davat_shode = `${o.guest.first_name} ${o.guest.last_name}`
                 }
-                if(o.user != undefined || o.user != null){
+                if(o.user !== undefined || o.user !== null){
                     davat_konande = `${o.user.first_name} ${o.user.last_name}`
                 }
-                if(o.template != undefined || o.template != null){
+                if(o.template !== undefined || o.template !== null){
                     name_davatname = `${o.template.name}`
                 }
 
@@ -148,11 +149,11 @@ export default function apis({Axios, getDateAndTime, getState}){
                 const msBetweenDates = Math.abs(created - now);
                 const hoursBetweenDates = msBetweenDates / (60 * 60 * 1000);
 
-                if(hoursBetweenDates > 24 && (o.status == 'S' || o.status == 's')){status = '3'} // منقضی شده 
-                else if(o.status == 'N'){status = '0'} // در انتظار تائید
-                else if(o.status == 'S' || o.status == 's'){status = '1'} //ارسال شده
-                else if(o.status == 'O'){status = '2'} // مشاهده شده
-                else if(o.status == 'U'){status = '4'} // خطا
+                if(hoursBetweenDates > 24 && (o.status === 'S' || o.status === 's')){status = '3'} // منقضی شده 
+                else if(o.status === 'N'){status = '0'} // در انتظار تائید
+                else if(o.status === 'NP' || o.status === 's'){status = '1'} //ارسال شده
+                else if(o.status === 'O'){status = '2'} // مشاهده شده
+                else if(o.status === 'U'){status = '4'} // خطا
                 else {status = '4'}
                 // else{status = '3'} // منقضی شده 
                 return {
@@ -208,6 +209,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             catch(err){
                 return []
             }
+            // debugger
             let resMapping = res.data.results.map((o) =>{
                 let {date,time} = getDateAndTime(o.created_at);
                 // let expiration_date = AIODate().getByOffset({date:date.split('/').map((x)=>+x),offset:o.expiration,calendarType:'jalali'})
@@ -232,9 +234,9 @@ export default function apis({Axios, getDateAndTime, getState}){
                 let day = expiration_date.getDate();
                 let jalali_expiration = AIODate().toJalali({date:[year,month,day]});
                 jalali_expiration = `${jalali_expiration[0]}/${jalali_expiration[1]}/${jalali_expiration[2]}`
-                if(o.mobile_poster) {
-                    o.mobile_poster = `${hostName}${o.mobile_poster}`
-                }
+                // if(o.mobile_poster) {
+                //     o.mobile_poster = `${hostName}${o.mobile_poster}`
+                // }
                 let az_tarikh, ta_tarikh 
                 if (o.event_start_date && o.event_end_date){
                 //به دست آوردن تاریخ های 
@@ -312,7 +314,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             let miladi_start_event;
             let jalali_end_event;
             let miladi_end_event;
-            if(mode == 'draft'){is_draft = true}else{is_draft = false}
+            if(mode === 'draft'){is_draft = true}else{is_draft = false}
 
             // به دست آوردن اختلاف روز بین امروز و تاریخ اعتبار
             const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
@@ -323,63 +325,73 @@ export default function apis({Axios, getDateAndTime, getState}){
             const expiration_date = new Date(model.tarikhe_etebar).toLocaleDateString('en-US') //todo
 
             //تبدیل تاریخ و ساعت شروع و پایان کار رویداد به فرمت میلادی 
-            if(model.az_tarikh && model.ta_tarikh){
+            
                 try{
-                    // jalali_start_event = model.az_tarikh.split('/')
-                    // jalali_start_event = jalali_start_event.map((o) =>{ return +o})
-                    // miladi_start_event = AIODate().toGregorian({date:`${jalali_start_event[0]}/${jalali_start_event[1]}/${jalali_start_event[2]}`})
-                    // miladi_start_event = `${miladi_start_event[0]}-${miladi_start_event[1]}-${miladi_start_event[2]} ${jalali_start_event[3]}:00:00` // convert to datetime field
-                    miladi_start_event = isoDate(model.az_tarikh)
-
-                    // jalali_end_event = model.ta_tarikh.split('/')
-                    // jalali_end_event = jalali_end_event.map((o) => { return +o })
-                    // miladi_end_event = AIODate().toGregorian({date:`${jalali_end_event[0]}/${jalali_end_event[1]}/${jalali_end_event[2]}`})
-                    // miladi_end_event = `${miladi_end_event[0]}-${miladi_end_event[1]}-${miladi_end_event[2]} ${jalali_end_event[3]}:00:00`
-                    miladi_end_event = isoDate(model.ta_tarikh)
-                    
+                    if(model.az_tarikh){
+                        
+                        miladi_start_event = isoDate(model.az_tarikh)
+                        debugger
+                    }
+                    if(model.ta_tarikh){
+                        debugger
+                        miladi_end_event = isoDate(model.ta_tarikh)
+                    }
                 }
                 catch{
+                    debugger
                     return 'لطفا فیلد های مورد نیاز را تکمیل کنید'
                 }
-            }
+            
             // let user = {
             //     username: "a.moghimi",
             //     roles: ["admin", "user"]
             // }
-            if (model.landing_page == ""){
+            if (model.landing_page === ""){
                 model.landing_page = undefined
             }
-            let apiBody = {
-                id: model.id,
-                template_id: model.id,
-                name: model.name_davatname,
-                // url: model.landing_page, // لینک 
-                sms_template: model.matne_payamak, // متن پیامک
-                text_template: model.matne_davatname, // متن دعوتنامه
-                expiration_date: isoDate(model.tarikhe_etebar), // تاریخ اعتبار
-                latitude: model.lat.toFixed(6), // latitude
-                longitude: model.long.toFixed(6), // longitude
-                mobile_poster: model.poster,
-                event_address: model.adrese_ghorfe,
-                event_start_date : miladi_start_event, 
-                // event_start_date : isoDate(model.az_tarikh), 
-                event_end_date: miladi_end_event,
-                // event_end_date: isoDate(model.ta_tarikh),
-                landing_page_link: model.landing_page, // لینک لندینگ پیج
-                brt_station_name: model.nazdik_tarin_brt,
-                metro_station_name: model.nazdik_tarin_metro,
-                can_others_invite: model.emkane_davat,
-                is_active: true,
-                is_draft: is_draft,
-                is_redirect_to_landing_page: model.ersale_mostaghim,
-                user: userInformation,
+            
+            let apiBody
+            try{
+                debugger
+                let ss = parseFloat(model.lat)
+                let we = ss.toFixed(6)
+                apiBody = {
+                    id: model.id,
+                    template_id: model.id,
+                    name: model.name_davatname,
+                    // url: model.landing_page, // لینک 
+                    sms_template: model.matne_payamak, // متن پیامک
+                    text_template: model.matne_davatname, // متن دعوتنامه
+                    expiration_date: isoDate(model.tarikhe_etebar), // تاریخ اعتبار
+                    latitude: parseFloat(model.lat).toFixed(6), // latitude
+                    longitude: parseFloat(model.long).toFixed(6), // longitude
+                    // mobile_poster: model.poster,
+                    event_address: model.adrese_ghorfe,
+                    event_start_date : miladi_start_event, 
+                    // event_start_date : isoDate(model.az_tarikh), 
+                    event_end_date: miladi_end_event,
+                    // event_end_date: isoDate(model.ta_tarikh),
+                    landing_page_link: model.landing_page, // لینک لندینگ پیج
+                    brt_station_name: model.nazdik_tarin_brt,
+                    metro_station_name: model.nazdik_tarin_metro,
+                    can_others_invite: model.emkane_davat,
+                    is_active: true,
+                    is_draft: is_draft,
+                    is_redirect_to_landing_page: model.ersale_mostaghim,
+                    // user: userInformation,
+                }
             }
-            if (model.poster != false){
+            catch(err){
+                debugger
+                return "در فراخوانی دیتا مشکلی پیش آمده است"
+            }
+            debugger
+            if (model.poster !== false){
                 apiBody["mobile_poster"] = model.poster
             }
             let formData = new FormData();
             for (const key in apiBody) {
-                if(apiBody[key] != undefined){
+                if(apiBody[key] !== undefined){
                     if(key === 'user'){
                         formData.append(key, JSON.stringify(apiBody[key]))    
                     }
@@ -391,9 +403,13 @@ export default function apis({Axios, getDateAndTime, getState}){
             }
 
             // تغییر دعوتنامه
-            if(mode == 'edit'){  // تمامی اطلاعاتی که سمت کلاین رفته دریافت می گردد
-                let check_desktop_poster = formData.get('desktop_poster')
-                if(!check_desktop_poster.name){ // اگر فایلی آپبود نشود باید تصویر موجود از قبل را از فرم دیتا پاک کرد تا به اررور نخوریم
+            if(mode === 'edit'){  
+                // تمامی اطلاعاتی که سمت کلاین رفته دریافت می گردد
+                debugger
+                let check_mobile_poster = formData.get('mobile_poster')
+                debugger
+                if(!check_mobile_poster.name){ // اگر فایلی آپبود نشود باید تصویر موجود از قبل را از فرم دیتا پاک کرد تا به اررور نخوریم
+                    debugger
                     formData.delete('desktop_poster')
                     formData.delete('mobile_poster')
                 }
@@ -466,7 +482,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             //     username: "a.moghimi",
             //     roles: ["admin", "user"]
             // }
-            if (davatname_haye_entekhab_shode.length == 0){
+            if (davatname_haye_entekhab_shode.length === 0){
                 return 'لیست دعوتنامه خالی است'
             }
 
@@ -474,7 +490,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             //     template_id += o
             //     template_id += ' '
             // })
-            if(model.jensiat == 'male'){gender = 'M'}else{gender = 'F'}
+            if(model.jensiat === 'male'){gender = 'M'}else{gender = 'F'}
             if(userInformation.roles.indexOf('admin') !== -1){
                 role = 'admin'
             }
@@ -530,7 +546,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             let successMessage;
             let errorMessage;
             let template_id = '';
-            if (davatname_haye_entekhab_shode.length == 0){
+            if (davatname_haye_entekhab_shode.length === 0){
                 return 'لیست دعوتنامه خالی است'
             }
             // davatname_haye_entekhab_shode.map((o) =>{
@@ -562,7 +578,7 @@ export default function apis({Axios, getDateAndTime, getState}){
                 debugger
                 return 'خطایی رخ داد'
             }
-            if (res.data.invalid_count != 0){
+            if (res.data.invalid_count !== 0){
                 errorMessage = `${res.data.invalid_count} مورد ناموفق ثبت شد `
                 successMessage = `${res.data.valid_count} مورد موفق ثبت شد`
 
@@ -600,8 +616,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             })
             let url = `${InvitatonsConfirm}?invitation_ids=${invitation_ids}`
 
-            if(state == true){
-                
+            if(state === true){
                 try {
                     res = await Axios.get(url)
                 }
@@ -609,7 +624,7 @@ export default function apis({Axios, getDateAndTime, getState}){
                     return 'خطایی در تائید موارد انتخاب شده رخ داده است'
                 }
                 if (res.data){
-                    if(res.data.is_success == true){
+                    if(res.data.is_success === true){
                         return true
                     }
                 }
@@ -649,7 +664,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             //davatname_haye_entekhab_shode: آرایه ای از آی دی دعوتنامه های انتخاب شده
             let ersale_mojadad_array = []
             for(let prop in davatname_haye_entekhab_shode){
-                if(davatname_haye_entekhab_shode[prop] == true){
+                if(davatname_haye_entekhab_shode[prop] === true){
                     ersale_mojadad_array.push(prop)
                 }
             }
@@ -660,7 +675,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             }
             try{
                 res = await Axios.post(url, apiBody)
-                if (res.data.is_success == true){
+                if (res.data.is_success === true){
                     return true
                 }
                 return true
