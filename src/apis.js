@@ -269,7 +269,7 @@ export default function apis({Axios, getDateAndTime, getState}){
                     tarikhe_etebar_js: o.expiration_date,//برای محاسبات لازم داریم
                     expiredDate: expiration_date,
                     faal: o.is_active,
-                    dastresi_ha:[],
+                    dastresi_ha: [],
                     poster: o.mobile_poster,
                     name_davatname: o.name,
                     matne_payamak: o.sms_template,
@@ -278,10 +278,10 @@ export default function apis({Axios, getDateAndTime, getState}){
                     ersale_mostaghim: o.is_redirect_to_landing_page,
                     lat: o.latitude,
                     long: o.longitude,
-                    adrese_ghorfe: o.event_address,
-                    landing_page: o.landing_page_link,
-                    nazdik_tarin_brt: o.brt_station_name,
-                    nazdik_tarin_metro: o.metro_station_name,
+                    adrese_ghorfe: o.event_address == null? undefined : o.event_address,
+                    landing_page: o.landing_page_link == null? undefined : o.landing_page_link,
+                    nazdik_tarin_brt: o.brt_station_name == null? undefined : o.brt_station_name,
+                    nazdik_tarin_metro: o.metro_station_name == null? undefined : o.metro_station_name,
                     az_tarikh: az_tarikh,
                     ta_tarikh: ta_tarikh,
                 }
@@ -385,10 +385,11 @@ export default function apis({Axios, getDateAndTime, getState}){
                 // debugger
                 return "در فراخوانی دیتا مشکلی پیش آمده است"
             }
-            // debugger
+            
             if (model.poster !== false){
                 apiBody["mobile_poster"] = model.poster
             }
+            // debugger
             let formData = new FormData();
             for (const key in apiBody) {
                 if(apiBody[key] !== undefined){
@@ -692,6 +693,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             return ' در حال حاضر امکان استفاده از ارسال مجدد موجود نمیباشد،فایل را اصلاح کرده و دوباره ارسال کنید'
         },
         async hazfe_davatname(obj){
+            debugger
             return true
         }
     } 
