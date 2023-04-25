@@ -2,13 +2,13 @@ import AIODate from "./npm/aio-date/aio-date";
 // const hostName = `http://172.16.7.34:8001`
 // const hostName = `http://172.16.7.34:8002`
 // const hostName = `http://localhost:8002`
-const hostName = `https://uu.davat.app`
+// const hostName = `https://uu.davat.app`
 // const hostName = `http://localhost:8002`
 // const hostName = `http://192.168.211.136:8001`
 // const hostName = `http://localhost:8001`
 // const hostName =  process.env.BACKEND_URL
 // const hostName = `http://192.168.10.51:8076`
-// const hostName = `https://u.davat.app`
+const hostName = `https://u.davat.app`
 let url;
 let user_name = 'm.shad' // یا 'm.shad'
 let user_name_role = 'admin'  // یا'user'
@@ -286,6 +286,7 @@ export default function apis({Axios, getDateAndTime, getState}){
                     ta_tarikh: ta_tarikh,
                 }
             })
+            debugger;
             return resMapping
         },
 
