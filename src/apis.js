@@ -286,7 +286,6 @@ export default function apis({Axios, getDateAndTime, getState}){
                     ta_tarikh: ta_tarikh,
                 }
             })
-            debugger;
             return resMapping
         },
 
@@ -694,7 +693,15 @@ export default function apis({Axios, getDateAndTime, getState}){
             return ' در حال حاضر امکان استفاده از ارسال مجدد موجود نمیباشد،فایل را اصلاح کرده و دوباره ارسال کنید'
         },
         async hazfe_davatname(obj){
-            debugger
+            let userInformation = getState().userInformation
+            url = `${invitationTemplateUrl}?username=${userInformation.username}&id=${obj.id}`
+            let res;
+            try{
+                res = await Axios.delete(url)
+            }
+            catch(err){
+                return 'خطایی در حذف این دعوتنامه رخ داد'
+            } 
             return true
         }
     } 
