@@ -25,7 +25,7 @@ const ShowAllNotVerified = `${hostName}/invitation/show/` //لیست نیاز ب
 //با متد گت این ای پی آی تائید انجام می شود
 const  InvitatonsConfirm = `${hostName}/invitation/v1/invitation/`
 
-const sendAgain = `${hostName}/invitation/v1/invitation/retry-invitation/`
+const sendAgain = `${hostName}/Api/V1/Invitation/ReInvite/`
 
 function isoDate(date){
     let g = AIODate().toGregorian({date})
@@ -144,7 +144,7 @@ export default function apis({Axios, getDateAndTime, getState}){
                 //به دست آوردن تایم به صورت فارسی
 
                 // به دست آوردن اختلاف زمانی برای تشخیص اینکه منقضی شده است یا خیر
-                let created = new Date(o.created_at).getTime()
+                let created = new Date(o.updated_at).getTime()
                 const now = new Date().getTime()
                 const msBetweenDates = Math.abs(created - now);
                 const hoursBetweenDates = msBetweenDates / (60 * 60 * 1000);
@@ -672,7 +672,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             let res;
             let url = `${sendAgain}`
             let apiBody = {
-                invitation_ids: ersale_mojadad_array
+                invite_ids: ersale_mojadad_array
             }
             try{
                 res = await Axios.post(url, apiBody)
