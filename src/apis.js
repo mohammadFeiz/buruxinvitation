@@ -151,7 +151,7 @@ export default function apis({Axios, getDateAndTime, getState}){
 
                 if(hoursBetweenDates > 24 && (o.status === 'S' || o.status === 's')){status = '3'} // منقضی شده 
                 else if(o.status === 'N'){status = '0'} // در انتظار تائید
-                else if(o.status === 'NP' || o.status === 's'){status = '1'} //ارسال شده
+                else if(o.status === 'NP' || o.status === 'S'){status = '1'} //ارسال شده
                 else if(o.status === 'O'){status = '2'} // مشاهده شده
                 else if(o.status === 'U'){status = '4'} // خطا
                 else {status = '4'}
