@@ -150,8 +150,8 @@ export default function apis({Axios, getDateAndTime, getState}){
                 const hoursBetweenDates = msBetweenDates / (60 * 60 * 1000);
 
                 if(hoursBetweenDates > 24 && (o.status === 'S' || o.status === 's')){status = '3'} // منقضی شده 
-                else if(o.status === 'N'){status = '0'} // در انتظار تائید
-                else if(o.status === 'NP' || o.status === 'S'){status = '1'} //ارسال شده
+                else if(o.status === 'NP'){status = '0'} // در انتظار تائید
+                else if(o.status === 'S'){status = '1'} //ارسال شده
                 else if(o.status === 'O'){status = '2'} // مشاهده شده
                 else if(o.status === 'U'){status = '4'} // خطا
                 else {status = '4'}
