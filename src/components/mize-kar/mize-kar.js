@@ -13,17 +13,18 @@ export default class MizeKar extends Component {
     static contextType = AppContext;
     constructor(props){
         super(props);
-        this.state = {niaz_be_taide_man:[],checks:{},mode:false,davatname_ha:[]}
+        this.state = {niaz_be_taide_man:[],checks:{},mode:false,davatname_ha:[],davatname_ha_total:0,pageNumber:1,pageSize:20}
     }
     async niaz_be_taide_man(){
         let {apis} = this.context;
         let niaz_be_taide_man = await apis({type:'niaz_be_taide_man'});
         this.setState({niaz_be_taide_man})
     }
-    async davatname_ha(){
+    async davatname_ha(obj = {}){
+        let {pageNumber = this.state.pageNumber,pageSize = this.state.pageSize} = obj;
         let {apis} = this.context;
-        let davatname_ha = await apis({type:'davatname_ha'});
-        this.setState({davatname_ha})
+        let {davatname_ha,total} = await apis({type:'davatname_ha',parameter:{pageNumber,pageSize}});
+        this.setState({davatname_ha,davatname_ha_total:total,pageNumber,pageSize})
     }
     componentDidMount(){
         this.niaz_be_taide_man();
@@ -121,7 +122,7 @@ export default class MizeKar extends Component {
         this.setState({davatname_ha});
     }
     render() {
-        let {mode,davatname_ha} = this.state;
+        let {mode,davatname_ha,pageNumber,pageSize,davatname_ha_total} = this.state;
         let {addPopup} = this.context;
         if(mode === 'tarahi_davatname'){return <TarahiDavatname onClose={()=>this.setState({mode:false})}/>}
         if(mode === 'ersale_davatname'){return <ErsaleDavatname onClose={()=>this.setState({mode:false})} davatname_ha={davatname_ha}/>}
@@ -130,7 +131,11 @@ export default class MizeKar extends Component {
                 <DavatnameHa 
                     onClose={()=>this.setState({mode:false})} 
                     davatname_ha={davatname_ha}
-                    onRemove={this.onRemove.bind(this)} 
+                    total={davatname_ha_total}
+                    onRemove={this.onRemove.bind(this)}
+                    pageNumber={pageNumber}
+                    pageSize={pageSize}
+                    onChangePaging={(obj)=>this.davatname_ha(obj)} 
                 />
             )
         }
@@ -464,7 +469,8 @@ class ErsaleDavatname extends Component{
     async componentDidMount(){
         let {apis} = this.context;
         let niaz_be_taide_man = await apis({type:'niaz_be_taide_man'});
-        this.setState({niaz_be_taide_man})
+        let {url:linke_template_excel} = await apis({type:'linke_template_excel'});
+        this.setState({niaz_be_taide_man,linke_template_excel})
     }
     async send(){
         let {apis,setConfirm} = this.context;
@@ -610,6 +616,29 @@ class ErsaleDavatname extends Component{
             )
         }
     }
+    async downloadTemplate() {
+        let {linke_template_excel} = this.state;
+        let url = linke_template_excel;
+        let name = 'exceltemplate'
+        fetch(url, {
+          mode: 'no-cors',
+    
+        })
+          .then(resp => resp.blob())
+          .then(blob => {
+            let url = window.URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.style.display = 'none';
+            //a.download = url.replace(/^.*[\\\/]/, '');
+            a.href = url;
+            a.download = name;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+          })
+          .catch(() => alert('oh no!'));
+    
+      }
     excel_layout(){
         let {excel,tab,successLength,errorList} = this.state;
         let {addPopup,apis,removePopup,setConfirm} = this.context;
@@ -624,6 +653,18 @@ class ErsaleDavatname extends Component{
                 {size:12},
                 {html:'اطلاعات بارگذاری شده باید شامل نام، نام خانوادگی و شماره تماس 11 رقمی مدعوین باشد.',className:'size16 color808080',align:'h'},
                 {size:12},
+                {
+                    align:'vh',className:'size14 color5897D2 bold',
+                    row:[
+                        {html:(
+                            <label>
+                                دانلود تمپلیت اکسل
+                                <input type='button' style={{display:'none'}} onClick={(e)=>this.downloadTemplate()}/>
+                            </label>
+                        )},
+                        {html:<Icon path={mdiFile} size={1}/>}
+                    ]
+                },
                 {
                     align:'vh',className:'size14 color5897D2 bold',
                     row:[
@@ -821,7 +862,14 @@ class DavatnameHa extends Component{
             )
         }
     }
+    onChangePaging(obj){
+        let {pageNumber,pageSize,onChangePaging,pagesLength} = this.props;
+        let res = {pageNumber,pageSize,...obj}
+        if(res.pageNumber < 1){return}
+        onChangePaging(res)
+    }
     render(){
+        let {pageNumber,pageSize,onChangePaging} = this.props;
         return (
             <RVD
                 layout={{
@@ -835,6 +883,16 @@ class DavatnameHa extends Component{
                                 this.splitter_layout('لیست'),
                                 this.list_layout(),
                                 {size:60}
+                            ]
+                        },
+                        {
+                            size:36,gap:12,
+                            row:[
+                                {flex:1},
+                                {html:'صفحه بعد',className:'fs-12 bold',onClick:()=>this.onChangePaging({pageNumber:pageNumber + 1})},
+                                {html:`# ${pageNumber}`,className:'fs-12 bold'},
+                                {html:'صفحه قبل',className:'fs-12 bold',onClick:()=>this.onChangePaging({pageNumber:pageNumber - 1})},
+                                {flex:1}
                             ]
                         }
                         
@@ -856,7 +914,7 @@ class DavatnameCard extends Component{
         let {object} = this.state;
         let {poster} = object;
         return (
-            <label style={{width:'100%',background:'#ddd',display:'flex',alignItems:'center',justifyContent:'center'}}>
+            <label onClick={()=>this.addPopup()} style={{width:'100%',background:'#ddd',display:'flex',alignItems:'center',justifyContent:'center'}}>
                 {
                     !poster &&
                     <svg width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -902,9 +960,23 @@ class DavatnameCard extends Component{
             ]
         }
     }
+    addPopup(){
+        let {object} = this.state;
+        let {addPopup} = this.context;
+        addPopup({
+            title:'ویرایش دعوتنامه',
+            content:()=>{
+                return (
+                    <div style={{background:'#f8f8f8',overflow:'hidden',height:'100%'}} className='msf'>
+                        <TarahiDavatname onClose={()=>this.setState({mode:false})} model={object}/>
+                    </div>
+                )
+            }
+        })
+    }
     active_layout(){
         let {object} = this.state;
-        let {apis,addPopup} = this.context;
+        let {apis} = this.context;
         return {
             row:[
                 {
@@ -932,18 +1004,7 @@ class DavatnameCard extends Component{
                     html:object.faal?'فعال':'غیر فعال',className:'color005478 size10 bold padding-0-6',align:'v'
                 },
                 {flex:1},
-                {html:'ویرایش',className:'color005478 size10 bold padding-0-6',attrs:{onClick:()=>{
-                    addPopup({
-                        title:'ویرایش دعوتنامه',
-                        content:()=>{
-                            return (
-                                <div style={{background:'#f8f8f8',overflow:'hidden',height:'100%'}} className='msf'>
-                                    <TarahiDavatname onClose={()=>this.setState({mode:false})} model={object}/>
-                                </div>
-                            )
-                        }
-                    })
-                }}}
+                {html:'ویرایش',className:'color005478 size10 bold padding-0-6',onClick:()=>this.addPopup()}
             ]
         }
     }

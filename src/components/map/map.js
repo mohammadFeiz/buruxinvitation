@@ -111,7 +111,7 @@ export default class Map extends Component {
     render() {
         let {
             changeView, zoom = 12, onClick, style, search,
-            key = 'web.3037ddd42c9e4173af6427782584a2a1',
+            key = 'web.e1737cb20bab4232817abfa23cd23400',
             onChange
         } = this.props;
         let { latitude, longitude, delay,prevLatitude,prevLongitude } = this.state;

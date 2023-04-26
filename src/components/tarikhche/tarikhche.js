@@ -12,17 +12,24 @@ export default class Tarikhche extends Component{
         super(props);
         this.state = {
             tarikhche:[],
-            checks:{}
+            checks:{},
+            total:0
         }
     }
     async componentDidMount(){
+        this.fetchData();
+    }
+    async fetchData(obj = {}){
+        let {pageNumber = 1,pageSize = 20} = obj
         let {apis} = this.context;
-        let tarikhche = await apis({type:'tarikhche'})
-        this.setState({tarikhche})
+        let {tarikhche,total} = await apis({type:'tarikhche',parameter:{pageNumber,pageSize}})
+        this.setState({tarikhche,total})
     }
     async ersale_mojadad(checks){
-        let {apis} = this.context;
+        let {apis,setConfirm} = this.context;
         let res = await apis({type:'ersale_mojadad',parameter:checks})
+        if(res === true){setConfirm({type:'success',text:'ارسال مجدد با موفقیت انجام شد'})}
+        else if(typeof res === 'string'){setConfirm({type:'error',text:res})}
     }
     toolbar_layout(){
         let {checks} = this.state;
@@ -37,7 +44,7 @@ export default class Tarikhche extends Component{
         }
     }
     table_layout(){
-        let {tarikhche,checks} = this.state;
+        let {tarikhche,checks,total} = this.state;
         this.order = 0;
         // if(!tarikhche.length){return false}
         return {
@@ -47,6 +54,12 @@ export default class Tarikhche extends Component{
                     rtl={true} lang='farsi'
                     model={tarikhche}
                     setModel={(tarikhche)=>this.setState({tarikhche})}
+                    paging={{
+                        size:20,length:total,
+                        onChange:({number:pageNumber,size:pageSize})=>{
+                            this.fetchData({pageNumber,pageSize})
+                        }
+                    }}
                     templates={{
                         order:()=>{
                             this.order++;

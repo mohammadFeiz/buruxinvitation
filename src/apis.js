@@ -1,7 +1,7 @@
 import AIODate from "./npm/aio-date/aio-date";
 // const hostName = `http://172.16.7.34:8001`
-const hostName = `http://172.16.7.34:8002`
-// const hostName = `https://u.davat.app`
+//const hostName = `http://172.16.7.34:8002`
+const hostName = `https://u.davat.app`
 // const hostName = `http://localhost:8002`
 // const hostName = `https://uu.davat.app`
 // const hostName = `http://localhost:8002`
@@ -98,9 +98,13 @@ export default function apis({Axios, getDateAndTime, getState}){
             )
             return resMapping
         },
-
+        async linke_template_excel(){
+            //return 'error';
+            return {url:''}
+        },
         // ********************* لیست تاریخچه **********************
-        async tarikhche(){
+        async tarikhche({pageNumber,pageSize}){
+            debugger;
             // return [
             //     {davat_shode:'علی احمدی',davat_konande:'حسین رحمتی',name_davatname:'نمایشگاه صنعت برق',zamane_davat:'1401/08/10 ساعت 10:42',id:0,status:'0',shomare_tamase_davat_shode:'09123534314',date:new Date().getTime() - (60 * 60 * 60 * 1000)},
             //     {davat_shode:'علی احمدی',davat_konande:'حسین رحمتی',name_davatname:'نمایشگاه صنعت برق',zamane_davat:'1401/08/10 ساعت 10:42',id:1,status:'1',shomare_tamase_davat_shode:'09123534314',date:new Date().getTime() - (60 * 60 * 60 * 1000)},
@@ -131,7 +135,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             }
 
             catch(err){
-                return []
+                return {tarikhche:[],total:0}
             }
                         // {davat_shode:'علی احمدی',
             // davat_konande:'حسین رحمتی',
@@ -174,7 +178,8 @@ export default function apis({Axios, getDateAndTime, getState}){
                 (objA, objB) => Number(objB.zamane_davat_time) - Number(objA.zamane_davat_time),
             ) 
             //dafaate_ersal
-            return resMapping 
+            let total = 0;
+            return {tarikhche:resMapping,total} 
         },
 
         // ********************* لیست کاربران **********************
@@ -191,7 +196,7 @@ export default function apis({Axios, getDateAndTime, getState}){
         },
 
         // ********************* لیست دعوتنامه ها **********************
-        async davatname_ha(){
+        async davatname_ha({pageSize,pageNumber}){
             // return [
             //     {name:'نمایشگاه صنعت برق',id:'0',tarikhe_ijad:'1401/3/3',tarikhe_etebar:'1401/4/3',faal:true,dastresi_ha:['مهدی شاد','محمد فیض']},
             //     {name:'همایش آبان ماه 1401',id:'1',tarikhe_ijad:'1401/3/3',tarikhe_etebar:'1401/4/3',faal:false,dastresi_ha:['مهدی شاد','محمد فیض']},
@@ -207,7 +212,7 @@ export default function apis({Axios, getDateAndTime, getState}){
                 res = await Axios.get(url)
             }
             catch(err){
-                return []
+                return {davatname_ha:[],total:0}
             }
             // debugger
             let resMapping = res.data.results.map((o) =>{
@@ -286,7 +291,8 @@ export default function apis({Axios, getDateAndTime, getState}){
                     ta_tarikh: ta_tarikh,
                 }
             })
-            return resMapping
+            let total = 0;
+            return {davatname_ha:resMapping,total}
         },
 
         // ********************* طراحی دعوتنامه **********************

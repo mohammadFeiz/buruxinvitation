@@ -69,12 +69,13 @@ class Main extends Component{
     else{
       this.setState({users})
     }
-    let davatname_ha = await apis({type:'davatname_ha'})
-    if(typeof davatname_ha === 'string'){
-      setConfirm({type:'error',text:'دریافت دعوتنامه ها با خطا مواجه شد',subtext:davatname_ha})
+    let res = await apis({type:'davatname_ha',parameter:{pageNumber:1,pageSize:20}})
+    if(typeof res === 'string'){
+      setConfirm({type:'error',text:'دریافت دعوتنامه ها با خطا مواجه شد',subtext:res})
     }
     else{
-      this.setState({davatname_ha})
+      let {davatname_ha,total} = res;
+      this.setState({davatname_ha,davatname_ha_total:total})
     }
   }
   getContext(){
