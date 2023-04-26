@@ -85,7 +85,7 @@ export default class Tarikhche extends Component{
                             if(day){return `${day} روز و ${hour} ساعت قبل`}
                             return `${hour} ساعت قبل`
                         }},
-                        {title:'تعداد دفعات ارسال',field:'row.dafaate_ersal',justify:true}
+                        {title:'تعداد دفعات ارسال مجدد',field:'row.dafaate_ersal',justify:true}
                     ]}
                 />
             )
