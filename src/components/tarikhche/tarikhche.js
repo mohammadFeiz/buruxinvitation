@@ -13,17 +13,18 @@ export default class Tarikhche extends Component{
         this.state = {
             tarikhche:[],
             checks:{},
-            total:0
+            total:0,
+            pageNumber:1,pageSize:20
         }
     }
     async componentDidMount(){
         this.fetchData();
     }
     async fetchData(obj = {}){
-        let {pageNumber = 1,pageSize = 20} = obj
+        let {pageNumber = this.state.pageNumber,pageSize = this.state.pageSize} = obj;
         let {apis} = this.context;
         let {tarikhche,total} = await apis({type:'tarikhche',parameter:{pageNumber,pageSize}})
-        this.setState({tarikhche,total})
+        this.setState({tarikhche,total,pageSize,pageNumber})
     }
     async ersale_mojadad(checks){
         let {apis,setConfirm} = this.context;
@@ -44,7 +45,7 @@ export default class Tarikhche extends Component{
         }
     }
     table_layout(){
-        let {tarikhche,checks,total} = this.state;
+        let {tarikhche,checks,total,pageSize,pageNumber} = this.state;
         this.order = 0;
         // if(!tarikhche.length){return false}
         return {
@@ -56,6 +57,8 @@ export default class Tarikhche extends Component{
                     setModel={(tarikhche)=>this.setState({tarikhche})}
                     paging={{
                         size:20,length:total,
+                        size:pageSize,
+                        number:pageNumber,
                         onChange:({number:pageNumber,size:pageSize})=>{
                             this.fetchData({pageNumber,pageSize})
                         }
