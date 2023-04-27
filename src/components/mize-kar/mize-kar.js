@@ -616,20 +616,40 @@ class ErsaleDavatname extends Component{
             )
         }
     }
-    async downloadTemplate() {
-        let {linke_template_excel} = this.state;
-        let url = linke_template_excel;
-        let name = 'exceltemplate'
-        fetch(url, {
-          mode: 'no-cors',
+    // async downloadTemplate() {
+    //     let {linke_template_excel} = this.state;
+    //     let url = linke_template_excel;
+    //     let name = 'main_template_v1.xlsx'
+    //     fetch(url, {
+    //       mode: 'no-cors',
     
-        })
-          .then(resp => resp.blob())
-          .then(blob => {
+    //     })
+    //       .then(resp => resp.blob())
+    //       .then(blob => {
+    //         let url = window.URL.createObjectURL(blob);
+    //         let a = document.createElement('a');
+    //         a.style.display = 'none';
+    //         //a.download = url.replace(/^.*[\\\/]/, '');
+    //         a.href = url;
+    //         a.download = name;
+    //         document.body.appendChild(a);
+    //         a.click();
+    //         window.URL.revokeObjectURL(url);
+    //       })
+    //       .catch(() => alert('oh no!'));
+    
+    // }
+    async downloadTemplate() {
+        let { linke_template_excel } = this.state;
+        let url = linke_template_excel;
+        let name = 'main_template_v1.xlsx';
+      
+        fetch(url)
+          .then((resp) => resp.blob())
+          .then((blob) => {
             let url = window.URL.createObjectURL(blob);
             let a = document.createElement('a');
             a.style.display = 'none';
-            //a.download = url.replace(/^.*[\\\/]/, '');
             a.href = url;
             a.download = name;
             document.body.appendChild(a);
@@ -637,7 +657,6 @@ class ErsaleDavatname extends Component{
             window.URL.revokeObjectURL(url);
           })
           .catch(() => alert('oh no!'));
-    
       }
     excel_layout(){
         let {excel,tab,successLength,errorList} = this.state;
@@ -658,7 +677,7 @@ class ErsaleDavatname extends Component{
                     row:[
                         {html:(
                             <label>
-                                دانلود تمپلیت اکسل
+                                دانلود قالب اکسل
                                 <input type='button' style={{display:'none'}} onClick={(e)=>this.downloadTemplate()}/>
                             </label>
                         )},
