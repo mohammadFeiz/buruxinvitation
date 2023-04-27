@@ -43,6 +43,7 @@ export default class Table extends Component {
       Group:Group(()=>this.props,()=>this.state,this.setColumns.bind(this)),
       columns:(props.columns || []).map((c)=>{return {...c}}),
       prevColumns:JSON.stringify(props.columns),
+      prevPaging:JSON.stringify(props.paging),
       saveColumnInStorage:this.saveColumnInStorage.bind(this),
       setColumn:this.setColumn.bind(this)
     }
@@ -452,11 +453,15 @@ export default class Table extends Component {
     }
   }
   render() {
-    let {model,columns,className,style} = this.props;
-    let {prevColumns} = this.state;
+    let {model,columns,className,style,paging} = this.props;
+    let {prevColumns,prevPaging} = this.state;
     let columnsStr = JSON.stringify(columns);
+    let pagingStr = JSON.stringify(paging);
     if(columnsStr !== prevColumns){
       setTimeout(()=>this.setState({columns,prevColumns:columnsStr},()=>this.updateColumnsByStorageKey()),0)
+    }
+    else if(pagingStr !== prevPaging){
+      setTimeout(()=>this.setState({paging,prevPaging:pagingStr}),0)
     }
     this.setColumnIds()
     //پیجینگ را زود تر می سازیم که دیفالت هاش محاسبه بشه

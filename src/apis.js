@@ -1,6 +1,6 @@
 import AIODate from "./npm/aio-date/aio-date";
-// const hostName = `http://172.16.7.34:8001`
 const hostName = `http://172.16.7.34:8002`
+//const hostName = `http://172.16.7.34:8002`
 // const hostName = `https://u.davat.app`
 // const hostName = `http://localhost:8002`
 // const hostName = `https://uu.davat.app`

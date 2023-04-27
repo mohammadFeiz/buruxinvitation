@@ -53,13 +53,15 @@ export default class Tarikhche extends Component{
             html:(
                 <Table
                     rtl={true} lang='farsi'
+                    style={{flex:1,height:'100%'}}
                     model={tarikhche}
                     setModel={(tarikhche)=>this.setState({tarikhche})}
                     paging={{
-                        size:20,length:total,
+                        length:total,
                         size:pageSize,
                         number:pageNumber,
                         onChange:({number:pageNumber,size:pageSize})=>{
+                            debugger;
                             this.fetchData({pageNumber,pageSize})
                         }
                     }}
