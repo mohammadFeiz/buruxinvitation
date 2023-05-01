@@ -14,7 +14,7 @@ export default class Tarikhche extends Component{
             tarikhche:[],
             checks:{},
             total:0,
-            pageNumber:1,pageSize:20
+            pageNumber:1,pageSize:10
         }
     }
     async componentDidMount(){
@@ -65,10 +65,10 @@ export default class Tarikhche extends Component{
                     setModel={(tarikhche)=>this.setState({tarikhche})}
                     paging={{
                         length:total,
+                        pageSizes:[10,20,50,100],
                         size:pageSize,
                         number:pageNumber,
                         onChange:({number:pageNumber,size:pageSize})=>{
-                            debugger;
                             this.fetchData({pageNumber,pageSize})
                         }
                     }}

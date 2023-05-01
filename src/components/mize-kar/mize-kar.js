@@ -13,7 +13,7 @@ export default class MizeKar extends Component {
     static contextType = AppContext;
     constructor(props){
         super(props);
-        this.state = {niaz_be_taide_man:[],checks:{},mode:false,davatname_ha:[],davatname_ha_total:0,pageNumber:1,pageSize:20}
+        this.state = {niaz_be_taide_man:[],checks:{},mode:false,davatname_ha:[],davatname_ha_total:0,pageNumber:1,pageSize:10}
     }
     async niaz_be_taide_man(){
         let {apis} = this.context;
