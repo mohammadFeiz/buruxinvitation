@@ -20,11 +20,18 @@ export default class Tarikhche extends Component{
     async componentDidMount(){
         this.fetchData();
     }
+    changeSearch(searchValue){
+        this.setState({searchValue});
+        clearTimeout(this.timeout);
+        this.timeout = setTimeout(()=>{
+            this.fetchData({searchValue})
+        },1000)
+    }
     async fetchData(obj = {}){
-        let {pageNumber = this.state.pageNumber,pageSize = this.state.pageSize} = obj;
+        let {pageNumber = this.state.pageNumber,pageSize = this.state.pageSize,searchValue = this.state.searchValue} = obj;
         let {apis} = this.context;
-        let {tarikhche,total} = await apis({type:'tarikhche',parameter:{pageNumber,pageSize}})
-        this.setState({tarikhche,total,pageSize,pageNumber})
+        let {tarikhche,total} = await apis({type:'tarikhche',parameter:{pageNumber,pageSize,searchValue}})
+        this.setState({tarikhche,total,pageSize,pageNumber,searchValue})
     }
     async ersale_mojadad(checks){
         let {apis,setConfirm} = this.context;
@@ -39,7 +46,7 @@ export default class Tarikhche extends Component{
             className:'padding-0-12',
             size:36,
             row:[
-                {flex:1},
+                {flex:1,html:<input type='text' value={searchValue} onChange={(e)=>this.changeSearch({searchValue:e.target.value})}/>,align:'v'},
                 {align:'v',html:<button onClick={()=>this.ersale_mojadad(checks)} disabled={checkeds.length === 0} className='button-2'>ارسال مجدد</button>}
             ]
         }
