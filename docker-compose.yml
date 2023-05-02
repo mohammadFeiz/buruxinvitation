@@ -8,9 +8,11 @@ services:
       dockerfile: Dockerfile
       #target: development
     volumes:
-      - './src:/app/src'
-      - '/app/node_modules'
+      - .:/app
+      # - './src:/app/src'
+      # - '/app/node_modules'
     ports:
       - 3076:3000
     environment:
-      - BACKEND_URL=http://192.168.10.51:8076/
+      - NODE_ENV=production
+      # - BACKEND_URL=http://192.168.10.51:8076/
