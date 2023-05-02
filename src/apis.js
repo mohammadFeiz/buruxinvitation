@@ -106,7 +106,8 @@ export default function apis({Axios, getDateAndTime, getState}){
             return {url: `${downloadTemplateFile}`}
         },
         // ********************* لیست تاریخچه **********************
-        async tarikhche({pageNumber,pageSize}){
+        async tarikhche({pageNumber,pageSize, searchValue}){
+            // debugger
             // return [
             //     {davat_shode:'علی احمدی',davat_konande:'حسین رحمتی',name_davatname:'نمایشگاه صنعت برق',zamane_davat:'1401/08/10 ساعت 10:42',id:0,status:'0',shomare_tamase_davat_shode:'09123534314',date:new Date().getTime() - (60 * 60 * 60 * 1000)},
             //     {davat_shode:'علی احمدی',davat_konande:'حسین رحمتی',name_davatname:'نمایشگاه صنعت برق',zamane_davat:'1401/08/10 ساعت 10:42',id:1,status:'1',shomare_tamase_davat_shode:'09123534314',date:new Date().getTime() - (60 * 60 * 60 * 1000)},

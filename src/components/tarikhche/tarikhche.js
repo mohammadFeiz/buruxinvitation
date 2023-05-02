@@ -40,7 +40,7 @@ export default class Tarikhche extends Component{
         else if(typeof res === 'string'){setConfirm({type:'error',text:res})}
     }
     toolbar_layout(){
-        let {checks} = this.state;
+        let {checks, searchValue} = this.state;
         let checkeds = Object.keys(checks).filter((o)=>checks[o]);
         return {
             className:'padding-0-12',
