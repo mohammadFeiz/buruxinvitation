@@ -136,6 +136,17 @@ export default class MizeKar extends Component {
                     pageNumber={pageNumber}
                     pageSize={pageSize}
                     onChangePaging={(obj)=>this.davatname_ha(obj)} 
+                    change_davatname_ha={(id,obj)=>{
+                        debugger
+                        this.setState({davatname_ha: davatname_ha.map((o)=>{
+                            if (id===o.id){
+                                return obj 
+                            }
+                            else{
+                                return o
+                            }
+                        })})
+                    }}
                 />
             )
         }
@@ -185,12 +196,13 @@ class TarahiDavatname extends Component{
     }
     async save(mode){
         let {apis,setConfirm} = this.context;
-        let {onClose} = this.props;
+        let {onClose,change_davatname_ha} = this.props;
         let {model,karbarane_daraye_dastresi} = this.state;
         if(!model.name_davatname || !model.tarikhe_etebar){alert('اطلاعات مورد نیاز را وارد کنید'); return;}
         let res = await apis({type:'zakhire_tarahi_davatname',parameter:{mode,model,karbarane_daraye_dastresi}})
         if(typeof res === 'string'){setConfirm({type:'error',text:'ذخیره دعوتنامه طراحی شده با خطا روبرو شد',subtext:res})}
         else{
+            change_davatname_ha(model.id,model)
             setConfirm({type:'success',text:'ذخیره دعوتنامه طراحی شده با موفقیت انجام شد'})
             onClose()
         }
@@ -607,7 +619,7 @@ class ErsaleDavatname extends Component{
                     popupWidth='fit'
                     text='انتخاب از لیست دعوتنامه ها'
                     value={davatname_haye_entekhab_shode}
-                    options={davatname_ha}
+                    options={davatname_ha.filter((o)=>o.is_active ===true && o.is_draft === false)}
                     optionText='option.name'
                     optionValue='option.id'
                     popupAttrs={{style:{maxHeight:300}}}
@@ -871,12 +883,12 @@ class DavatnameHa extends Component{
         }
     }
     list_layout(){
-        let {davatname_ha,onRemove} = this.props;
+        let {davatname_ha,onRemove,change_davatname_ha} = this.props;
         return {
             flex:1,
             html:(
                 <div style={{display:'inline-block',padding:'0 12px', overflowY:'auto'}}>
-                    {davatname_ha.map((o,i)=><DavatnameCard key={o.id} object={o} onRemove={()=>onRemove(o)}/>)}
+                    {davatname_ha.map((o,i)=><DavatnameCard key={o.id} object={o} onRemove={()=>onRemove(o)} change_davatname_ha={change_davatname_ha}/>)}
                 </div>
             )
         }
@@ -982,12 +994,13 @@ class DavatnameCard extends Component{
     addPopup(){
         let {object} = this.state;
         let {addPopup} = this.context;
+        let {change_davatname_ha} = this.props;
         addPopup({
             title:'ویرایش دعوتنامه',
             content:()=>{
                 return (
                     <div style={{background:'#f8f8f8',overflow:'hidden',height:'100%'}} className='msf'>
-                        <TarahiDavatname onClose={()=>this.setState({mode:false})} model={object}/>
+                        <TarahiDavatname onClose={()=>this.setState({mode:false})} model={object} change_davatname_ha={change_davatname_ha}/>
                     </div>
                 )
             }

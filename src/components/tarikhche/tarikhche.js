@@ -46,7 +46,7 @@ export default class Tarikhche extends Component{
             className:'padding-0-12',
             size:36,
             row:[
-                {flex:1,html:<input type='text' value={searchValue} onChange={(e)=>this.changeSearch({searchValue:e.target.value})}/>,align:'v'},
+                {flex:1,html:<input type='text' value={searchValue} onChange={(e)=>this.changeSearch(e.target.value)}/>,align:'v'},
                 {align:'v',html:<button onClick={()=>this.ersale_mojadad(checks)} disabled={checkeds.length === 0} className='button-2'>ارسال مجدد</button>}
             ]
         }

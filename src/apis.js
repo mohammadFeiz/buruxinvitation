@@ -269,6 +269,8 @@ export default function apis({Axios, getDateAndTime, getState}){
                 // let hoursBetweenDates = msBetweenDates / (1000 * 3600 * 24);
                 return {
                     id: o.id,
+                    is_active:o.is_active,
+                    is_draft: o.is_draft,
                     name: o.name,
                     tarikhe_ijad: tarikhe_ijad,
                     // tarikhe_etebar: expiration_date,
