@@ -14,7 +14,7 @@ export default class Tarikhche extends Component{
             tarikhche:[],
             checks:{},
             total:0,
-            pageNumber:1,pageSize:10
+            pageNumber:1,pageSize:50
         }
     }
     async componentDidMount(){
