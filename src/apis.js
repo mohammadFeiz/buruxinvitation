@@ -107,7 +107,6 @@ export default function apis({Axios, getDateAndTime, getState}){
         },
         // ********************* لیست تاریخچه **********************
         async tarikhche({pageNumber,pageSize, searchValue}){
-            // debugger
             // return [
             //     {davat_shode:'علی احمدی',davat_konande:'حسین رحمتی',name_davatname:'نمایشگاه صنعت برق',zamane_davat:'1401/08/10 ساعت 10:42',id:0,status:'0',shomare_tamase_davat_shode:'09123534314',date:new Date().getTime() - (60 * 60 * 60 * 1000)},
             //     {davat_shode:'علی احمدی',davat_konande:'حسین رحمتی',name_davatname:'نمایشگاه صنعت برق',zamane_davat:'1401/08/10 ساعت 10:42',id:1,status:'1',shomare_tamase_davat_shode:'09123534314',date:new Date().getTime() - (60 * 60 * 60 * 1000)},
@@ -131,7 +130,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             if (searchValue){
                 url = url + `search=${searchValue}`
             }
-            debugger
+            
             let status;
             let created_at;
             let res;
@@ -220,7 +219,6 @@ export default function apis({Axios, getDateAndTime, getState}){
             catch(err){
                 return {davatname_ha:[],total:0}
             }
-            // debugger
             let resMapping = res.data.results.map((o) =>{
                 let {date,time} = getDateAndTime(o.created_at);
                 // let expiration_date = AIODate().getByOffset({date:date.split('/').map((x)=>+x),offset:o.expiration,calendarType:'jalali'})
@@ -344,15 +342,12 @@ export default function apis({Axios, getDateAndTime, getState}){
                     if(model.az_tarikh){
                         
                         miladi_start_event = isoDate(model.az_tarikh)
-                        // debugger
                     }
                     if(model.ta_tarikh){
-                        // debugger
                         miladi_end_event = isoDate(model.ta_tarikh)
                     }
                 }
                 catch{
-                    // debugger
                     return 'لطفا فیلد های مورد نیاز را تکمیل کنید'
                 }
             
@@ -366,7 +361,6 @@ export default function apis({Axios, getDateAndTime, getState}){
             
             let apiBody
             try{
-                // debugger
                 apiBody = {
                     id: model.id,
                     template_id: model.id,
@@ -394,14 +388,12 @@ export default function apis({Axios, getDateAndTime, getState}){
                 }
             }
             catch(err){
-                // debugger
                 return "در فراخوانی دیتا مشکلی پیش آمده است"
             }
             
             if (model.poster !== false){
                 apiBody["mobile_poster"] = model.poster
             }
-            // debugger
             let formData = new FormData();
             for (const key in apiBody) {
                 if(apiBody[key] !== undefined){
@@ -418,11 +410,8 @@ export default function apis({Axios, getDateAndTime, getState}){
             // تغییر دعوتنامه
             if(mode === 'edit'){  
                 // تمامی اطلاعاتی که سمت کلاین رفته دریافت می گردد
-                // debugger
                 let check_mobile_poster = formData.get('mobile_poster')
-                // debugger
                 if(!check_mobile_poster.name){ // اگر فایلی آپبود نشود باید تصویر موجود از قبل را از فرم دیتا پاک کرد تا به اررور نخوریم
-                    // debugger
                     formData.delete('desktop_poster')
                     formData.delete('mobile_poster')
                 }
@@ -434,7 +423,6 @@ export default function apis({Axios, getDateAndTime, getState}){
                     })
                 }
                 catch(err){
-                    // debugger
                     return 'خطایی در تغییر این دعوتنامه رخ داد'
                 } 
                 return true
@@ -457,7 +445,6 @@ export default function apis({Axios, getDateAndTime, getState}){
                                 return err.response.data.message
                             }
                             else{
-                                // debugger
                                 return 'فیلد های مورد نیاز را تکمیل کنید'
                             }
                         }
@@ -588,7 +575,6 @@ export default function apis({Axios, getDateAndTime, getState}){
                 })
             }
             catch(err){
-                // debugger
                 return 'خطایی رخ داد'
             }
             if (res.data.invalid_count !== 0){
