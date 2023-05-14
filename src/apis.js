@@ -128,6 +128,10 @@ export default function apis({Axios, getDateAndTime, getState}){
             // ]
             let userInformation = getState().userInformation
             url = `${showAllInvitation}?username=${userInformation.username}&limit=${pageSize}&offset=${(pageNumber - 1) * pageSize}`
+            if (searchValue){
+                url = url + `search=${searchValue}`
+            }
+            debugger
             let status;
             let created_at;
             let res;
