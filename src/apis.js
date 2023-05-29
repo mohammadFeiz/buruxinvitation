@@ -1,7 +1,7 @@
 import AIODate from "./npm/aio-date/aio-date";
-// const hostName = `http://172.16.7.34:8002`
+const hostName = `http://172.16.7.34:8002`
 //const hostName = `http://172.16.7.34:8002`
-const hostName = `https://u.davat.app`
+// const hostName = `https://u.davat.app`
 // const hostName = `http://localhost:8002`
 // const hostName = `https://uu.davat.app`
 // const hostName = `http://localhost:8002`
@@ -321,7 +321,7 @@ export default function apis({Axios, getDateAndTime, getState}){
                         miladi_end_event = isoDate(model.ta_tarikh)
                     }
                 }
-                catch{
+                catch(err){
                     return 'لطفا فیلد های مورد نیاز را تکمیل کنید'
                 }
             
@@ -488,8 +488,20 @@ export default function apis({Axios, getDateAndTime, getState}){
                 res = await Axios.post(url, urlParams)
             }
             catch(err){
+                if(err.response){
+                    if(err.response.data){
+                        return err.response.data.message
+                    }
+                    else{
+                        return "خطایی در ثبت دیتا ها رخ داد"
+                    }
+                }
+                else{
+                    return "خطایی در ثبت دیتا ها رخ داد"
+                }
                 return "خطایی در ثبت دیتا ها رخ داد"
             }
+            
             //return 'خطایی رخ داد';
             return true
         },
@@ -520,6 +532,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             let successMessage;
             let errorMessage;
             let template_id = '';
+            debugger
             if (davatname_haye_entekhab_shode.length === 0){
                 return 'لیست دعوتنامه خالی است'
             }
@@ -549,6 +562,17 @@ export default function apis({Axios, getDateAndTime, getState}){
                 })
             }
             catch(err){
+                if(err.response){
+                    if(err.response.data){
+                        return err.response.data.message
+                    }
+                    else{
+                        return "خطایی در ثبت دیتا ها رخ داد"
+                    }
+                }
+                else{
+                    return "خطایی در ثبت دیتا ها رخ داد"
+                }
                 return 'خطایی رخ داد'
             }
             if (res.data.invalid_count !== 0){
