@@ -1,9 +1,9 @@
 import AIODate from "./npm/aio-date/aio-date";
-const hostName = `http://172.16.7.34:8002`
+// const hostName = `http://172.16.7.34:8002`
 //const hostName = `http://172.16.7.34:8002`
 // const hostName = `https://u.davat.app`
 // const hostName = `http://localhost:8002`
-// const hostName = `https://uu.davat.app`
+const hostName = `https://uu.davat.app`
 // const hostName = `http://localhost:8002`
 // const hostName = `http://192.168.211.136:8001`
 // const hostName = `http://localhost:8001`
@@ -532,7 +532,6 @@ export default function apis({Axios, getDateAndTime, getState}){
             let successMessage;
             let errorMessage;
             let template_id = '';
-            debugger
             if (davatname_haye_entekhab_shode.length === 0){
                 return 'لیست دعوتنامه خالی است'
             }

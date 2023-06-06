@@ -137,7 +137,6 @@ export default class MizeKar extends Component {
                     pageSize={pageSize}
                     onChangePaging={(obj)=>this.davatname_ha(obj)} 
                     change_davatname_ha={(id,obj)=>{
-                        debugger
                         this.setState({davatname_ha: davatname_ha.map((o)=>{
                             if (id===o.id){
                                 return obj 
