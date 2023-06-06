@@ -3,18 +3,20 @@ import AIODate from "./npm/aio-date/aio-date";
 //const hostName = `http://172.16.7.34:8002`
 // const hostName = `https://u.davat.app`
 // const hostName = `http://localhost:8002`
-const hostName = `https://uu.davat.app`
+// const hostName = process.env.REACT_APP_BACKEND_URL || `https://uu.davat.app`
+const hostName = `https://u.davat.app`
+
+console.log("hostname", hostName);
 // const hostName = `http://localhost:8002`
 // const hostName = `http://192.168.211.136:8001`
 // const hostName = `http://localhost:8001`
 // const hostName =  process.env.BACKEND_URL
 // const hostName = `http://192.168.10.51:8076`
-let url;
 // let user_name = 'm.shad' // یا 'm.shad'
 // let user_name_role = 'admin'  // یا'user'
 //آدرس برای ساخت تمپلیت و ولیدیت کردن و همچنین بررسی اینکه آیا آن تمپلیت فعال است یا خیر
 const invitationTemplateUrl = `${hostName}/Api/V1/Invitation/InvitationTemplate/` // دعوتنامه ها
-
+console.log(invitationTemplateUrl);
 const excellImport = `${hostName}/Api/V1/Invitation/GroupSending/` //ارسال گروهی
 
 const ersalTakiUrl = `${hostName}/Api/V1/Invitation/SingleSending/` // ارسال تکی
@@ -108,7 +110,7 @@ export default function apis({Axios, getDateAndTime, getState}){
         // ********************* لیست تاریخچه **********************
         async tarikhche({pageNumber,pageSize, searchValue}){
             let userInformation = getState().userInformation
-            url = `${showAllInvitation}?username=${userInformation.username}&limit=${pageSize}&offset=${(pageNumber - 1) * pageSize}`
+            let url = `${showAllInvitation}?username=${userInformation.username}&limit=${pageSize}&offset=${(pageNumber - 1) * pageSize}`
             if (searchValue){
                 url = url + `search=${searchValue}`
             }
@@ -186,6 +188,7 @@ export default function apis({Axios, getDateAndTime, getState}){
         async davatname_ha({pageSize,pageNumber}){
 
             let url = `${invitationTemplateUrl}?limit=${pageSize}&offset=${(pageNumber - 1) * pageSize}`
+            console.log("url", url);
             let res;
             try{
                 res = await Axios.get(url)
@@ -294,7 +297,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             let userInformation = getState().userInformation
 
             let res;
-            url = `${invitationTemplateUrl}?username=${userInformation.username}`
+            let url = `${invitationTemplateUrl}?username=${userInformation.username}`
             let is_draft;
             let jalali_start_event;
             let miladi_start_event;
@@ -447,7 +450,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             
             //return 'خطایی رخ داد';
             let userInformation = getState().userInformation
-            url = `${ersalTakiUrl}?username=${userInformation.username}`
+            let url = `${ersalTakiUrl}?username=${userInformation.username}`
             let res;
             let role
             let gender;
@@ -526,7 +529,7 @@ export default function apis({Axios, getDateAndTime, getState}){
             let userInformation = getState().userInformation
 
 
-            url = `${excellImport}?username=${userInformation.username}`
+            let url = `${excellImport}?username=${userInformation.username}`
             let res;
             let role;
             let successMessage;
@@ -688,7 +691,7 @@ export default function apis({Axios, getDateAndTime, getState}){
         },
         async hazfe_davatname(obj){
             let userInformation = getState().userInformation
-            url = `${invitationTemplateUrl}?username=${userInformation.username}&id=${obj.id}`
+            let url = `${invitationTemplateUrl}?username=${userInformation.username}&id=${obj.id}`
             let res;
             try{
                 res = await Axios.delete(url)
