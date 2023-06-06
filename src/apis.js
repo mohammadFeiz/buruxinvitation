@@ -6,7 +6,6 @@ import AIODate from "./npm/aio-date/aio-date";
 // const hostName = process.env.REACT_APP_BACKEND_URL || `https://uu.davat.app`
 const hostName = `https://u.davat.app`
 
-console.log("hostname", hostName);
 // const hostName = `http://localhost:8002`
 // const hostName = `http://192.168.211.136:8001`
 // const hostName = `http://localhost:8001`
@@ -16,7 +15,6 @@ console.log("hostname", hostName);
 // let user_name_role = 'admin'  // یا'user'
 //آدرس برای ساخت تمپلیت و ولیدیت کردن و همچنین بررسی اینکه آیا آن تمپلیت فعال است یا خیر
 const invitationTemplateUrl = `${hostName}/Api/V1/Invitation/InvitationTemplate/` // دعوتنامه ها
-console.log(invitationTemplateUrl);
 const excellImport = `${hostName}/Api/V1/Invitation/GroupSending/` //ارسال گروهی
 
 const ersalTakiUrl = `${hostName}/Api/V1/Invitation/SingleSending/` // ارسال تکی
@@ -188,7 +186,6 @@ export default function apis({Axios, getDateAndTime, getState}){
         async davatname_ha({pageSize,pageNumber}){
 
             let url = `${invitationTemplateUrl}?limit=${pageSize}&offset=${(pageNumber - 1) * pageSize}`
-            console.log("url", url);
             let res;
             try{
                 res = await Axios.get(url)
@@ -381,7 +378,6 @@ export default function apis({Axios, getDateAndTime, getState}){
                         formData.append(key, apiBody[key])
                     }
                 }
-                console.log(`${key}`, apiBody[key])
             }
 
             // تغییر دعوتنامه
