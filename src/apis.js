@@ -1,5 +1,6 @@
 import AIODate from "./npm/aio-date/aio-date";
-const hostName = `http://172.16.7.34:8002`;
+// const hostName = `http://172.16.7.34:8002`;
+const hostName = `http://192.168.10.50:8086`;
 //const hostName = `http://172.16.7.34:8002`
 // const hostName = `https://u.davat.app`
 // const hostName = `http://localhost:8002`
@@ -395,7 +396,7 @@ export default function apis({ Axios, getDateAndTime, getState }) {
           brt_station_name: model.nazdik_tarin_brt,
           metro_station_name: model.nazdik_tarin_metro,
           can_others_invite: model.emkane_davat,
-          is_active: true,
+          is_active: model.is_active,
           is_draft: is_draft,
           is_redirect_to_landing_page: model.ersale_mostaghim,
           // user: userInformation,
@@ -451,7 +452,11 @@ export default function apis({ Axios, getDateAndTime, getState }) {
           });
         } catch (err) {
           if (err.response.data) {
-            return err.response.data.message;
+            if (err.response.data.message) {
+              return err.response.data.message;
+            } else {
+              return "خطای نامشخص";
+            }
           } else {
             return "خطای نامشخص";
           }
@@ -520,7 +525,11 @@ export default function apis({ Axios, getDateAndTime, getState }) {
         res = await Axios.post(url, urlParams);
       } catch (err) {
         if (err.response.data) {
-          return err.response.data.message;
+          if (err.response.data.message) {
+            return err.response.data.message;
+          } else {
+            return "خطای نامشخص";
+          }
         } else {
           return "خطای نامشخص";
         }
@@ -583,7 +592,12 @@ export default function apis({ Axios, getDateAndTime, getState }) {
         });
       } catch (err) {
         if (err.response.data) {
-          return err.response.data.message;
+          if (err.response.data.message){
+              return err.response.data.message;
+          }
+          else{
+              return "خطای نامشخص";
+          }
         } else {
           return "خطای نامشخص";
         }
@@ -608,7 +622,6 @@ export default function apis({ Axios, getDateAndTime, getState }) {
         successLength: res.data.valid_count,
         errorList: errorList,
       };
-
       return resMapping;
     },
 
@@ -631,7 +644,11 @@ export default function apis({ Axios, getDateAndTime, getState }) {
           res = await Axios.get(url);
         } catch (err) {
           if (err.response.data) {
-            return err.response.data.message;
+            if (err.response.data.message) {
+              return err.response.data.message;
+            } else {
+              return "خطای نامشخص";
+            }
           } else {
             return "خطای نامشخص";
           }
@@ -653,10 +670,10 @@ export default function apis({ Axios, getDateAndTime, getState }) {
       //state -> نشان دهنده این است که قالب را فعال یا غیر فعال کرده است.
       let userInformation = getState().userInformation;
 
-      let url = `${invitationTemplateUrl}`;
+      let url = `${invitationTemplateUrl}?username=${userInformation.username}`;
       let res;
       let apiBody = {
-        template_id: object.id,
+        id: object.id,
         is_active: state,
         user: userInformation,
       };
@@ -666,7 +683,11 @@ export default function apis({ Axios, getDateAndTime, getState }) {
         return true;
       } catch (err) {
         if (err.response.data) {
-          return err.response.data.message;
+          if (err.response.data.message) {
+            return err.response.data.message;
+          } else {
+            return "خطای نامشخص";
+          }
         } else {
           return "خطای نامشخص";
         }
@@ -695,7 +716,11 @@ export default function apis({ Axios, getDateAndTime, getState }) {
         return true;
       } catch (err) {
         if (err.response.data) {
-          return err.response.data.message;
+          if (err.response.data.message) {
+            return err.response.data.message;
+          } else {
+            return "خطای نامشخص";
+          }
         } else {
           return "خطای نامشخص";
         }
@@ -715,7 +740,11 @@ export default function apis({ Axios, getDateAndTime, getState }) {
         res = await Axios.delete(url);
       } catch (err) {
         if (err.response.data) {
-          return err.response.data.message;
+          if (err.response.data.message) {
+            return err.response.data.message;
+          } else {
+            return "خطای نامشخص";
+          }
         } else {
           return "خطای نامشخص";
         }
