@@ -1,8 +1,8 @@
 import AIODate from "./npm/aio-date/aio-date";
 // const hostName = `http://172.16.7.34:8002`;
-const hostName = `http://192.168.10.50:8086`;
+// const hostName = `http://192.168.10.50:8086`;
 //const hostName = `http://172.16.7.34:8002`
-// const hostName = `https://u.davat.app`
+const hostName = `https://u.davat.app`
 // const hostName = `http://localhost:8002`
 // const hostName = process.env.REACT_APP_BACKEND_URL || `https://uu.davat.app`
 // const hostName = `https://u.davat.app`
