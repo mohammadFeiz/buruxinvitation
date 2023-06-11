@@ -933,7 +933,7 @@ class DavatnameHa extends Component{
                             ]
                         },
                         {
-                            size:36,gap:12,
+                            size:36,gap:12,style:{direction:'ltr'},
                             row:[
                                 {flex:1},
                                 {html:'صفحه بعد',className:'fs-12 bold',onClick:()=>this.onChangePaging({pageNumber:pageNumber + 1})},
