@@ -3,15 +3,8 @@ import AIODate from "./npm/aio-date/aio-date";
 const hostName = `http://192.168.10.50:8086`;
 // const hostName = `http://172.16.7.34:8002`
 // const hostName = `https://u.davat.app`
-// const hostName = `http://localhost:8002`
 // const hostName = process.env.REACT_APP_BACKEND_URL || `https://uu.davat.app`
-// const hostName = `https://u.davat.app`
 
-// const hostName = `http://localhost:8002`
-// const hostName = `http://192.168.211.136:8001`
-// const hostName = `http://localhost:8001`
-// const hostName =  process.env.BACKEND_URL
-// const hostName = `http://192.168.10.51:8076`
 // let user_name = 'm.shad' // یا 'm.shad'
 // let user_name_role = 'admin'  // یا'user'
 //آدرس برای ساخت تمپلیت و ولیدیت کردن و همچنین بررسی اینکه آیا آن تمپلیت فعال است یا خیر
@@ -38,10 +31,22 @@ function isoDate(date) {
 export default function apis({ Axios, getDateAndTime, getState }) {
   return {
     async badges(){
-      return {
-        pishnevis:3,
-        tedad:3,
-        faal:5
+      let url = `${hostName}/Api/V1/Invitation/InvitationTemplateInfoApi/`
+      try{
+        let res = await Axios.get(url);
+        res = res.data
+        return {
+          pishnevis: res.draft_templates,
+          tedad: res.all_templates,
+          faal: res.active_templates,
+        }
+      }
+      catch(err){
+        return {
+          pishnevis:0,
+          tedad:0,
+          faal:0,
+        }
       }
     },
     // ********************* نیاز به تائید من **********************
@@ -120,29 +125,18 @@ export default function apis({ Axios, getDateAndTime, getState }) {
     // ********************* لیست تاریخچه **********************
     async tarikhche({ pageNumber, pageSize, searchValue }) {
       let userInformation = getState().userInformation;
-      let url = `${showAllInvitation}?username=${
-        userInformation.username
-      }&limit=${pageSize}&offset=${(pageNumber - 1) * pageSize}`;
+      let url = `${showAllInvitation}?username=${userInformation.username}&limit=${pageSize}&offset=${(pageNumber - 1) * pageSize}`;
       if (searchValue) {
         url = url + `search=${searchValue}`;
       }
 
-      let status;
-      let created_at;
-      let res;
+      let status, created_at, res;
 
       try {
         res = await Axios.get(url);
       } catch (err) {
         return { tarikhche: [], total: 0 };
       }
-      // {davat_shode:'علی احمدی',
-      // davat_konande:'حسین رحمتی',
-      // name_davatname:'نمایشگاه صنعت برق',
-      // zamane_davat:'1401/08/10 ساعت 10:42',
-      // id:15,status:'0',
-      // shomare_tamase_davat_shode:'09123534314',
-      // date:new Date().getTime() - (60 * 60 * 60 * 1000)}
       let resMapping = res.data.results.map((o) => {
         //به دست آوردن تایم به صورت فارسی
 
@@ -220,15 +214,6 @@ export default function apis({ Axios, getDateAndTime, getState }) {
       }
       let resMapping = res.data.results.map((o) => {
         let { date, time } = getDateAndTime(o.created_at);
-        // let expiration_date = AIODate().getByOffset({date:date.split('/').map((x)=>+x),offset:o.expiration,calendarType:'jalali'})
-        // let y;
-        // let tt = expiration_date.map((z) => {
-        //     if(z != undefined){
-        //         y += `${z}`
-        //         y += '/'
-        //     }
-        // })
-        //get create_at and expiration_date of template
         let created_at = new Date(o.created_at)
           .toISOString(o.created_at)
           .replace("T", " ")
@@ -247,9 +232,6 @@ export default function apis({ Axios, getDateAndTime, getState }) {
           date: [year, month, day],
         });
         jalali_expiration = `${jalali_expiration[0]}/${jalali_expiration[1]}/${jalali_expiration[2]}`;
-        // if(o.mobile_poster) {
-        //     o.mobile_poster = `${hostName}${o.mobile_poster}`
-        // }
         let az_tarikh, ta_tarikh;
         if (o.event_start_date && o.event_end_date) {
           //به دست آوردن تاریخ های
@@ -257,7 +239,6 @@ export default function apis({ Axios, getDateAndTime, getState }) {
           az_tarikh = `${az_tarikh.date}/${az_tarikh.time}`;
           ta_tarikh = getDateAndTime(o.event_end_date);
           ta_tarikh = `${ta_tarikh.date}/${ta_tarikh.time}`;
-          // created_at = new Date(created_at).toLocaleDateString('fa-IR')
         }
 
         let tarikhe_ijad = AIODate().toJalali({
@@ -269,22 +250,12 @@ export default function apis({ Axios, getDateAndTime, getState }) {
           pattern: "{year}/{month}/{day}",
         });
 
-        // برای تبدیل تاریخ میلادی به شمسی
-        // let expired_at = new Date(o.created_at).toISOString(o.created_at).replace('T', ' ').replace('Z', '')
-        // created_at = `${new Date(created_at).toLocaleDateString('fa-IR')}`
-
-        // اختلاف بازه بین تاریخ ایحاد و تاریخ اعتبار
-        // let tarikhe_ijad = new Date(o.created_at).getTime()
-        // let tarikhe_etebar = new Date().getTime()
-        // let  msBetweenDates = Math.abs(tarikhe_etebar - tarikhe_ijad);
-        // let hoursBetweenDates = msBetweenDates / (1000 * 3600 * 24);
         return {
           id: o.id,
           is_active: o.is_active,
           is_draft: o.is_draft,
           name: o.name,
           tarikhe_ijad: tarikhe_ijad,
-          // tarikhe_etebar: expiration_date,
           tarikhe_etebar: tarikhe_etebar,
           tarikhe_etebar_js: o.expiration_date, //برای محاسبات لازم داریم
           expiredDate: expiration_date,
@@ -317,44 +288,11 @@ export default function apis({ Axios, getDateAndTime, getState }) {
 
     async zakhire_tarahi_davatname({ mode, model, karbarane_daraye_dastresi }) {
       //mode: 'save' | 'draft'
-      //model: آبجکت پر شده در فرم
-      //name_davatname(string)
-      //tarikhe_etebar(string)
-      //landing_page(string)
-      //matne_payamak(string)
-      //matne_davatname(string)
-      //poster(file object)
-      //ersale_mostaghim(boolean)
-      //emkane_davat(boolean)
-      //karbarane_daraye_dastresi: آرایه ای از آی دی کاربران
-
-      //return 'خطایی رخ داد';
       let userInformation = getState().userInformation;
 
-      let res;
+      let res, is_draft, jalali_start_event, miladi_start_event, jalali_end_event, miladi_end_event;
       let url = `${invitationTemplateUrl}?username=${userInformation.username}`;
-      let is_draft;
-      let jalali_start_event;
-      let miladi_start_event;
-      let jalali_end_event;
-      let miladi_end_event;
-      if (mode === "draft") {
-        is_draft = true;
-      } else {
-        is_draft = false;
-      }
-
-      // به دست آوردن اختلاف روز بین امروز و تاریخ اعتبار
-      const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
-      let today = new Date().toLocaleDateString("fa-IR-u-nu-latn"); //تاریخ امروز به فارسی با حروف لاتین
-      const firstDate = new Date(today);
-      const secondDate = new Date(model.tarikhe_etebar);
-      const diffDays = Math.round(Math.abs((secondDate - firstDate) / oneDay));
-      const expiration_date = new Date(model.tarikhe_etebar).toLocaleDateString(
-        "en-US"
-      ); //todo
-
-      //تبدیل تاریخ و ساعت شروع و پایان کار رویداد به فرمت میلادی
+      is_draft = mode == "draft"
 
       try {
         if (model.az_tarikh) {
@@ -367,13 +305,11 @@ export default function apis({ Axios, getDateAndTime, getState }) {
         return "خطا در فرمت تاریخ شروع و پایان";
       }
 
-      // let user = {
-      //     username: "a.moghimi",
-      //     roles: ["admin", "user"]
-      // }
       if (model.landing_page === "") {
         model.landing_page = undefined;
       }
+      let df = isoDate(model.tarikhe_etebar)
+      debugger
 
       let apiBody;
       try {
@@ -381,18 +317,14 @@ export default function apis({ Axios, getDateAndTime, getState }) {
           id: model.id,
           template_id: model.id,
           name: model.name_davatname,
-          // url: model.landing_page, // لینک
           sms_template: model.matne_payamak, // متن پیامک
           text_template: model.matne_davatname, // متن دعوتنامه
           expiration_date: isoDate(model.tarikhe_etebar), // تاریخ اعتبار
           latitude: parseFloat(model.lat).toFixed(6), // latitude
           longitude: parseFloat(model.long).toFixed(6), // longitude
-          // mobile_poster: model.poster,
           event_address: model.adrese_ghorfe,
           event_start_date: miladi_start_event,
-          // event_start_date : isoDate(model.az_tarikh),
           event_end_date: miladi_end_event,
-          // event_end_date: isoDate(model.ta_tarikh),
           landing_page_link: model.landing_page, // لینک لندینگ پیج
           brt_station_name: model.nazdik_tarin_brt,
           metro_station_name: model.nazdik_tarin_metro,
