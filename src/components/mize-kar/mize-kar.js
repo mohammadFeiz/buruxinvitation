@@ -199,7 +199,10 @@ class TarahiDavatname extends Component{
         let {apis,setConfirm} = this.context;
         let {onClose,change_davatname_ha} = this.props;
         let {model,karbarane_daraye_dastresi} = this.state;
-        if(!model.name_davatname || !model.tarikhe_etebar){alert('اطلاعات مورد نیاز را وارد کنید'); return;}
+        if(!model.name_davatname || !model.tarikhe_etebar){
+            setConfirm({type:'error',text:'اطلاعات مورد نیاز را وارد کنید'})
+            return;
+        }
         let res = await apis({type:'zakhire_tarahi_davatname',parameter:{mode,model,karbarane_daraye_dastresi}})
         if(typeof res === 'string'){setConfirm({type:'error',text:'ذخیره دعوتنامه طراحی شده با خطا روبرو شد',subtext:res})}
         else{
