@@ -1,6 +1,7 @@
 import AIODate from "./npm/aio-date/aio-date";
 // const hostName = `http://172.16.7.34:8002`;
 const hostName = `http://192.168.10.50:8086`;
+const base_url = `${hostName}/Api/V1/Invitation`
 // const hostName = `http://172.16.7.34:8002`
 // const hostName = `https://u.davat.app`
 // const hostName = process.env.REACT_APP_BACKEND_URL || `https://uu.davat.app`
@@ -8,18 +9,18 @@ const hostName = `http://192.168.10.50:8086`;
 // let user_name = 'm.shad' // یا 'm.shad'
 // let user_name_role = 'admin'  // یا'user'
 //آدرس برای ساخت تمپلیت و ولیدیت کردن و همچنین بررسی اینکه آیا آن تمپلیت فعال است یا خیر
-const invitationTemplateUrl = `${hostName}/Api/V1/Invitation/InvitationTemplate/`; // دعوتنامه ها
-const excellImport = `${hostName}/Api/V1/Invitation/GroupSending/`; //ارسال گروهی
+const invitationTemplateUrl = `${base_url}/InvitationTemplate/`; // دعوتنامه ها
+const excellImport = `${base_url}/GroupSending/`; //ارسال گروهی
 
-const ersalTakiUrl = `${hostName}/Api/V1/Invitation/SingleSending/`; // ارسال تکی
+const ersalTakiUrl = `${base_url}/SingleSending/`; // ارسال تکی
 
-const showAllInvitation = `${hostName}/Api/V1/Invitation/Invite/`; //تاریخچه
+const showAllInvitation = `${base_url}/Invite/`; //تاریخچه
 const ShowAllNotVerified = `${hostName}/invitation/show/`; //لیست نیاز به تائید من
 
 //با متد گت این ای پی آی تائید انجام می شود
 const InvitatonsConfirm = `${hostName}/invitation/v1/invitation/`;
 
-const sendAgain = `${hostName}/Api/V1/Invitation/ReInvite/`;
+const sendAgain = `${base_url}/ReInvite/`;
 const downloadTemplateFile = `${hostName}/DownloadTemplateExcelFile`;
 
 function isoDate(date) {
@@ -31,7 +32,7 @@ function isoDate(date) {
 export default function apis({ Axios, getDateAndTime, getState }) {
   return {
     async badges(){
-      let url = `${hostName}/Api/V1/Invitation/InvitationTemplateInfoApi/`
+      let url = `${base_url}/InvitationTemplateInfoApi/`
       try{
         let res = await Axios.get(url);
         res = res.data
