@@ -997,14 +997,14 @@ class DavatnameCard extends Component{
     }
     addPopup(){
         let {object} = this.state;
-        let {addPopup} = this.context;
+        let {addPopup,removePopup} = this.context;
         let {change_davatname_ha} = this.props;
         addPopup({
             title:'ویرایش دعوتنامه',
             content:()=>{
                 return (
                     <div style={{background:'#f8f8f8',overflow:'hidden',height:'100%'}} className='msf'>
-                        <TarahiDavatname onClose={()=>this.setState({mode:false})} model={object} change_davatname_ha={change_davatname_ha}/>
+                        <TarahiDavatname onClose={()=>removePopup()} model={object} change_davatname_ha={change_davatname_ha}/>
                     </div>
                 )
             }
