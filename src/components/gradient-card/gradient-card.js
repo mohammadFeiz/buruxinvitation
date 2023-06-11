@@ -42,12 +42,6 @@ export default class GradientCard extends Component {
         if (type === '2') {return 'دعوتنامه ها'}
         if (type === '3') {return 'ارسال دعوتنامه'}
     }
-    getDetails(){
-        let { type } = this.props;
-        if (type === '1') {return [['پیش نویس',5],['ظرفیت',5]]}
-        if (type === '2') {return [['تعداد',5],['اخیرا حذف شده',5]]}
-        if (type === '3') {return [['دعوتنامه های فعال',5],['خطا ها',5]]}
-    }
     getGradient(){
         let { type } = this.props;
         if (type === '1') {return 'linear-gradient(180deg, #4CC3F5 0%, #6CCE6C 100%)'}
@@ -68,7 +62,7 @@ export default class GradientCard extends Component {
         }
     }
     details_layout(){
-        let details = this.getDetails()
+        let {details} = this.props
         return {
             className:'colorFFF size12',gap:6,
             column:details.map((o)=>{

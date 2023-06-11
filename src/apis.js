@@ -37,6 +37,13 @@ function isoDate(date) {
 
 export default function apis({ Axios, getDateAndTime, getState }) {
   return {
+    async badges(){
+      return {
+        pishnevis:3,
+        tedad:3,
+        faal:5
+      }
+    },
     // ********************* نیاز به تائید من **********************
     async niaz_be_taide_man() {
       // return [

@@ -26,22 +26,34 @@ export default class MizeKar extends Component {
         let {davatname_ha,total} = await apis({type:'davatname_ha',parameter:{pageNumber,pageSize}});
         this.setState({davatname_ha,davatname_ha_total:total,pageNumber,pageSize})
     }
+    async getBadges(){
+        let {apis} = this.context;
+        let badges = await apis({type:'badges'});
+        this.setState({badges})
+    }
     componentDidMount(){
         this.niaz_be_taide_man();
         this.davatname_ha();
+        this.getBadges();
     }
     header_layout() {
+        let {badges = {}} = this.state;
+        let details = [
+            [['پیش نویس',badges.pishnevis]],
+            [['تعداد',badges.tedad]],
+            [['دعوتنامه های فعال',badges.faal]]
+        ]
         return {
             row:[
                 {flex:1},
-                {html:<GradientCard type={'1'} onClick={(mode)=>this.setState({mode})}/>},
+                {html:<GradientCard type={'1'} onClick={(mode)=>this.setState({mode})} details={details[0]}/>},
                 {size:24},
                 {html:<GradientCard type={'2'} onClick={async (mode)=>{
                     await this.davatname_ha()
                     this.setState({mode})
-                }}/>},
+                }} details={details[1]}/>},
                 {size:24},
-                {html:<GradientCard type={'3'} onClick={(mode)=>this.setState({mode})}/>},
+                {html:<GradientCard type={'3'} onClick={(mode)=>this.setState({mode})} details={details[2]}/>},
                 {flex:1}
             ]
         }
