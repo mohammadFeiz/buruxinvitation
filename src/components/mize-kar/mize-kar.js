@@ -121,10 +121,21 @@ export default class MizeKar extends Component {
         davatname_ha = davatname_ha.filter(({id})=>id !== o.id);
         this.setState({davatname_ha});
     }
+    change_davatname_ha(id,obj){
+        let {davatname_ha} = this.state;
+        this.setState({davatname_ha: davatname_ha.map((o)=>{
+            if (id===o.id){
+                return obj 
+            }
+            else{
+                return o
+            }
+        })})
+    }
     render() {
         let {mode,davatname_ha,pageNumber,pageSize,davatname_ha_total} = this.state;
         let {addPopup} = this.context;
-        if(mode === 'tarahi_davatname'){return <TarahiDavatname onClose={()=>this.setState({mode:false})}/>}
+        if(mode === 'tarahi_davatname'){return <TarahiDavatname onClose={()=>this.setState({mode:false})} change_davatname_ha={this.change_davatname_ha.bind(this)}/>}
         if(mode === 'ersale_davatname'){return <ErsaleDavatname onClose={()=>this.setState({mode:false})} davatname_ha={davatname_ha}/>}
         if(mode === 'davatname_ha'){
             return (
@@ -136,16 +147,7 @@ export default class MizeKar extends Component {
                     pageNumber={pageNumber}
                     pageSize={pageSize}
                     onChangePaging={(obj)=>this.davatname_ha(obj)} 
-                    change_davatname_ha={(id,obj)=>{
-                        this.setState({davatname_ha: davatname_ha.map((o)=>{
-                            if (id===o.id){
-                                return obj 
-                            }
-                            else{
-                                return o
-                            }
-                        })})
-                    }}
+                    change_davatname_ha={this.change_davatname_ha.bind(this)}
                 />
             )
         }
