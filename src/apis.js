@@ -1,7 +1,7 @@
 import AIODate from "./npm/aio-date/aio-date";
 // const hostName = `http://172.16.7.34:8002`;
 const hostName = `http://192.168.10.50:8086`;
-//const hostName = `http://172.16.7.34:8002`
+// const hostName = `http://172.16.7.34:8002`
 // const hostName = `https://u.davat.app`
 // const hostName = `http://localhost:8002`
 // const hostName = process.env.REACT_APP_BACKEND_URL || `https://uu.davat.app`
@@ -247,15 +247,9 @@ export default function apis({ Axios, getDateAndTime, getState }) {
         if (o.event_start_date && o.event_end_date) {
           //به دست آوردن تاریخ های
           az_tarikh = getDateAndTime(o.event_start_date);
-          az_tarikh = `${az_tarikh.date}/${az_tarikh.time
-            .replace("Z", "")
-            .replace(/:/g, "")
-            .replace(/00/g, "")}`;
+          az_tarikh = `${az_tarikh.date}/${az_tarikh.time}`;
           ta_tarikh = getDateAndTime(o.event_end_date);
-          ta_tarikh = `${ta_tarikh.date}/${ta_tarikh.time
-            .replace("Z", "")
-            .replace(/:/g, "")
-            .replace(/00/g, "")}`;
+          ta_tarikh = `${ta_tarikh.date}/${ta_tarikh.time}`;
           // created_at = new Date(created_at).toLocaleDateString('fa-IR')
         }
 

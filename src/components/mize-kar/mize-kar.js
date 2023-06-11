@@ -975,8 +975,12 @@ class DavatnameCard extends Component{
     }
     days_layout(){
         let {object} = this.props;
-        let {day} = AIODate().getDelta({date: new Date().getTime(), otherDate: object.tarikhe_etebar_js});
-        return {size:24,align:'v',html:`${day} روز اعتبار دارد`,className:'size10 color605E5C padding-0-6 bold'}
+        let {day, type} = AIODate().getDelta({date: new Date().getTime(), otherDate: object.tarikhe_etebar_js});
+        if (type === "remaining") {
+            day = 0
+        }
+        let html = day === 0 ? `منقضی شده` : `${day} روز اعتبار دارد`
+        return {size:24,align:'v',html,className:'size10 color605E5C padding-0-6 bold', style:{color:day===0 ? "red": undefined}}
     }
     date_layout(type){
         let {object} = this.props;
