@@ -941,12 +941,8 @@ class DavatnameHa extends Component{
 
 class DavatnameCard extends Component{
     static contextType = AppContext;
-    constructor(props){
-        super(props);
-        this.state = {object:props.object}
-    }
     poster(){
-        let {object} = this.state;
+        let {object} = this.props;
         let {poster} = object;
         return (
             <label onClick={()=>this.addPopup()} style={{width:'100%',background:'#ddd',display:'flex',alignItems:'center',justifyContent:'center'}}>
@@ -971,19 +967,19 @@ class DavatnameCard extends Component{
         }
     }
     name_layout(){
-        let {object} = this.state;
+        let {object} = this.props;
         let {name} = object;
         return {
             size:36,html:name,align:'vh',className:'size14 bold'
         }
     }
     days_layout(){
-        let {object} = this.state;
+        let {object} = this.props;
         let {day} = AIODate().getDelta({date: new Date().getTime(), otherDate: object.tarikhe_etebar_js});
         return {size:24,align:'v',html:`${day} روز اعتبار دارد`,className:'size10 color605E5C padding-0-6 bold'}
     }
     date_layout(type){
-        let {object} = this.state;
+        let {object} = this.props;
         let value = object[type];
         let text = {'tarikhe_ijad':'تاریخ ایجاد:','tarikhe_etebar':'تاریخ اعتبار:'}[type];
         return {
@@ -996,7 +992,7 @@ class DavatnameCard extends Component{
         }
     }
     addPopup(){
-        let {object} = this.state;
+        let {object} = this.props;
         let {addPopup,removePopup} = this.context;
         let {change_davatname_ha} = this.props;
         addPopup({
@@ -1011,7 +1007,7 @@ class DavatnameCard extends Component{
         })
     }
     active_layout(){
-        let {object} = this.state;
+        let {object,change_davatname_ha} = this.props;
         let {apis} = this.context;
         return {
             row:[
@@ -1031,7 +1027,7 @@ class DavatnameCard extends Component{
                             let res = await apis({type:'taghire_davatname',parameter:{object,state:!object.faal}})
                             if(res === true){
                                 object.faal = !object.faal;
-                                this.setState({object})
+                                change_davatname_ha(object.id,object)
                             }
                         }
                     }
@@ -1046,7 +1042,7 @@ class DavatnameCard extends Component{
     }
     footer_layout(){
         let {apis} = this.context;
-        let {object} = this.state;
+        let {object} = this.props;
         let {dastresi_ha} = object;
         let {onRemove} = this.props;
         return {
