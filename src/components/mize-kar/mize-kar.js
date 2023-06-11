@@ -968,9 +968,9 @@ class DavatnameCard extends Component{
     }
     name_layout(){
         let {object} = this.props;
-        let {name} = object;
+        let {name_davatname} = object;
         return {
-            size:36,html:name,align:'vh',className:'size14 bold'
+            size:36,html:name_davatname,align:'vh',className:'size14 bold'
         }
     }
     days_layout(){
