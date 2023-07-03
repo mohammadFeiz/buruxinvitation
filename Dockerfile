@@ -14,7 +14,7 @@ COPY package*.json ./
 
 # Install dependencies
 #RUN npm config set strict-ssl false
-#RUN npm cache clean --force
+RUN npm cache clean --force
 RUN npm install 
 
 # Copy the rest of the app files to the working directory
