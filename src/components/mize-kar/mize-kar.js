@@ -7,6 +7,7 @@ import { mdiToggleSwitch,mdiToggleSwitchOffOutline,mdiDotsHorizontal,mdiChevronL
 import GradientCard from '../gradient-card/gradient-card';
 import Form from '../form/form';
 import AIODate from './../../npm/aio-date/aio-date';
+import AIOInput from './../../npm/aio-input/aio-input';
 import Map from '../map/map';
 import AppContext from '../../app-context';
 export default class MizeKar extends Component {
@@ -211,7 +212,7 @@ class TarahiDavatname extends Component{
         let {apis,setConfirm} = this.context;
         let {onClose,change_davatname_ha} = this.props;
         let {model,karbarane_daraye_dastresi} = this.state;
-        if(!model.name_davatname || !model.tarikhe_etebar){
+        if(mode !== 'draft' && (!model.name_davatname || !model.tarikhe_etebar)){
             setConfirm({type:'error',text:'اطلاعات مورد نیاز را وارد کنید'})
             return;
         }
@@ -230,7 +231,8 @@ class TarahiDavatname extends Component{
                 size:48,gap:6,className:'margin-0-24 bgFFF round8 padding-0-12',align:'v',
                 row:[
                     {flex:1},
-                    {html:'ذخیره',className:'color0094D4 size14 bold',attrs:{onClick:()=>this.save('edit')}},
+                    {html:'ذخیره',className:'color0094D4 size14 bold',attrs:{onClick:()=>this.save('save')}},
+                    {html:'ذخیره پیشنویس',className:'color0094D4 size14 bold',attrs:{onClick:()=>this.save('draft')}},
                     {html:<div style={{width:1,height:20}} className='bg0094D4'></div>,align:'vh'},
                     {html:'خروج',className:'colorC92828 size14 bold',attrs:{onClick:()=>onClose()}},
                     
@@ -481,7 +483,8 @@ class ErsaleDavatname extends Component{
             checks:[],
             excel:false,
             successLength:false,
-            errorList:false
+            errorList:false,
+            files:[]
         }
     }
     initModel(){
@@ -687,7 +690,7 @@ class ErsaleDavatname extends Component{
           .catch(() => alert('oh no!'));
       }
     excel_layout(){
-        let {excel,tab,successLength,errorList} = this.state;
+        let {excel,tab,successLength,errorList,files} = this.state;
         let {addPopup,apis,removePopup,setConfirm} = this.context;
         if(tab !== '1'){return false}
         return {
@@ -699,33 +702,43 @@ class ErsaleDavatname extends Component{
                 {html:'لیست اطلاعات مدعوین را وارد نمایید',className:'size16 bold',align:'h'},
                 {size:12},
                 {html:'اطلاعات بارگذاری شده باید شامل نام، نام خانوادگی و شماره تماس 11 رقمی مدعوین باشد.',className:'size16 color808080',align:'h'},
-                {size:12},
+                {size:24},
                 {
                     align:'vh',className:'size14 color5897D2 bold',
                     row:[
                         {html:(
                             <label>
-                                دانلود قالب اکسل
-                                <input type='button' style={{display:'none'}} onClick={(e)=>this.downloadTemplate()}/>
+                                <AIOInput
+                                    style={{background:'dodgerblue',color:'#fff',width:260}}
+                                    className='br-6'
+                                    before={<Icon path={mdiFileExcel} size={0.8}/>}
+                                    type='file'
+                                    text='بارگذاری فایل اکسل'
+                                    value={excel?[excel]:undefined}
+                                    onChange={(files)=>this.setState({excel:files[0],successLength:false,errorList:false})}
+                                />
+                                {/* <input type='file' style={{display:'none'}} onChange={(e)=>this.setState({excel:e.target.files[0],successLength:false,errorList:false})}/> */}
                             </label>
                         )},
-                        {html:<Icon path={mdiFile} size={1}/>}
-                    ]
-                },
-                {
-                    align:'vh',className:'size14 color5897D2 bold',
-                    row:[
-                        {html:(
-                            <label>
-                                بارگذاری فایل اکسل
-                                <input type='file' style={{display:'none'}} onChange={(e)=>this.setState({excel:e.target.files[0],successLength:false,errorList:false})}/>
-                            </label>
-                        )},
-                        {html:<Icon path={mdiFile} size={1}/>}
                     ]
                 },
                 {size:12},
-                {show:!!excel,className:'size14 color5897D2 bold',html:excel.name,align:'vh'},
+                {
+                    align:'vh',className:'size14 color5897D2 bold',
+                    row:[
+                        {html:(    
+                            <AIOInput
+                                type='button'
+                                style={{background:'dodgerblue',color:'#fff',width:260}}
+                                className='br-6'
+                                before={<Icon path={mdiFileExcel} size={0.8}/>}
+                                text='دانلود قالب اکسل'
+                                onClick={(e)=>this.downloadTemplate()}
+                            />
+                        )}
+                    ]
+                },
+                
                 {size:12},
                 {show:successLength !== false,html:this.getSuccessButton(`${successLength} مورد با موفقیت ثبت شد`,'#AAF2BE'),align:'h'},
                 {size:12},
