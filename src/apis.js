@@ -3,8 +3,8 @@ import AIODate from "./npm/aio-date/aio-date";
 // const hostName = `http://192.168.10.50:8086`;
 
 // const hostName = `http://172.16.7.34:8002` 
-const hostName = `http://localhost:8002` 
-// const hostName = `https://u.davat.app`
+// const hostName = `http://localhost:8002` 
+const hostName = `https://u.davat.app`
 // const hostName = process.env.REACT_APP_BACKEND_URL || `https://uu.davat.app`
 const base_url = `${hostName}/Api/V1/Invitation`
 // let user_name = 'm.shad' // یا 'm.shad'
@@ -295,7 +295,6 @@ export default function apis({ Axios, getDateAndTime, getState }) {
       let res, is_draft, jalali_start_event, miladi_start_event, jalali_end_event, miladi_end_event;
       let url = `${invitationTemplateUrl}?username=${userInformation.username}`;
       is_draft = mode == "draft"
-      debugger
       try {
         if (model.az_tarikh) {
           miladi_start_event = isoDate(model.az_tarikh);
@@ -338,7 +337,6 @@ export default function apis({ Axios, getDateAndTime, getState }) {
       } catch (err) {
         return "در فراخوانی دیتا مشکلی پیش آمده است";
       }
-      debugger
 
       if (model.poster !== false) {
         apiBody["mobile_poster"] = model.poster;
@@ -364,7 +362,6 @@ export default function apis({ Axios, getDateAndTime, getState }) {
           formData.delete("mobile_poster");
         }
         try {
-          debugger
           res = await Axios.put(url, formData, {
             headers: {
               "Content-Type": "multipart/form-data",
@@ -381,7 +378,6 @@ export default function apis({ Axios, getDateAndTime, getState }) {
         return true;
       } else {
         try {
-          debugger
           res = await Axios.post(url, formData, {
             headers: {
               "Content-Type": "multipart/form-data",
@@ -515,7 +511,7 @@ export default function apis({ Axios, getDateAndTime, getState }) {
         role = "user";
       }
       let formData = new FormData();
-      formData.append("file", excel);
+      formData.append("file", excel['file']);
       // formData.append('template_ids', template_id)
       formData.append("template_ids", davatname_haye_entekhab_shode);
       formData.append("username", userInformation.username); // username باید از کاربر گرفته شود
