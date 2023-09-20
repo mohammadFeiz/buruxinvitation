@@ -1,7 +1,6 @@
 import React,{Component} from 'react';
 import RVD from 'react-virtual-dom';
-import Table from './../table/table';
-import AIOButton from 'aio-button';
+import AIOInput from './../../npm/aio-input/aio-input';
 import {Icon} from '@mdi/react';
 import { mdiDotsHorizontal } from '@mdi/js';
 import AppContext from '../../app-context';
@@ -14,7 +13,14 @@ export default class Tarikhche extends Component{
             tarikhche:[],
             checks:{},
             total:0,
-            pageNumber:1,pageSize:50
+            paging:{
+                number:1,size:50,
+                length:0,
+                onChange:({number,size})=>{
+                    let {paging} = this.state;
+                    this.setState({paging:{...paging,size,number}},()=>this.fetchData())
+                }
+            }
         }
     }
     async componentDidMount(){
@@ -28,10 +34,11 @@ export default class Tarikhche extends Component{
         },1000)
     }
     async fetchData(obj = {}){
-        let {pageNumber = this.state.pageNumber,pageSize = this.state.pageSize,searchValue = this.state.searchValue} = obj;
+        let {paging} = this.state;
+        let {searchValue = this.state.searchValue} = obj;
         let {apis} = this.context;
-        let {tarikhche,total} = await apis({type:'tarikhche',parameter:{pageNumber,pageSize,searchValue}})
-        this.setState({tarikhche,total,pageSize,pageNumber,searchValue})
+        let {tarikhche,total} = await apis({type:'tarikhche',parameter:{pageNumber:paging.number,pageSize:paging.size,searchValue}})
+        this.setState({tarikhche,total,searchValue})
     }
     async ersale_mojadad(checks){
         let {apis,setConfirm} = this.context;
@@ -52,38 +59,25 @@ export default class Tarikhche extends Component{
         }
     }
     table_layout(){
-        let {tarikhche,checks,total,pageSize,pageNumber} = this.state;
+        let {tarikhche,checks,total,paging} = this.state;
         this.order = 0;
         // if(!tarikhche.length){return false}
         return {
             flex:1,
             html:(
-                <Table
-                    rtl={true} lang='farsi'
+                <AIOInput
+                    type='table' rtl={true} lang='farsi'
                     style={{flex:1,height:'100%'}}
-                    model={tarikhche}
-                    setModel={(tarikhche)=>this.setState({tarikhche})}
-                    paging={{
-                        length:total,
-                        pageSizes:[10,20,50,100],
-                        size:pageSize,
-                        number:pageNumber,
-                        onChange:({number:pageNumber,size:pageSize})=>{
-                            this.fetchData({pageNumber,pageSize})
-                        }
-                    }}
-                    templates={{
+                    rows={tarikhche}
+                    onChange={(tarikhche)=>this.setState({tarikhche})}
+                    paging={{...paging,length:total}}
+                    getValue={{
                         order:()=>{
                             this.order++;
                             return this.order;
                         },
                         options:()=>{
-                            return (
-                                <AIOButton
-                                    type='button'
-                                    text={<Icon path={mdiDotsHorizontal} size={0.9}/>}
-                                />
-                            )
+                            return (<button><Icon path={mdiDotsHorizontal} size={0.9}/></button>)
                         },
                         checkbox:(row)=>{
                             let disabled = row.status !== '3' && row.status !== '4';

@@ -8,7 +8,7 @@ import AIODate from './npm/aio-date/aio-date';
 import RVD from 'react-virtual-dom';
 import AIOService from 'aio-service';
 import RKS from 'react-keycloak-spa';
-import AIOButton from 'aio-button';
+import AIOInput from './npm/aio-input/aio-input';
 import {Icon} from '@mdi/react';
 import {mdiAccount} from '@mdi/js';
 import apis from './apis';
@@ -104,7 +104,7 @@ class Main extends Component{
                 row:[
                   {html:<DateAndTime/>},
                   {html:(
-                    <AIOButton
+                    <AIOInput
                       type='select'
                       before={<Icon path={mdiAccount} size={0.9}/>}
                       style={{background:'none'}}

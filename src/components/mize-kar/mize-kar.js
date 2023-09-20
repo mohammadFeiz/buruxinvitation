@@ -1,11 +1,8 @@
 import React, { Component } from 'react';
-import AIOButton from 'aio-button';
-import Table from './../table/table';
 import RVD from './../../npm/react-virtual-dom/react-virtual-dom';
 import {Icon} from '@mdi/react';
 import { mdiToggleSwitch,mdiToggleSwitchOffOutline,mdiDotsHorizontal,mdiChevronLeft, mdiChevronDoubleDown,mdiFileExcel,mdiFile,mdiAccountCircleOutline, mdiDelete} from '@mdi/js';
 import GradientCard from '../gradient-card/gradient-card';
-import Form from '../form/form';
 import AIODate from './../../npm/aio-date/aio-date';
 import AIOInput from './../../npm/aio-input/aio-input';
 import Map from '../map/map';
@@ -81,20 +78,16 @@ export default class MizeKar extends Component {
         return {
             flex:1,
             html:(
-                <Table
-                    model={niaz_be_taide_man}
-                    templates={{
+                <AIOInput
+                    type='table'
+                    rows={niaz_be_taide_man}
+                    getValue={{
                         order:()=>{
                             this.order++;
                             return this.order;
                         },
                         options:()=>{
-                            return (
-                                <AIOButton
-                                    type='button'
-                                    text={<Icon path={mdiDotsHorizontal} size={0.9}/>}
-                                />
-                            )
+                            return (<button><Icon path={mdiDotsHorizontal} size={0.9}/></button>)
                         },
                         checkbox:(row)=>{
                             return <input type='checkbox' checked={!!checks[row.id]} onChange={(e)=>this.setState({checks:{...checks,[row.id]:e.target.checked}})}/>
@@ -266,15 +259,10 @@ class TarahiDavatname extends Component{
             ]
         }
     }
-    formGap(rowKey){
-        return {
-            type:'html',html:()=>'',rowWidth:12,rowKey
-        }
-    }
     poster(){
         let {model} = this.state;
         return (
-            <label style={{width:'100%',height:98,background:'#f1f2f3',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer'}}>
+            <label style={{width:150,height:150,background:'#f1f2f3',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer'}}>
                 <input type='file' style={{display:'none'}} onChange={(e)=>{
                     model.poster = e.target.files[0];
                     this.setState({model})
@@ -298,51 +286,79 @@ class TarahiDavatname extends Component{
         let style1 = {height:100}
         return {
             html:(
-                <Form
-                    lang='fa'
-                    style={{background:'#fff',margin:'0 24px',borderRadius:8}}
-                    model={model}
-                    inlineLabel={true}
-                    labelStyle={{width:106,justifyContent:'end'}}
+                <AIOInput 
+                    type='form' lang='fa'
+                    style={{background:'#fff',margin:'0 24px',borderRadius:8,fontSize:12}}
+                    value={model}
+                    inputAttrs={{style:{minHeight:36}}}
                     onChange={(model)=>this.setState({model})}
-                    inputs={[
-                        {type:'text',field:'model.name_davatname',label:'نام دعوتنامه :',rowKey:'1',validations:[['required']]},
-                        this.formGap('1'),
-                        {type:'datepicker',field:'model.tarikhe_etebar',label:'تاریخ اعتبار دعوتنامه :',calendarType:'jalali',rowKey:'1',validations:[['required']]},
-                        this.formGap('1'),
-                        {type:'text',field:'model.landing_page',label:'لندینگ پیج :',rowKey:'1'},
-                        {type:'textarea',field:'model.matne_payamak',label:'متن پیامک :',rowKey:'2',inputStyle:style1,validations:[['required']]},
-                        this.formGap('2'),
-                        {type:'textarea',field:'model.matne_davatname',label:'متن دعوتنامه :',rowKey:'2',inputStyle:style1,validations:[['required']]},
-                        this.formGap('2'),
-                        {type:'html',html:()=>this.poster(),label:'تصویر پوستر :',rowKey:'2'},
-                        {type:'datepicker',label:'تاریخ برگزاری ایونت از',field:'model.az_tarikh',unit:'hour',calendarType:'jalali',rowKey:'3'},
-                        this.formGap('3'),
-                        {type:'datepicker',label:'تاریخ برگزاری ایونت تا',field:'model.ta_tarikh',unit:'hour',calendarType:'jalali',rowKey:'3'},
-                        this.formGap('3'),
-                        {type:'checkbox',text:'ارسال مستقیم به لندینگ پیچ',field:'model.ersale_mostaghim',rowKey:'3'},
-                        this.formGap('3'),
-                        {type:'text',field:'model.adrese_ghorfe',label:'آدرس غرفه :'},
-                        {type:'text',field:'model.nazdik_tarin_brt',label:' نزدیک ترین ایستگاه بی آر تی :'},
-                        {type:'text',field:'model.nazdik_tarin_metro',label:'نزدیک ترین ایستگاه مترو :'},
-                        {type:'checkbox',text:'امکان دعوت از دوستان',field:'model.emkane_davat',rowKey:'3'},
-                        {
-                            type:'html',label:'موقعیت',inlineLabel:false,html:()=>{
-                                //return <Map lat={model.lat} long={model.long} style={{width:'100%',height:160,resize:'vertical',minHeight:100}} onChange={(lat,long)=>this.setState({model:{...model,lat,long}})}/>
-                                return (
-                                    <Map 
-                                        latitude={model.lat} longitude={model.long} 
-                                        style={{width:'100%',height:160,resize:'vertical',minHeight:100}} 
-                                        changeView={false}
-                                        onClick={()=>{
-                                            this.setState({showMap:true})
-                                        }}
-                                    />
-                                )
+                    inputs={{
+                        props:{gap:12},
+                        column:[
+                            {
+                                row:[
+                                    {input:{type:'text'},field:'value.name_davatname',label:'نام دعوتنامه :',validations:[['required']]},
+                                    {input:{type:'datepicker',calendarType:'jalali'},field:'value.tarikhe_etebar',label:'تاریخ اعتبار دعوتنامه :',validations:[['required']]},
+                            
+                                ]
+                            },
+                            {
+                                row:[
+                                    {input:{type:'textarea',style:style1},field:'value.matne_payamak',label:'متن پیامک :',validations:[['required']]},
+                                    {input:{type:'textarea',style:style1},field:'value.matne_davatname',label:'متن دعوتنامه :',validations:[['required']]}
+                                ]
+                            },
+                            {
+                                row:[
+                                    {input:{type:'datepicker',unit:'hour',calendarType:'jalali'},label:'تاریخ برگزاری ایونت از',field:'value.az_tarikh'},
+                                    {input:{type:'datepicker',unit:'hour',calendarType:'jalali'},label:'تاریخ برگزاری ایونت تا',field:'value.ta_tarikh'},
+                                ]
+                            },
+                            {
+                                row:[
+                                    {
+                                        flex:1,
+                                        column:[
+                                            {input:{type:'text'},field:'value.landing_page',inlineLabel:'لندینگ پیج :',labelAttrs:{style:{width:160}}},
+                                            {input:{type:'text'},field:'value.adrese_ghorfe',inlineLabel:'آدرس غرفه :',labelAttrs:{style:{width:160}}},
+                                            {input:{type:'text'},field:'value.nazdik_tarin_brt',inlineLabel:' نزدیک ترین ایستگاه بی آر تی :',labelAttrs:{style:{width:160}}},
+                                            {input:{type:'text'},field:'value.nazdik_tarin_metro',inlineLabel:'نزدیک ترین ایستگاه مترو :',labelAttrs:{style:{width:160}}},
+                                    
+                                        ]
+                                    },
+                                    {
+                                        column:[
+                                            {html:'انتخاب پوستر'},
+                                            {html:()=>this.poster()},
+                                        ]
+                                    }
+                                ]
+                            },      
+                            
+                            {
+                                row:[
+                                    {input:{type:'checkbox',text:'ارسال مستقیم به لندینگ پیچ'},label:'.',field:'value.ersale_mostaghim'},
+                                    {input:{type:'checkbox',text:'امکان دعوت از دوستان'},label:'.',field:'value.emkane_davat'},
+                                ]
+                            },
+                            {
+                                label:'موقعیت',html:()=>{
+                                    //return <Map lat={model.lat} long={model.long} style={{width:'100%',height:160,resize:'vertical',minHeight:100}} onChange={(lat,long)=>this.setState({model:{...model,lat,long}})}/>
+                                    return (
+                                        <Map 
+                                            latitude={model.lat} longitude={model.long} 
+                                            style={{width:'100%',height:160,resize:'vertical',minHeight:100}} 
+                                            changeView={false}
+                                            onClick={()=>{
+                                                this.setState({showMap:true})
+                                            }}
+                                        />
+                                    )
+                                }
                             }
-                        }
-                        
-                    ]}
+                            
+                        ]
+                    }}
                 />
             )
         }
@@ -353,7 +369,7 @@ class TarahiDavatname extends Component{
         return {
             className:'bgFFF margin-0-24 round8',
             html:(
-                <AIOButton
+                <AIOInput
                     className='bgFFF'
                     style={{width:'100%',height:36}}
                     type='multiselect'
@@ -398,7 +414,7 @@ class TarahiDavatname extends Component{
                             this.nav_layout(),
                             {size:12},
                             {
-                                flex:1,scroll:'v',
+                                flex:1,className:'ofy-auto',
                                 column:[
                                     this.splitter_layout('موضوع'),
                                     this.form_layout(),
@@ -567,7 +583,7 @@ class ErsaleDavatname extends Component{
         return {
             className:'margin-0-24 bgFFF round8 padding-0-12',
             html:(
-                <AIOButton 
+                <AIOInput 
                     type='tabs'
                     options={[
                         {text:'تکی',value:'0'},
@@ -600,26 +616,37 @@ class ErsaleDavatname extends Component{
         if(tab !== '0'){return false}
         return {
             html:(
-                <Form
+                <AIOInput
+                    type='form'
                     style={{background:'#fff',margin:'0 24px',borderRadius:8}}
-                    model={model}
+                    value={model}
                     lang='fa'
-                    inlineLabel={true}
-                    labelStyle={{width:106,justifyContent:'end'}}
+                    inputAttrs={{style:{minHeight:36}}}
                     onChange={(model)=>this.setState({model})}
-                    inputs={[
-                        {type:'text',field:'model.nam',label:'نام:',rowKey:'1',validations:[['required']]},
-                        this.formGap('1'),
-                        {type:'text',field:'model.name_khanevadegi',label:'نام خانوادگی :',rowKey:'1',validations:[['required']]},
-                        this.formGap('1'),
-                        {type:'text',field:'model.shomare_tamas',label:'شماره تماس :',rowKey:'1',validations:[['required']]},
-                        
-                        {type:'text',field:'model.sherkat',label:'شرکت/فروشگاه :',rowKey:'2'},
-                        this.formGap('2'),
-                        {type:'text',field:'model.semat',label:'سمت :',rowKey:'2'},
-                        this.formGap('2'),
-                        {type:'radio',options:[{text:'آقا',value:'male'},{text:'خانم',value:'female'}],field:'model.jensiat',rowKey:'2',optionStyle:{width:'fit-content'},label:'جنیست'}
-                    ]}
+                    inputs={{
+                        props:{gap:12},
+                        column:[
+                            {
+                                row:[
+                                    {input:{type:'text'},field:'value.nam',label:'نام:',validations:[['required']]},
+                                    {input:{type:'text'},field:'value.name_khanevadegi',label:'نام خانوادگی :',validations:[['required']]},
+                                ]
+                            },
+                            {
+                                row:[
+                                    {input:{type:'text'},field:'value.shomare_tamas',label:'شماره تماس :',validations:[['required']]},
+                                    {input:{type:'text'},field:'value.sherkat',label:'شرکت/فروشگاه :'}
+                                ]
+                            },
+                            {
+                                row:[
+                                    {input:{type:'text'},field:'value.semat',label:'سمت :'},
+                                    {input:{type:'radio',options:[{text:'آقا',value:'male'},{text:'خانم',value:'female'}],optionStyle:{width:'fit-content'}},field:'value.jensiat',label:'جنیست'}
+                                ]
+                            },
+                            
+                        ]
+                    }}
                 />
             )
         }
@@ -631,7 +658,7 @@ class ErsaleDavatname extends Component{
         return {
             className:'bgFFF margin-0-24 round8',
             html:(
-                <AIOButton
+                <AIOInput
                     className='bgFFF'
                     style={{width:'100%',height:36}}
                     type='multiselect'
@@ -781,21 +808,17 @@ class ErsaleDavatname extends Component{
         return {
             flex:1,
             html:(
-                <Table
-                    model={niaz_be_taide_man}
+                <AIOInput
+                    type='table'
+                    rows={niaz_be_taide_man}
                     style={{padding:24}}
-                    templates={{
+                    getValue={{
                         order:()=>{
                             this.order++;
                             return this.order;
                         },
                         options:()=>{
-                            return (
-                                <AIOButton
-                                    type='button' style={{background:'none'}}
-                                    text={<Icon path={mdiDotsHorizontal} size={0.8}/>}
-                                />
-                            )
+                            return (<button><Icon path={mdiDotsHorizontal} size={0.8}/></button>)
                         },
                         checkbox:(row)=>{
                             return <input type='checkbox' checked={!!checks[row.id]} onChange={(e)=>this.setState({checks:{...checks,[row.id]:e.target.checked}})}/>
@@ -851,25 +874,16 @@ class Khata_haye_ersal extends Component{
     getTable(){
         let {model} = this.state;
         return (
-            <Table
-                model={model}
+            <AIOInput
+                type='table'
+                rows={model}
                 excel={true}
-                templates={{
-                    remove:(row)=>{
-                        return (
-                            <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M12 12.5C12 13.4474 11.4474 14 10.5 14H4.5C3.55263 14 3 13.4474 3 12.5V4.25H12V12.5ZM13.5 12.5V2.75H1.5V12.5C1.5 14.1842 2.81579 15.5 4.5 15.5H10.5C12.1842 15.5 13.5 14.1842 13.5 12.5ZM0.75 4.25H2.25C2.65789 4.25 3 3.90789 3 3.5C3 3.0921 2.65789 2.75 2.25 2.75H0.75C0.342105 2.75 4.47035e-08 3.0921 4.47035e-08 3.5C4.47035e-08 3.90789 0.342105 4.25 0.75 4.25ZM14.25 2.75H12.75C12.3421 2.75 12 3.0921 12 3.5C12 3.90789 12.3421 4.25 12.75 4.25H14.25C14.6579 4.25 15 3.90789 15 3.5C15 3.0921 14.6579 2.75 14.25 2.75ZM9.75 0.5H5.25C4.84211 0.5 4.5 0.842105 4.5 1.25C4.5 1.65789 4.84211 2 5.25 2H9.75C10.1579 2 10.5 1.65789 10.5 1.25C10.5 0.842105 10.1579 0.5 9.75 0.5ZM6.75 11.75V6.5C6.75 6.09211 6.40789 5.75 6 5.75C5.59211 5.75 5.25 6.09211 5.25 6.5V11.75C5.25 12.1579 5.59211 12.5 6 12.5C6.40789 12.5 6.75 12.1579 6.75 11.75ZM9.75 11.75V6.5C9.75 6.09211 9.40789 5.75 9 5.75C8.59211 5.75 8.25 6.09211 8.25 6.5V11.75C8.25 12.1579 8.59211 12.5 9 12.5C9.40789 12.5 9.75 12.1579 9.75 11.75Z" fill="#DC3838"/>
-</svg>
-
-                        )
-                    }
-                }}
                 columns={[
-                    {title:'نام',field:'row.name',titleJustify:false,inlineEdit:true},
-                    {title:'شماره تماس',field:'row.phone',titleJustify:false,inlineEdit:true},
+                    {title:'نام',field:'row.name',titleJustify:false,type:'text'},
+                    {title:'شماره تماس',field:'row.phone',titleJustify:false,type:'text'},
                     {title:'علت خطا',field:'row.error',titleJustify:false},
                 ]}
-                setModel={(model)=>this.setState({model})}
+                onChange={(model)=>this.setState({model})}
             />
         )
     }
@@ -912,13 +926,34 @@ class DavatnameHa extends Component{
         }
     }
     list_layout(){
-        let {davatname_ha,onRemove,change_davatname_ha} = this.props;
+        let {davatname_ha,onRemove,change_davatname_ha,pageNumber,pageSize,total} = this.props;
         return {
             flex:1,
             html:(
-                <div style={{display:'inline-block',padding:'0 12px', overflowY:'auto'}}>
-                    {davatname_ha.map((o,i)=><DavatnameCard key={o.id} object={o} onRemove={()=>onRemove(o)} change_davatname_ha={change_davatname_ha}/>)}
-                </div>
+                <AIOInput
+                    paging={{
+                        size:pageSize,
+                        number:pageNumber,
+                        length:total,
+                        serverSide:true,
+                        onChange:({size,number})=>{
+                            let {onChangePaging} = this.props;
+                            let res = {pageNumber:number,pageSize:size}
+                            if(res.pageNumber < 1){return}
+                            onChangePaging(res)
+                        }
+                    }}
+                    type='table'
+                    rows={davatname_ha}
+                    attrs={{style:{height:'100%'}}}
+                    rowsTemplate={(rows)=>{
+                        return (
+                            <div style={{flex:1,display:'inline-block',padding:'0 12px', overflowY:'auto'}}>
+                                {rows.map((o,i)=><DavatnameCard key={o.id} object={o} onRemove={()=>onRemove(o)} change_davatname_ha={change_davatname_ha}/>)}
+                            </div>
+                        )
+                    }}
+                />
             )
         }
     }
@@ -942,20 +977,8 @@ class DavatnameHa extends Component{
                             column:[
                                 this.splitter_layout('لیست'),
                                 this.list_layout(),
-                                {size:60}
-                            ]
-                        },
-                        {
-                            size:36,gap:12,style:{direction:'ltr'},
-                            row:[
-                                {flex:1},
-                                {html:'صفحه بعد',className:'fs-12 bold',onClick:()=>this.onChangePaging({pageNumber:pageNumber + 1})},
-                                {html:`# ${pageNumber}`,className:'fs-12 bold'},
-                                {html:'صفحه قبل',className:'fs-12 bold',onClick:()=>this.onChangePaging({pageNumber:pageNumber - 1})},
-                                {flex:1}
                             ]
                         }
-                        
                     ]
                 }}
             />

@@ -369,7 +369,12 @@
   width:100%;
   height:100%;
 }
-
+.t-a-right{
+  text-align:right;
+}
+.t-a-left{
+  text-align:left;
+}
 .rvd-rotate-card{
   transform:rotateX(180deg);
   opacity:0;
@@ -398,7 +403,17 @@
   transform:scale(0.8);
   border-radius:8px;
 }
+/* Chrome, Safari, Edge, Opera */
+input.no-spin::-webkit-outer-spin-button,
+input.no-spin::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 
+/* Firefox */
+input.no-spin[type=number] {
+  -moz-appearance: textfield;
+}
 @keyframes rvdloading {
   0%{background-position:0% 0%}
   100%{background-position:100% 0%}
