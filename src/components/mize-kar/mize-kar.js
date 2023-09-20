@@ -165,8 +165,13 @@ export default class MizeKar extends Component {
                         {size:24},
                         this.header_layout(),
                         {size:24},
-                        this.toolbar_layout(),
-                        this.table_layout()
+                        {
+                            className:'p-12',
+                            column:[
+                                this.toolbar_layout(),
+                                this.table_layout()
+                            ]
+                        }
 
                     ]
                 }}
@@ -945,7 +950,7 @@ class DavatnameHa extends Component{
                     }}
                     type='table'
                     rows={davatname_ha}
-                    attrs={{style:{height:'100%'}}}
+                    attrs={{style:{height:'100%',background:'#eee'}}}
                     rowsTemplate={(rows)=>{
                         return (
                             <div style={{flex:1,display:'inline-block',padding:'0 12px', overflowY:'auto'}}>
@@ -975,7 +980,6 @@ class DavatnameHa extends Component{
                         {
                             flex:1,scroll:'v',
                             column:[
-                                this.splitter_layout('لیست'),
                                 this.list_layout(),
                             ]
                         }

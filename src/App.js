@@ -1,11 +1,11 @@
 import React,{Component} from 'react';
-import RSA from 'react-super-app';
+import RSA from './npm/react-super-app/react-super-app';
 import MizeKar from './components/mize-kar/mize-kar';
 import Dastresi from './components/dastresi/dastresi';
 import Tarikhche from './components/tarikhche/tarikhche';
 import getSvg from './getSvg';
 import AIODate from './npm/aio-date/aio-date';
-import RVD from 'react-virtual-dom';
+import RVD from './npm/react-virtual-dom/react-virtual-dom';
 import AIOService from 'aio-service';
 import RKS from 'react-keycloak-spa';
 import AIOInput from './npm/aio-input/aio-input';
@@ -48,6 +48,7 @@ class Main extends Component{
       roles: roles,logout:keycloak.logout,name:keycloak.tokenParsed.name
     }
     this.state = {
+      rsa:new RSA({rtl:true}),
       userInformation,
       apis:AIOService({apis,getState:()=>this.state}),
       users:[],
@@ -82,47 +83,63 @@ class Main extends Component{
     return {...this.state}
   }
   render(){
-    let {userInformation} = this.state;
+    let {userInformation,rsa} = this.state;
     return (
       <AppContext.Provider value={this.getContext()}>
-        <RSA
-          navId='mize_kar'
-          navs={[
-            {text:'دسترسی',id:'dastresi',icon:()=>getSvg('dastresi')},
-            {text:'میز‌کار',id:'mize_kar',icon:()=>getSvg('mize_kar')},
-            {text:'تاریخچه',id:'tarikhche',icon:()=>getSvg('tarikhche')}
-          ]}
-          body={({navId})=>{
-            if(navId === 'mize_kar'){return <MizeKar/>}
-            if(navId === 'dastresi'){return <Dastresi/>}
-            if(navId === 'tarikhche'){return <Tarikhche/>}
-          }}
-          header={()=>(
-            <RVD
-              layout={{
-                gap:3,
-                row:[
-                  {html:<DateAndTime/>},
-                  {html:(
-                    <AIOInput
-                      type='select'
-                      before={<Icon path={mdiAccount} size={0.9}/>}
-                      style={{background:'none'}}
-                      options={[
-                        {text:'خروج از سیستم',value:'logout'}
-                      ]}
-                      text={userInformation.name}
-                      onChange={(value)=>{
-                        if(value === 'logout'){this.state.userInformation.logout()}
-                      }}
-                    />
-                  )}
-                ]
-              }}
-            />
-          )}
-          getActions={(obj)=>this.setState(obj)}
-        />
+        {
+          rsa.render({
+            navId:'mize_kar',
+            navs:[
+              {text:'دسترسی',id:'dastresi',icon:()=>getSvg('dastresi')},
+              {text:'میز‌کار',id:'mize_kar',icon:()=>getSvg('mize_kar')},
+              {text:'تاریخچه',id:'tarikhche',icon:()=>getSvg('tarikhche')}
+            ],
+            body:({navId})=>{
+              if(navId === 'mize_kar'){return <MizeKar/>}
+              if(navId === 'dastresi'){return <Dastresi/>}
+              if(navId === 'tarikhche'){return <Tarikhche/>}
+            },
+            navHeader:()=>{
+              return (
+                <RVD
+                  layout={{
+                    column:[
+                      {size:24},
+                      {html:'BURUX',align:'h',className:'bold h-36',style:{color:'orange',fontSize:30}},
+                      {html:'Invitation',align:'h',style:{color:'#fff',fontSize:14,letterSpacing:4}},
+                      {size:24}
+                    ]
+                  }}
+                />
+              )
+            },
+            headerContent:()=>(
+              <RVD
+                layout={{
+                  gap:3,
+                  row:[
+                    {flex:1},
+                    {html:<DateAndTime/>},
+                    {html:(
+                      <AIOInput
+                        type='select'
+                        before={<Icon path={mdiAccount} size={0.9}/>}
+                        style={{background:'none'}}
+                        options={[
+                          {text:'خروج از سیستم',value:'logout'}
+                        ]}
+                        text={userInformation.name}
+                        onChange={(value)=>{
+                          if(value === 'logout'){this.state.userInformation.logout()}
+                        }}
+                      />
+                    )}
+                  ]
+                }}
+              />
+            )
+          })
+        }
       </AppContext.Provider>
     )
   }
@@ -145,8 +162,7 @@ class DateAndTime extends Component{
     return (
       <RVD
         layout={{
-          childsAttrs:{className:'time-box'},
-          childsProps:{align:'v'},
+          childsProps:{align:'v',className:'time-box'},
           row:[
             {html:weekDay},
             {html:d},

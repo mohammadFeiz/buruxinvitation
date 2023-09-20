@@ -85,14 +85,20 @@ class ReactSuperApp extends Component {
     return navs.filter(({ show = () => true }) => show())[0].id;
   }
   header_layout(nav) {
-    let { header, side, title = () => nav.text } = this.props;
+    let { header,headerContent, side, title = () => nav.text } = this.props;
     if (header === false) { return false }
+    if(header){
+      return {
+        style: { flex: 'none', width: '100%' }, align: 'v', className: 'rsa-header of-visible',
+        html:header()
+      } 
+    }
     return {
       style: { flex: 'none', width: '100%' }, align: 'v', className: 'rsa-header of-visible',
       row: [
         { size: 60, show: !!side, html: <Icon path={mdiMenu} size={1} />, align: 'vh', attrs: { onClick: () => this.openSide() } },
         { show: title !== false, html: () => title(nav), className: 'rsa-header-title' },
-        { flex: 1, show: !!header, html: () => header(this.state), className: 'of-visible' },
+        { flex: 1, show: !!headerContent, html: () => headerContent(), className: 'of-visible' },
       ]
     }
   }
