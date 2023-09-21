@@ -49,6 +49,8 @@ export default class GradientCard extends Component {
         if (type === '3') {return 'linear-gradient(180deg, #4CC3F5 0%, #A974ED 100%)'}
     }
     svg_layout(){
+        let {mode} = this.props;
+        if(mode === 'xs'){return false}
         return {flex:1,align:'vh',html:this.getSvg()}
     }
     title_layout(){
@@ -84,11 +86,11 @@ export default class GradientCard extends Component {
         if (type === '3') {return 'ersale_davatname'}
     }
     render() {
-        let {onClick} = this.props;
+        let {onClick,mode} = this.props;
         return (
             <RVD
                 layout={{
-                    style:{background:this.getGradient(),width:168,height:280,borderRadius:24},
+                    style:{flex:'none',background:this.getGradient(),width:mode === 'xs'?'100%':180,height:mode === 'xs'?undefined:280,borderRadius:mode === 'xs'?6:24,padding:mode === 'xs'?12:undefined},
                     attrs:{
                         onClick:()=>onClick?onClick(this.getMode()):undefined
                     },
@@ -97,7 +99,7 @@ export default class GradientCard extends Component {
                         this.title_layout(),
                         this.splitter_layout(),
                         this.details_layout(),
-                        {size:48}
+                        {show:mode !== 'xs',size:48}
                     ]
                 }}
             />

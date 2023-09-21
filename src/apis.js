@@ -129,7 +129,7 @@ export default function apis({ Axios, getDateAndTime, getState }) {
       let userInformation = getState().userInformation;
       let url = `${showAllInvitation}?username=${userInformation.username}&limit=${pageSize}&offset=${(pageNumber - 1) * pageSize}`;
       if (searchValue) {
-        url = url + `search=${searchValue}`;
+        url = url + `&search=${searchValue}`;
       }
 
       let status, created_at, res;

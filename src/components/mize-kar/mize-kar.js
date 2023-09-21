@@ -5,7 +5,7 @@ import { mdiToggleSwitch,mdiToggleSwitchOffOutline,mdiDotsHorizontal,mdiChevronL
 import GradientCard from '../gradient-card/gradient-card';
 import AIODate from './../../npm/aio-date/aio-date';
 import AIOInput from './../../npm/aio-input/aio-input';
-import Map from '../map/map';
+import AIOMap from './../../npm/aio-map/aio-map';
 import AppContext from '../../app-context';
 export default class MizeKar extends Component {
     static contextType = AppContext;
@@ -42,17 +42,31 @@ export default class MizeKar extends Component {
             [['دعوتنامه های فعال',badges.faal]]
         ]
         return {
-            row:[
-                {flex:1},
-                {html:<GradientCard type={'1'} onClick={(mode)=>this.setState({mode})} details={details[0]}/>},
-                {size:24},
-                {html:<GradientCard type={'2'} onClick={async (mode)=>{
-                    await this.davatname_ha()
-                    this.setState({mode})
-                }} details={details[1]}/>},
-                {size:24},
-                {html:<GradientCard type={'3'} onClick={(mode)=>this.setState({mode})} details={details[2]}/>},
-                {flex:1}
+            column:[
+                {
+                    hide_xs:true,gap:24,
+                    row:[
+                        {flex:1},
+                        {html:<GradientCard type={'1'} onClick={(mode)=>this.setState({mode})} details={details[0]}/>},
+                        {html:<GradientCard type={'2'} onClick={async (mode)=>{
+                            await this.davatname_ha()
+                            this.setState({mode})
+                        }} details={details[1]}/>},
+                        {html:<GradientCard type={'3'} onClick={(mode)=>this.setState({mode})} details={details[2]}/>},
+                        {flex:1}
+                    ]
+                },
+                {
+                    show_xs:true,gap:24,align:'h',className:'p-h-24',
+                    column:[
+                        {html:<GradientCard type={'1'} mode='xs' onClick={(mode)=>this.setState({mode})} details={details[0]}/>,style:{width:'100%'}},
+                        {html:<GradientCard type={'2'} mode='xs' onClick={async (mode)=>{
+                            await this.davatname_ha()
+                            this.setState({mode})
+                        }} details={details[1]}/>,style:{width:'100%'}},
+                        {html:<GradientCard type={'3'} mode='xs' onClick={(mode)=>this.setState({mode})} details={details[2]}/>,style:{width:'100%'}},
+                    ]
+                }
             ]
         }
     }
@@ -289,6 +303,43 @@ class TarahiDavatname extends Component{
     form_layout(){
         let {model} = this.state;
         let style1 = {height:100}
+        let input_name = {input:{type:'text'},field:'value.name_davatname',label:'نام دعوتنامه :',validations:[['required']]};
+        let input_tarikhe_etebar = {input:{type:'datepicker',calendarType:'jalali'},field:'value.tarikhe_etebar',label:'تاریخ اعتبار دعوتنامه :',validations:[['required']]}
+        let input_matne_payamak = {input:{type:'textarea',style:style1},field:'value.matne_payamak',label:'متن پیامک :',validations:[['required']]};
+        let input_matne_davatname = {input:{type:'textarea',style:style1},field:'value.matne_davatname',label:'متن دعوتنامه :',validations:[['required']]}
+        let input_tarikhe_bargozari_az = {input:{type:'datepicker',unit:'hour',calendarType:'jalali'},label:'تاریخ برگزاری ایونت از',field:'value.az_tarikh'};
+        let input_tarikhe_bargozari_ta = {input:{type:'datepicker',unit:'hour',calendarType:'jalali'},label:'تاریخ برگزاری ایونت تا',field:'value.ta_tarikh'};
+        let input_ersal_be_landing = {input:{type:'checkbox',text:'ارسال مستقیم به لندینگ پیچ'},label:'.',field:'value.ersale_mostaghim'}
+        let input_emkane_davat = {input:{type:'checkbox',text:'امکان دعوت از دوستان'},label:'.',field:'value.emkane_davat'}
+        let input_landing = {input:{type:'text'},field:'value.landing_page',inlineLabel:'لندینگ پیج :',labelAttrs:{style:{width:160}}}
+        let input_adrese_ghorfe = {input:{type:'text'},field:'value.adrese_ghorfe',inlineLabel:'آدرس غرفه :',labelAttrs:{style:{width:160}}}
+        let input_nazdiktarin_brt = {input:{type:'text'},field:'value.nazdik_tarin_brt',inlineLabel:' نزدیک ترین ایستگاه بی آر تی :',labelAttrs:{style:{width:160}}}
+        let input_nazdiktarin_metro = {input:{type:'text'},field:'value.nazdik_tarin_metro',inlineLabel:'نزدیک ترین ایستگاه مترو :',labelAttrs:{style:{width:160}}}
+        let input_poster = {column:[{html:'انتخاب پوستر'},{html:()=>this.poster()},]}
+        let input_location = {
+            label:'موقعیت',html:()=>{
+                //return <Map lat={model.lat} long={model.long} style={{width:'100%',height:160,resize:'vertical',minHeight:100}} onChange={(lat,long)=>this.setState({model:{...model,lat,long}})}/>
+                return (
+                    <AIOMap
+                        apiKeys={{
+                            map:'web.0a2aa5f83d314a8c9916473aa0e01438',
+                            service:'service.09a2234e299a4ff585007b2894df9fca',
+                        }}
+                        style={{width:'100%',height:160,resize:'vertical',minHeight:100}} 
+                        latitude={model.lat}
+                        longitude={model.long}
+                        onSubmit={(lat,long)=>{
+                            model.lat = lat;
+                            model.long = long;
+                            this.setState({showMap:false,model})
+                        }}
+                        title='انتخاب موقعیت'
+                        search={true}
+                        popup={true}
+                    />
+                )
+            }
+        }
         return {
             html:(
                 <AIOInput 
@@ -301,67 +352,45 @@ class TarahiDavatname extends Component{
                         props:{gap:12},
                         column:[
                             {
-                                row:[
-                                    {input:{type:'text'},field:'value.name_davatname',label:'نام دعوتنامه :',validations:[['required']]},
-                                    {input:{type:'datepicker',calendarType:'jalali'},field:'value.tarikhe_etebar',label:'تاریخ اعتبار دعوتنامه :',validations:[['required']]},
+                                hide_xs:true,
+                                column:[
+                                    {row:[input_name,input_tarikhe_etebar]},
+                                    {row:[input_matne_payamak,input_matne_davatname]},
+                                    {row:[input_tarikhe_bargozari_az,input_tarikhe_bargozari_ta]},
+                                    {row:[input_ersal_be_landing,input_emkane_davat]},
+                                ]
+                            },
+                            {
+                                show_xs:true,
+                                column:[
+                                    input_name,
+                                    input_tarikhe_etebar,
+                                    input_matne_payamak,
+                                    input_matne_davatname,
+                                    input_tarikhe_bargozari_az,
+                                    input_tarikhe_bargozari_ta,
+                                    input_ersal_be_landing,
+                                    input_emkane_davat
+                                ]
+                            },
+                            {
+                                show_xs:true,
+                                column:[
+                                    input_landing,input_adrese_ghorfe,input_nazdiktarin_brt,input_nazdiktarin_metro,input_poster
+                                ]
+                            },
                             
-                                ]
-                            },
                             {
-                                row:[
-                                    {input:{type:'textarea',style:style1},field:'value.matne_payamak',label:'متن پیامک :',validations:[['required']]},
-                                    {input:{type:'textarea',style:style1},field:'value.matne_davatname',label:'متن دعوتنامه :',validations:[['required']]}
-                                ]
-                            },
-                            {
-                                row:[
-                                    {input:{type:'datepicker',unit:'hour',calendarType:'jalali'},label:'تاریخ برگزاری ایونت از',field:'value.az_tarikh'},
-                                    {input:{type:'datepicker',unit:'hour',calendarType:'jalali'},label:'تاریخ برگزاری ایونت تا',field:'value.ta_tarikh'},
-                                ]
-                            },
-                            {
+                                hide_xs:true,
                                 row:[
                                     {
                                         flex:1,
-                                        column:[
-                                            {input:{type:'text'},field:'value.landing_page',inlineLabel:'لندینگ پیج :',labelAttrs:{style:{width:160}}},
-                                            {input:{type:'text'},field:'value.adrese_ghorfe',inlineLabel:'آدرس غرفه :',labelAttrs:{style:{width:160}}},
-                                            {input:{type:'text'},field:'value.nazdik_tarin_brt',inlineLabel:' نزدیک ترین ایستگاه بی آر تی :',labelAttrs:{style:{width:160}}},
-                                            {input:{type:'text'},field:'value.nazdik_tarin_metro',inlineLabel:'نزدیک ترین ایستگاه مترو :',labelAttrs:{style:{width:160}}},
-                                    
-                                        ]
+                                        column:[input_landing,input_adrese_ghorfe,input_nazdiktarin_brt,input_nazdiktarin_metro,]
                                     },
-                                    {
-                                        column:[
-                                            {html:'انتخاب پوستر'},
-                                            {html:()=>this.poster()},
-                                        ]
-                                    }
-                                ]
-                            },      
-                            
-                            {
-                                row:[
-                                    {input:{type:'checkbox',text:'ارسال مستقیم به لندینگ پیچ'},label:'.',field:'value.ersale_mostaghim'},
-                                    {input:{type:'checkbox',text:'امکان دعوت از دوستان'},label:'.',field:'value.emkane_davat'},
+                                    input_poster
                                 ]
                             },
-                            {
-                                label:'موقعیت',html:()=>{
-                                    //return <Map lat={model.lat} long={model.long} style={{width:'100%',height:160,resize:'vertical',minHeight:100}} onChange={(lat,long)=>this.setState({model:{...model,lat,long}})}/>
-                                    return (
-                                        <Map 
-                                            latitude={model.lat} longitude={model.long} 
-                                            style={{width:'100%',height:160,resize:'vertical',minHeight:100}} 
-                                            changeView={false}
-                                            onClick={()=>{
-                                                this.setState({showMap:true})
-                                            }}
-                                        />
-                                    )
-                                }
-                            }
-                            
+                            input_location
                         ]
                     }}
                 />
@@ -408,7 +437,6 @@ class TarahiDavatname extends Component{
         }
     }
     render(){
-        let {showMap,model} = this.state;
         return (
             <>
                 <RVD
@@ -434,56 +462,6 @@ class TarahiDavatname extends Component{
                         ]
                     }}
                 />
-                {
-                    showMap && 
-                    
-                        <RVD
-                            layout = {{
-                                style: {
-                                    position: 'fixed', 
-                                    width:'100%', 
-                                    height:'100%', 
-                                    left:0, 
-                                    top:0, 
-                                    background:"#FFF"
-                                },
-                                column:[
-                                    {
-                                        size: 36, 
-                                        row: [
-                                            {
-                                                flex: 1,
-                                                html: 'نقشه'
-                                            },
-                                            {
-                                                size: 48,
-                                                align: 'vh',
-                                                html: 'X',
-                                                onClick: () => {
-                                                    this.setState({showMap: false})
-                                                }
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        flex: 1,
-                                        html: (
-                                            <Map
-                                            latitude={model.lat} longitude={model.long} 
-                                            style={{width:'100%',height:'160%'}} 
-                                            onChange={(lat,long)=>{
-                                                model.lat = lat;
-                                                model.long = long;
-                                                this.setState({showMap:false,model})
-                                            }}
-                                            search={true}
-                                            />
-                                        )
-                                    }
-                                ]
-                            }} 
-                        />
-                }
             </>
         )
     }
