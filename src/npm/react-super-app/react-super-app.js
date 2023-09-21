@@ -16,7 +16,15 @@ export default class RSA {
   render = (props) => {
     return (
       <>
-        <ReactSuperApp {...props} popup={this.popup} rtl={this.rtl} maxWidth={this.maxWidth} handleSetNavId={(setNavId) => this.setNavId = setNavId} />
+        <ReactSuperApp 
+          {...props} popup={this.popup} rtl={this.rtl} maxWidth={this.maxWidth}
+          getActions={({getNavId,setNavId,openSide,closeSide})=>{
+            this.getNavId = getNavId;
+            this.setNavId = setNavId;
+            this.openSide = openSide;
+            this.closeSide = closeSide;
+          }}
+        />
       </>
     )
   }
@@ -34,7 +42,6 @@ class ReactSuperApp extends Component {
       event.stopPropagation();
       return false;
     };
-    props.handleSetNavId(this.setNavId.bind(this))
     this.state = {
       navId: this.initNavId(),
       splash,
@@ -65,12 +72,14 @@ class ReactSuperApp extends Component {
         }
 
       },
+      openSide:this.openSide.bind(this),
+      closeSide:this.closeSide.bind(this),
       setNavId: this.setNavId.bind(this),
       getNavId:this.getNavId.bind(this)
     }
     if (props.themes) { this.state.changeTheme('init') }
     if (splash) { setTimeout(() => this.setState({ splash: false }), splashTime) }
-    if (props.getActions) { props.getActions({ ...this.state }) }
+    props.getActions({ ...this.state })
   }
   getNavId(){return this.state.navId}
   setNavId(navId){this.setState({navId})}
@@ -87,11 +96,11 @@ class ReactSuperApp extends Component {
   header_layout(nav) {
     let { header,headerContent, side, title = () => nav.text } = this.props;
     if (header === false) { return false }
-    if(header){
+    if(typeof header === 'function'){
       return {
         style: { flex: 'none', width: '100%' }, align: 'v', className: 'rsa-header of-visible',
-        html:header()
-      } 
+        html: header()
+      }
     }
     return {
       style: { flex: 'none', width: '100%' }, align: 'v', className: 'rsa-header of-visible',
@@ -161,6 +170,10 @@ class ReactSuperApp extends Component {
       backdrop:{attrs:{className:'rsa-sidemenu-backdrop'}},
       body: { render: ({ close }) => this.renderSide(close) },
     })
+  }
+  closeSide(){
+    let { popup } = this.props;
+    popup.removeModal('rsadefaultsidemodal')
   }
   renderSide(close) {
     let { side = {}, rtl } = this.props;
@@ -262,7 +275,7 @@ class SideMenu extends Component {
         return {
           show: Show !== false, size: 36, className: 'rsa-sidemenu-item' + (className ? ' ' + className : ''), onClick: () => { onClick(o); onClose() },
           row: [
-            { size: 48, html: icon(), align: 'vh' },
+            { size: 48, html: typeof icon === 'function'?icon():icon, align: 'vh' },
             { html: text, align: 'v' }
           ]
         }
