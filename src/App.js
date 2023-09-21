@@ -6,12 +6,12 @@ import Tarikhche from './components/tarikhche/tarikhche';
 import getSvg from './getSvg';
 import AIODate from './npm/aio-date/aio-date';
 import RVD from './npm/react-virtual-dom/react-virtual-dom';
-import AIOService from 'aio-service';
+import AIOService from './npm/aio-service/aio-service';
 import RKS from 'react-keycloak-spa';
 import AIOInput from './npm/aio-input/aio-input';
 import {Icon} from '@mdi/react';
 import {mdiAccount} from '@mdi/js';
-import apis from './apis';
+import getResponse from './apis';
 import AppContext from './app-context';
 import './index.css';
 
@@ -50,7 +50,7 @@ class Main extends Component{
     this.state = {
       rsa:new RSA({rtl:true}),
       userInformation,
-      apis:AIOService({apis,getState:()=>this.state}),
+      apis:AIOService({id:'brxinvitation',getResponse,getState:()=>this.state}),
       users:[],
       statuses:[
         {value:'0',text:'در انتظار تائید',color:'#979797'},
@@ -63,14 +63,14 @@ class Main extends Component{
   }
   async componentDidMount(){
     let {setConfirm,apis} = this.state;
-    let users = await apis({type:'users'})
+    let users = await apis({api:'users'})
     if(typeof users === 'string'){
       setConfirm({type:'error',text:'دریافت کاربران با خطا مواجه شد',subtext:users})
     }
     else{
       this.setState({users})
     }
-    let res = await apis({type:'davatname_ha',parameter:{pageNumber:1,pageSize:20}})
+    let res = await apis({api:'davatname_ha',parameter:{pageNumber:1,pageSize:20}})
     if(typeof res === 'string'){
       setConfirm({type:'error',text:'دریافت دعوتنامه ها با خطا مواجه شد',subtext:res})
     }

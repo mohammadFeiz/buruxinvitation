@@ -31,12 +31,12 @@ export default class Tarikhche extends Component{
         let {paging} = this.state;
         let {searchValue = this.state.searchValue} = obj;
         let {apis} = this.context;
-        let {tarikhche,total} = await apis({type:'tarikhche',parameter:{pageNumber:paging.number,pageSize:paging.size,searchValue}})
+        let {tarikhche,total} = await apis({api:'tarikhche',parameter:{pageNumber:paging.number,pageSize:paging.size,searchValue}})
         this.setState({tarikhche,total,searchValue})
     }
     async ersale_mojadad(checks){
         let {apis,setConfirm} = this.context;
-        let res = await apis({type:'ersale_mojadad',parameter:checks})
+        let res = await apis({api:'ersale_mojadad',parameter:checks})
         if(res === true){setConfirm({type:'success',text:'ارسال مجدد با موفقیت انجام شد'})}
         else if(typeof res === 'string'){setConfirm({type:'error',text:res})}
     }

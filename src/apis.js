@@ -30,58 +30,29 @@ function isoDate(date) {
   return new Date(`${year}/${month}/${day} ${hour}:${minute}`).toISOString();
 }
 
-export default function apis({ Axios, getDateAndTime, getState }) {
+export default function getResponse({ Axios, getState,helper }) {
   return {
     async badges(){
-      let url = `${base_url}/InvitationTemplateInfoApi/`
       try{
-        let res = await Axios.get(url);
+        let res = await Axios.get(`${base_url}/InvitationTemplateInfoApi/`);
         res = res.data
-        return {
-          pishnevis: res.draft_templates,
-          tedad: res.all_templates,
-          faal: res.active_templates,
-        }
+        return {result:{pishnevis: res.draft_templates,tedad: res.all_templates,faal: res.active_templates}}
       }
       catch(err){
-        return {
-          pishnevis:0,
-          tedad:0,
-          faal:0,
-        }
+        helper.showAlert({type:'error',text:'badge',subtext:err.message})
+        return {result:{pishnevis:0,tedad:0,faal:0}}
       }
     },
     // ********************* نیاز به تائید من **********************
     async niaz_be_taide_man() {
       // return [
       //     {davat_shode:'علی احمدی',davat_konande:'حسین رحمتی',name_davatname:'نمایشگاه صنعت برق',zamane_davat:'1401/08/10 ساعت 10:42',id:0},
-      //     {davat_shode:'علی احمدی',davat_konande:'حسین رحمتی',name_davatname:'نمایشگاه صنعت برق',zamane_davat:'1401/08/10 ساعت 10:42',id:1},
-      //     {davat_shode:'علی احمدی',davat_konande:'حسین رحمتی',name_davatname:'نمایشگاه صنعت برق',zamane_davat:'1401/08/10 ساعت 10:42',id:2},
-      //     {davat_shode:'علی احمدی',davat_konande:'حسین رحمتی',name_davatname:'نمایشگاه صنعت برق',zamane_davat:'1401/08/10 ساعت 10:42',id:3},
-      //     {davat_shode:'علی احمدی',davat_konande:'حسین رحمتی',name_davatname:'نمایشگاه صنعت برق',zamane_davat:'1401/08/10 ساعت 10:42',id:4},
-      //     {davat_shode:'علی احمدی',davat_konande:'حسین رحمتی',name_davatname:'نمایشگاه صنعت برق',zamane_davat:'1401/08/10 ساعت 10:42',id:5},
-      //     {davat_shode:'علی احمدی',davat_konande:'حسین رحمتی',name_davatname:'نمایشگاه صنعت برق',zamane_davat:'1401/08/10 ساعت 10:42',id:6},
-      //     {davat_shode:'علی احمدی',davat_konande:'حسین رحمتی',name_davatname:'نمایشگاه صنعت برق',zamane_davat:'1401/08/10 ساعت 10:42',id:7},
-      //     {davat_shode:'علی احمدی',davat_konande:'حسین رحمتی',name_davatname:'نمایشگاه صنعت برق',zamane_davat:'1401/08/10 ساعت 10:42',id:8},
-      //     {davat_shode:'علی احمدی',davat_konande:'حسین رحمتی',name_davatname:'نمایشگاه صنعت برق',zamane_davat:'1401/08/10 ساعت 10:42',id:9},
-      //     {davat_shode:'علی احمدی',davat_konande:'حسین رحمتی',name_davatname:'نمایشگاه صنعت برق',zamane_davat:'1401/08/10 ساعت 10:42',id:10},
-      //     {davat_shode:'علی احمدی',davat_konande:'حسین رحمتی',name_davatname:'نمایشگاه صنعت برق',zamane_davat:'1401/08/10 ساعت 10:42',id:11},
-      //     {davat_shode:'علی احمدی',davat_konande:'حسین رحمتی',name_davatname:'نمایشگاه صنعت برق',zamane_davat:'1401/08/10 ساعت 10:42',id:12},
-      //     {davat_shode:'علی احمدی',davat_konande:'حسین رحمتی',name_davatname:'نمایشگاه صنعت برق',zamane_davat:'1401/08/10 ساعت 10:42',id:13},
-      //     {davat_shode:'علی احمدی',davat_konande:'حسین رحمتی',name_davatname:'نمایشگاه صنعت برق',zamane_davat:'1401/08/10 ساعت 10:42',id:14},
-      //     {davat_shode:'علی احمدی',davat_konande:'حسین رحمتی',name_davatname:'نمایشگاه صنعت برق',zamane_davat:'1401/08/10 ساعت 10:42',id:15},
       // ]
-      let url = `${ShowAllNotVerified}`;
       let res;
       let jalali_created_at;
-      try {
-        res = await Axios.get(url);
-      } catch (err) {
-        return [];
-      }
-      if (res.data.data === undefined || res.data.data === null) {
-        return [];
-      }
+      let response = await Axios.get(`${ShowAllNotVerified}`);
+      let result;
+      if (response.data.data === undefined || response.data.data === null) {result = [];}
       let resMapping = res.data.data.map((o) => {
         jalali_created_at = new Date(o.created_at)
           .toISOString(o.created_at)
@@ -112,17 +83,17 @@ export default function apis({ Axios, getDateAndTime, getState }) {
           zamane_davat_time: new Date(o.created_at),
         };
       });
-      resMapping = resMapping.sort(
+      result = resMapping.sort(
         (objA, objB) =>
           Number(objB.zamane_davat_time) - Number(objA.zamane_davat_time)
       );
-      return resMapping;
+      return {result};
     },
 
     //***************دانلود فایل تمپلیت***************** */
     async linke_template_excel() {
       //return 'error';
-      return { url: `${downloadTemplateFile}` };
+      return {result:{ url: `${downloadTemplateFile}` }};
     },
     // ********************* لیست تاریخچه **********************
     async tarikhche({ pageNumber, pageSize, searchValue }) {
@@ -134,38 +105,21 @@ export default function apis({ Axios, getDateAndTime, getState }) {
 
       let status, created_at, res;
 
-      try {
-        res = await Axios.get(url);
-      } catch (err) {
+      try {res = await Axios.get(url);} 
+      catch (err) {
+        helper.showAlert({type:'error',text:'tarikhche',subtext:err.message})
         return { tarikhche: [], total: 0 };
       }
       let resMapping = res.data.results.map((o) => {
-        //به دست آوردن تایم به صورت فارسی
-
         // به دست آوردن اختلاف زمانی برای تشخیص اینکه منقضی شده است یا خیر
-        let created = new Date(o.updated_at).getTime();
-        const now = new Date().getTime();
-        const msBetweenDates = Math.abs(created - now);
-        const hoursBetweenDates = msBetweenDates / (60 * 60 * 1000);
-
-        if (hoursBetweenDates > 24 && (o.status === "S" || o.status === "s")) {
-          status = "3";
-        } // منقضی شده
-        else if (o.status === "NP") {
-          status = "0";
-        } // در انتظار تائید
-        else if (o.status === "S") {
-          status = "1";
-        } //ارسال شده
-        else if (o.status === "O") {
-          status = "2";
-        } // مشاهده شده
-        else if (o.status === "U") {
-          status = "4";
-        } // خطا
-        else {
-          status = "4";
-        }
+        //getDelta یک تاریخ می گیره و فاصله ی اون با لحظه ای که در اون هستیم رو به تفکیک روز ساعت دقیقه و ثانیه میده
+        const {day,hour,minute,second} = AIODate().getDelta({date:o.updated_at});
+        if (day && (o.status === "S" || o.status === "s")) {status = "3";} // منقضی شده
+        else if (o.status === "NP") {status = "0";} // در انتظار تائید
+        else if (o.status === "S") {status = "1";} //ارسال شده
+        else if (o.status === "O") {status = "2";} // مشاهده شده
+        else if (o.status === "U") {status = "4";} // خطا
+        else {status = "4";}
         // else{status = '3'} // منقضی شده
         return {
           id: o.id,
@@ -187,20 +141,22 @@ export default function apis({ Axios, getDateAndTime, getState }) {
       );
       //dafaate_ersal
       let total = res.data.count ? res.data.count : 0;
-      return { tarikhche: resMapping, total };
+      return {result:{ tarikhche: resMapping, total }};
     },
 
     // ********************* لیست کاربران **********************
     async users() {
-      return [
-        { name: "احسان رودکی", id: "0" },
-        { name: "هانیه غفاری", id: "1" },
-        { name: "زهرا امیری", id: "2" },
-        { name: "نازنین سلطانی", id: "3" },
-        { name: "علی راقبی", id: "4" },
-        { name: "شهرام صادقی", id: "5" },
-        { name: "نسرین کمالی فر", id: "6" },
-      ];
+      return {
+        result:[
+          { name: "احسان رودکی", id: "0" },
+          { name: "هانیه غفاری", id: "1" },
+          { name: "زهرا امیری", id: "2" },
+          { name: "نازنین سلطانی", id: "3" },
+          { name: "علی راقبی", id: "4" },
+          { name: "شهرام صادقی", id: "5" },
+          { name: "نسرین کمالی فر", id: "6" },
+        ]
+      };
     },
 
     // ********************* لیست دعوتنامه ها **********************
@@ -209,37 +165,18 @@ export default function apis({ Axios, getDateAndTime, getState }) {
         (pageNumber - 1) * pageSize
       }`;
       let res;
-      try {
-        res = await Axios.get(url);
-      } catch (err) {
+      try {res = await Axios.get(url);} 
+      catch (err) {
+        helper.showAlert({type:'error',text:'davatname_ha',subtext:err.message})
         return { davatname_ha: [], total: 0 };
       }
       let resMapping = res.data.results.map((o) => {
-        let { date, time } = getDateAndTime(o.created_at);
-        let created_at = new Date(o.created_at)
-          .toISOString(o.created_at)
-          .replace("T", " ")
-          .replace("Z", "");
-        let getMiladiDate = new Date(created_at).toLocaleDateString();
-        let getMiladiDateTime = new Date(getMiladiDate).getTime();
-        let addExpirationDate = getMiladiDateTime + o.expiration * 86400000;
-        let tarikhe_etebar_js = addExpirationDate + 86400000;
-        tarikhe_etebar_js = new Date(o.created_at);
-        // let sd = new Date(addExpirationDate).toLocaleDateString('fa-IR')
-        let expiration_date = new Date(addExpirationDate);
-        let year = expiration_date.getFullYear();
-        let month = expiration_date.getMonth() + 1;
-        let day = expiration_date.getDate();
-        let jalali_expiration = AIODate().toJalali({
-          date: [year, month, day],
-        });
-        jalali_expiration = `${jalali_expiration[0]}/${jalali_expiration[1]}/${jalali_expiration[2]}`;
         let az_tarikh, ta_tarikh;
         if (o.event_start_date && o.event_end_date) {
           //به دست آوردن تاریخ های
-          az_tarikh = getDateAndTime(o.event_start_date);
+          az_tarikh = helper.getDateAndTime(o.event_start_date);
           az_tarikh = `${az_tarikh.date}/${az_tarikh.time}`;
-          ta_tarikh = getDateAndTime(o.event_end_date);
+          ta_tarikh = helper.getDateAndTime(o.event_end_date);
           ta_tarikh = `${ta_tarikh.date}/${ta_tarikh.time}`;
         }
 
@@ -251,7 +188,12 @@ export default function apis({ Axios, getDateAndTime, getState }) {
           date: o.expiration_date,
           pattern: "{year}/{month}/{day}",
         });
-
+        //به دست آوردن اختلاف زمان حال با زمان اکسپایرد 
+        let {day, type} = AIODate().getDelta({date: o.expiration_date});
+        //اگر زمان گذشته تعداد روز رو صفر کن
+        if (type === "passed") {day = 0}
+        let etebar = day === 0 ? `منقضی شده` : `${day} روز اعتبار دارد`
+        
         return {
           id: o.id,
           is_active: o.is_active,
@@ -259,8 +201,7 @@ export default function apis({ Axios, getDateAndTime, getState }) {
           name: o.name,
           tarikhe_ijad: tarikhe_ijad,
           tarikhe_etebar: tarikhe_etebar,
-          tarikhe_etebar_js: o.expiration_date, //برای محاسبات لازم داریم
-          expiredDate: expiration_date,
+          etebar,
           faal: o.is_active,
           dastresi_ha: [],
           poster: o.mobile_poster,
@@ -283,7 +224,7 @@ export default function apis({ Axios, getDateAndTime, getState }) {
         };
       });
       let total = res.data.count ? res.data.count : 0;
-      return { davatname_ha: resMapping, total };
+      return {result:{ davatname_ha: resMapping, total }};
     },
 
     // ********************* طراحی دعوتنامه **********************
@@ -296,19 +237,11 @@ export default function apis({ Axios, getDateAndTime, getState }) {
       let url = `${invitationTemplateUrl}?username=${userInformation.username}`;
       is_draft = mode == "draft"
       try {
-        if (model.az_tarikh) {
-          miladi_start_event = isoDate(model.az_tarikh);
-        }
-        if (model.ta_tarikh) {
-          miladi_end_event = isoDate(model.ta_tarikh);
-        }
-      } catch (err) {
-        return "خطا در فرمت تاریخ شروع و پایان";
-      }
-
-      if (model.landing_page === "") {
-        model.landing_page = undefined;
-      }
+        if (model.az_tarikh) {miladi_start_event = isoDate(model.az_tarikh);}
+        if (model.ta_tarikh) {miladi_end_event = isoDate(model.ta_tarikh);}
+      } 
+      catch (err) {return {result:"خطا در فرمت تاریخ شروع و پایان"}}
+      if (model.landing_page === "") {model.landing_page = undefined;}
       let df = isoDate(model.tarikhe_etebar)
 
       let apiBody;
@@ -334,24 +267,17 @@ export default function apis({ Axios, getDateAndTime, getState }) {
           is_redirect_to_landing_page: model.ersale_mostaghim,
           // user: userInformation,
         };
-      } catch (err) {
-        return "در فراخوانی دیتا مشکلی پیش آمده است";
-      }
+      } 
+      catch (err) {return {result:"در فراخوانی دیتا مشکلی پیش آمده است"}}
 
-      if (model.poster !== false) {
-        apiBody["mobile_poster"] = model.poster;
-      }
+      if (model.poster !== false) {apiBody["mobile_poster"] = model.poster;}
       let formData = new FormData();
       for (const key in apiBody) {
         if (apiBody[key] !== undefined) {
-          if (key === "user") {
-            formData.append(key, JSON.stringify(apiBody[key]));
-          } else {
-            formData.append(key, apiBody[key]);
-          }
+          if (key === "user") {formData.append(key, JSON.stringify(apiBody[key]));} 
+          else {formData.append(key, apiBody[key]);}
         }
       }
-
       // تغییر دعوتنامه
       if (model.id) {
         // تمامی اطلاعاتی که سمت کلاین رفته دریافت می گردد
@@ -361,44 +287,17 @@ export default function apis({ Axios, getDateAndTime, getState }) {
           formData.delete("desktop_poster");
           formData.delete("mobile_poster");
         }
-        try {
-          res = await Axios.put(url, formData, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          });
-        } catch (err) {
-          if (err.response.data) {
-            return err.response.data.message;
-          } else {
-            return "خطایی در تغییر این دعوتنامه رخ داد";
-          }
-          // return 'خطایی در تغییر این دعوتنامه رخ داد'
+        try {res = await Axios.put(url, formData, {headers: {"Content-Type": "multipart/form-data"}});} 
+        catch (err) {return {result:err.response.data?err.response.data.message:"خطایی در تغییر این دعوتنامه رخ داد"}}
+        return {result:true};
+      } 
+      else {
+        try {res = await Axios.post(url, formData, {headers: {"Content-Type": "multipart/form-data"}});} 
+        catch (err) {
+          return {result:err.response.data && err.response.data.message?err.response.data.message:"خطای نامشخص"}
         }
-        return true;
-      } else {
-        try {
-          res = await Axios.post(url, formData, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          });
-        } catch (err) {
-          if (err.response.data) {
-            if (err.response.data.message) {
-              return err.response.data.message;
-            } else {
-              return "خطای نامشخص";
-            }
-          } else {
-            return "خطای نامشخص";
-          }
-          // return 'خطایی در ثبت دعوتنامه رخ داد'
-        }
-        return true;
+        return {result:true};
       }
-      //return 'خطایی رخ داد';
-      return true;
     },
 
     // ********************* ارسال تکی **********************
@@ -415,32 +314,10 @@ export default function apis({ Axios, getDateAndTime, getState }) {
       //return 'خطایی رخ داد';
       let userInformation = getState().userInformation;
       let url = `${ersalTakiUrl}?username=${userInformation.username}`;
-      let res;
-      let role;
-      let gender;
-      let template_id = "";
-      // let user = {
-      //     username: "a.moghimi",
-      //     roles: ["admin", "user"]
-      // }
-      if (davatname_haye_entekhab_shode.length === 0) {
-        return "لیست دعوتنامه خالی است";
-      }
-
-      // davatname_haye_entekhab_shode.map((o) =>{
-      //     template_id += o
-      //     template_id += ' '
-      // })
-      if (model.jensiat === "male") {
-        gender = "M";
-      } else {
-        gender = "F";
-      }
-      if (userInformation.roles.indexOf("admin") !== -1) {
-        role = "admin";
-      } else {
-        role = "user";
-      }
+      let res,template_id = "";
+      if (davatname_haye_entekhab_shode.length === 0) {return {result:"لیست دعوتنامه خالی است"};}
+      let gender = model.jensiat === "male"?"M":"F";
+      let role = userInformation.roles.indexOf("admin") !== -1?"admin":"user";
 
       let urlParams = {
         first_name: model.nam,
@@ -449,27 +326,13 @@ export default function apis({ Axios, getDateAndTime, getState }) {
         phone_number: model.shomare_tamas,
         gender: gender,
         username: userInformation.username, //باید اطلاعات یوزر را بگیرم
-        // template_id: template_id, //davatname_haye_entekhab_shode
         template_ids: davatname_haye_entekhab_shode, //davatname_haye_entekhab_shode
         role: role, // نقش کاربری که ارسال میکند
         user: userInformation,
       };
-      try {
-        res = await Axios.post(url, urlParams);
-      } catch (err) {
-        if (err.response.data) {
-          if (err.response.data.message) {
-            return err.response.data.message;
-          } else {
-            return "خطای نامشخص";
-          }
-        } else {
-          return "خطای نامشخص";
-        }
-      }
-
-      //return 'خطایی رخ داد';
-      return true;
+      try {res = await Axios.post(url, urlParams);} 
+      catch (err) {return err.response.data && err.response.data.message?err.response.data.message:"خطای نامشخص"}
+      return {result:true};
     },
 
     // ********************* ارسال گروهی **********************
@@ -492,70 +355,35 @@ export default function apis({ Axios, getDateAndTime, getState }) {
       let userInformation = getState().userInformation;
 
       let url = `${excellImport}?username=${userInformation.username}`;
-      let res;
-      let role;
-      let successMessage;
-      let errorMessage;
+      let res,successMessage,errorMessage;
       let template_id = "";
-      if (davatname_haye_entekhab_shode.length === 0) {
-        return "لیست دعوتنامه خالی است";
-      }
+      if (davatname_haye_entekhab_shode.length === 0) {return {result:"لیست دعوتنامه خالی است"}}
       // davatname_haye_entekhab_shode.map((o) =>{
       //     template_id += o
       //     template_id += ' '
       // })
-
-      if (userInformation.roles.indexOf("admin") !== -1) {
-        role = "admin";
-      } else {
-        role = "user";
-      }
+      let role = userInformation.roles.indexOf("admin") !== -1?"admin":"user";
       let formData = new FormData();
       formData.append("file", excel['file']);
       // formData.append('template_ids', template_id)
       formData.append("template_ids", davatname_haye_entekhab_shode);
       formData.append("username", userInformation.username); // username باید از کاربر گرفته شود
       formData.append("role", role); // با توجه به نقش کاربری که دارد ارسال گروهی را انجام می دهد.
-
-      try {
-        res = await Axios.post(url, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-      } catch (err) {
-        if (err.response.data) {
-          if (err.response.data.message){
-              return err.response.data.message;
-          }
-          else{
-              return "خطای نامشخص";
-          }
-        } else {
-          return "خطای نامشخص";
-        }
-      }
+      try {res = await Axios.post(url, formData, {headers: {"Content-Type": "multipart/form-data"}});} 
+      catch (err) {return err.response.data && err.response.data.message?err.response.data.message:"خطای نامشخص";}
       if (res.data.invalid_count !== 0) {
         errorMessage = `${res.data.invalid_count} مورد ناموفق ثبت شد `;
         successMessage = `${res.data.valid_count} مورد موفق ثبت شد`;
-
-        // return `${errorMessage}
-        // و
-        // ${successMessage}`
       }
       let errorList = [];
       res.data.invalid_data.map((o) => {
-        errorList.push({
-          name: `${o.first_name} ${o.last_name}`,
-          phone: o.phone_number,
-          error: o.description,
-        });
+        errorList.push({name: `${o.first_name} ${o.last_name}`,phone: o.phone_number,error: o.description});
       });
       let resMapping = {
         successLength: res.data.valid_count,
         errorList: errorList,
       };
-      return resMapping;
+      return {result:resMapping};
     },
 
     // ********************* تائید  **********************
@@ -573,27 +401,14 @@ export default function apis({ Axios, getDateAndTime, getState }) {
       let url = `${InvitatonsConfirm}?invitation_ids=${invitation_ids}`;
 
       if (state === true) {
-        try {
-          res = await Axios.get(url);
-        } catch (err) {
-          if (err.response.data) {
-            if (err.response.data.message) {
-              return err.response.data.message;
-            } else {
-              return "خطای نامشخص";
-            }
-          } else {
-            return "خطای نامشخص";
-          }
-        }
+        try {res = await Axios.get(url)} 
+        catch (err) {return err.response.data && err.response.data.message?err.response.data.message:"خطای نامشخص";}
         if (res.data) {
-          if (res.data.is_success === true) {
-            return true;
-          }
+          if (res.data.is_success === true) {return {result:true};}
         }
-        // return true
-      } else {
-        return true;
+      } 
+      else {
+        return {result:true};
         // return 'این موارد در حال حاظر عدم تائید هستند'
       }
     },
@@ -602,29 +417,13 @@ export default function apis({ Axios, getDateAndTime, getState }) {
     async taghire_davatname({ object, state }) {
       //state -> نشان دهنده این است که قالب را فعال یا غیر فعال کرده است.
       let userInformation = getState().userInformation;
-
       let url = `${invitationTemplateUrl}?username=${userInformation.username}`;
-      let res;
-      let apiBody = {
-        id: object.id,
-        is_active: state,
-        user: userInformation,
-      };
-
+      let apiBody = {id: object.id,is_active: state,user: userInformation};
       try {
-        res = await Axios.put(url, apiBody);
-        return true;
-      } catch (err) {
-        if (err.response.data) {
-          if (err.response.data.message) {
-            return err.response.data.message;
-          } else {
-            return "خطای نامشخص";
-          }
-        } else {
-          return "خطای نامشخص";
-        }
-      }
+        await Axios.put(url, apiBody);
+        return {result:true};
+      } 
+      catch (err) {return err.response.data && err.response.data.message?err.response.data.message:"خطای نامشخص";}
     },
 
     // ********************* ارسال مجدد **********************
@@ -636,34 +435,17 @@ export default function apis({ Axios, getDateAndTime, getState }) {
           ersale_mojadad_array.push(prop);
         }
       }
-      let res;
-      let url = `${sendAgain}`;
-      let apiBody = {
-        invite_ids: ersale_mojadad_array,
-      };
       try {
-        res = await Axios.post(url, apiBody);
-        if (res.data.is_success === true) {
-          return true;
-        }
-        return true;
-      } catch (err) {
-        if (err.response.data) {
-          if (err.response.data.message) {
-            return err.response.data.message;
-          } else {
-            return "خطای نامشخص";
-          }
-        } else {
-          return "خطای نامشخص";
-        }
-      }
+        await Axios.post(`${sendAgain}`, {invite_ids: ersale_mojadad_array});
+        return {result:true};
+      } 
+      catch (err) {return err.response.data && err.response.data.message?err.response.data.message:"خطای نامشخص";}
     },
 
     // ************ارسال مجدد *****************
     async ersale_mojadade_khatahaye_excel({ model }) {
       // return {successLength:4,errorList:[]}
-      return " در حال حاضر امکان استفاده از ارسال مجدد موجود نمیباشد،فایل را اصلاح کرده و دوباره ارسال کنید";
+      return {result:" در حال حاضر امکان استفاده از ارسال مجدد موجود نمیباشد،فایل را اصلاح کرده و دوباره ارسال کنید"};
     },
     async hazfe_davatname(obj) {
       let userInformation = getState().userInformation;
@@ -671,18 +453,9 @@ export default function apis({ Axios, getDateAndTime, getState }) {
       let res;
       try {
         res = await Axios.delete(url);
-      } catch (err) {
-        if (err.response.data) {
-          if (err.response.data.message) {
-            return err.response.data.message;
-          } else {
-            return "خطای نامشخص";
-          }
-        } else {
-          return "خطای نامشخص";
-        }
-      }
-      return true;
+        return {result:true}
+      } 
+      catch (err) {return err.response.data && err.response.data.message?err.response.data.message:"خطای نامشخص";}
     },
   };
 }

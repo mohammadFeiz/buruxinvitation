@@ -15,18 +15,18 @@ export default class MizeKar extends Component {
     }
     async niaz_be_taide_man(){
         let {apis} = this.context;
-        let niaz_be_taide_man = await apis({type:'niaz_be_taide_man'});
+        let niaz_be_taide_man = await apis({api:'niaz_be_taide_man',def:[]});
         this.setState({niaz_be_taide_man})
     }
     async davatname_ha(obj = {}){
         let {pageNumber = this.state.pageNumber,pageSize = this.state.pageSize} = obj;
         let {apis} = this.context;
-        let {davatname_ha,total} = await apis({type:'davatname_ha',parameter:{pageNumber,pageSize}});
+        let {davatname_ha,total} = await apis({api:'davatname_ha',parameter:{pageNumber,pageSize}});
         this.setState({davatname_ha,davatname_ha_total:total,pageNumber,pageSize})
     }
     async getBadges(){
         let {apis} = this.context;
-        let badges = await apis({type:'badges'});
+        let badges = await apis({api:'badges'});
         this.setState({badges})
     }
     componentDidMount(){
@@ -78,7 +78,7 @@ export default class MizeKar extends Component {
             setConfirm({type:'warning',text:'هیچ موردی از جدول انتخاب نشده است'})
             return;
         }
-        let res = await apis({type:'taid',parameter:{state,selected}})
+        let res = await apis({api:'taid',parameter:{state,selected}})
         if(typeof res === 'string'){setConfirm({type:'error',text:`${state?'تایید':'عدم تایید'} با خطا روبرو شد`,subtext:res})}
         else{
             this.setState({niaz_be_taide_man:niaz_be_taide_man.filter((o)=>!checks[o.id])})
@@ -228,7 +228,7 @@ class TarahiDavatname extends Component{
             setConfirm({type:'error',text:'اطلاعات مورد نیاز را وارد کنید'})
             return;
         }
-        let res = await apis({type:'zakhire_tarahi_davatname',parameter:{mode,model,karbarane_daraye_dastresi}})
+        let res = await apis({api:'zakhire_tarahi_davatname',parameter:{mode,model,karbarane_daraye_dastresi}})
         if(typeof res === 'string'){setConfirm({type:'error',text:'ذخیره دعوتنامه طراحی شده با خطا روبرو شد',subtext:res})}
         else{
             change_davatname_ha(model.id,model)
@@ -498,8 +498,8 @@ class ErsaleDavatname extends Component{
     }
     async componentDidMount(){
         let {apis} = this.context;
-        let niaz_be_taide_man = await apis({type:'niaz_be_taide_man'});
-        let {url:linke_template_excel} = await apis({type:'linke_template_excel'});
+        let niaz_be_taide_man = await apis({api:'niaz_be_taide_man'});
+        let {url:linke_template_excel} = await apis({api:'linke_template_excel'});
         this.setState({niaz_be_taide_man,linke_template_excel})
     }
     async send(){
@@ -508,7 +508,7 @@ class ErsaleDavatname extends Component{
         let {model,davatname_haye_entekhab_shode,excel,tab} = this.state;
         if(tab === '0'){
             if(!model.nam || !model.name_khanevadegi || !model.jensiat){alert('اطلاعات مورد نیاز را وارد کنید'); return;}
-            let res = await apis({type:'ersale_taki',parameter:{model,davatname_haye_entekhab_shode}})
+            let res = await apis({api:'ersale_taki',parameter:{model,davatname_haye_entekhab_shode}})
             if(typeof res === 'string'){setConfirm({type:'error',text:'ارسال دعوتنامه تکی با خطا روبرو شد',subtext:res})}
             else{
                 setConfirm({type:'success',text:'ارسال دعوتنامه تکی با موفقیت انجام شد'})
@@ -517,7 +517,7 @@ class ErsaleDavatname extends Component{
         }
         if(tab === '1'){
             if(!excel){alert('فایل اکسل را آپلود کنید'); return;}
-            let res = await apis({type:'ersale_goroohi',parameter:{davatname_haye_entekhab_shode,excel}})
+            let res = await apis({api:'ersale_goroohi',parameter:{davatname_haye_entekhab_shode,excel}})
             if(typeof res === 'string'){setConfirm({type:'error',text:'ارسال دعوتنامه گروهی با خطا روبرو شد',subtext:res})}
             else{
                 let {successLength,errorList} = res;
@@ -535,7 +535,7 @@ class ErsaleDavatname extends Component{
             setConfirm({type:'warning',text:'هیچ موردی از جدول انتخاب نشده است'})
             return;
         }
-        let res = await apis({type:'taid',parameter:{state,selected}})
+        let res = await apis({api:'taid',parameter:{state,selected}})
         if(typeof res === 'string'){setConfirm({type:'error',text:`${state?'تایید':'عدم تایید'} با خطا روبرو شد`,subtext:res})}
         else{
             this.setState({niaz_be_taide_man:niaz_be_taide_man.filter((o)=>!checks[o.id])})
@@ -761,7 +761,7 @@ class ErsaleDavatname extends Component{
                             content:()=>{
                                 return (
                                     <Khata_haye_ersal model={JSON.parse(JSON.stringify(errorList))} onSubmit={async (model)=>{
-                                        let res = await apis({type:'ersale_mojadade_khatahaye_excel',parameter:{model}});
+                                        let res = await apis({api:'ersale_mojadade_khatahaye_excel',parameter:{model}});
                                         if(res === true){removePopup()}
                                         if(typeof res === 'string'){
                                             setConfirm({type:'error',text:'خطا',subtext:res});
@@ -1005,12 +1005,8 @@ class DavatnameCard extends Component{
     }
     days_layout(){
         let {object} = this.props;
-        let {day, type} = AIODate().getDelta({date: new Date().getTime(), otherDate: object.tarikhe_etebar_js});
-        if (type === "remaining") {
-            day = 0
-        }
-        let html = day === 0 ? `منقضی شده` : `${day} روز اعتبار دارد`
-        return {size:24,align:'v',html,className:'size10 color605E5C padding-0-6 bold', style:{color:day===0 ? "red": undefined}}
+        let {etebar} = object;
+        return {size:24,align:'v',html:etebar,className:'size10 color605E5C padding-0-6 bold', style:{color:etebar === 'منقضی شده' ? "red": undefined}}
     }
     date_layout(type){
         let {object} = this.props;
@@ -1058,7 +1054,7 @@ class DavatnameCard extends Component{
                     ),align:'v',
                     attrs:{
                         onClick:async ()=>{
-                            let res = await apis({type:'taghire_davatname',parameter:{object,state:!object.faal}})
+                            let res = await apis({api:'taghire_davatname',parameter:{object,state:!object.faal}})
                             if(res === true){
                                 object.faal = !object.faal;
                                 change_davatname_ha(object.id,object)
@@ -1090,7 +1086,7 @@ class DavatnameCard extends Component{
                 {flex:1},
                 {html:<Icon path={mdiDelete} size={0.7}/>,className:'bgC92828 colorFFF round4',attrs:{
                     onClick:async ()=>{
-                        let res = await apis({type:'hazfe_davatname',parameter:object})
+                        let res = await apis({api:'hazfe_davatname',parameter:object})
                         if(res === true){onRemove()}
                     }
                 }}
