@@ -51,7 +51,7 @@ export default class Map extends Component {
     async getAddress(latitude, longitude){
         let { apiKeys = {}} = this.props;
         try{
-            let param = {headers:{'Api-Key':apiKeys.service,'Authorization':undefined}}
+            let param = {headers:{'Api-Key':apiKeys.service}}
             let url = `https://api.neshan.org/v5/reverse?lat=${latitude}&lng=${longitude}`;
             let res = await Axios.get(url,param);
             let address;
@@ -94,7 +94,6 @@ export default class Map extends Component {
         this.map.panTo({ lat, lng })
     }
     async updateAddress(lat,lng){
-        console.log('updateAddress')
         let {onChangeAddress} = this.props;
         let address = await this.getAddress(lat,lng)
         this.setState({address})

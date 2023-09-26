@@ -161,8 +161,9 @@ export default function getResponse({ Axios, getState,helper }) {
     },
 
     // ********************* لیست دعوتنامه ها **********************
-    async davatname_ha({ pageSize, pageNumber,is_draft = false }) {
+    async davatname_ha({ pageSize, pageNumber,is_draft = false,searchValue }) {
       let url = `${invitationTemplateUrl}?limit=${pageSize}&offset=${(pageNumber - 1) * pageSize}&is_draft=${is_draft}`;
+      if(searchValue){url += `&search=${searchValue}`}
       let res;
       try {res = await Axios.get(url);} 
       catch (err) {

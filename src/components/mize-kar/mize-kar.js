@@ -3,7 +3,8 @@ import RVD from './../../npm/react-virtual-dom/react-virtual-dom';
 import {Icon} from '@mdi/react';
 import { 
     mdiToggleSwitch,mdiToggleSwitchOffOutline,mdiDotsHorizontal,mdiChevronLeft, mdiChevronDoubleDown,mdiFileExcel,mdiPencil,mdiAccountCircleOutline, mdiDelete,
-    mdiSend
+    mdiSend,
+    mdiMagnify
 } from '@mdi/js';
 import GradientCard from '../gradient-card/gradient-card';
 import AIODate from './../../npm/aio-date/aio-date';
@@ -190,9 +191,9 @@ class TarahiDavatname extends Component{
         apis({
             api:'zakhire_tarahi_davatname',
             parameter:{mode,model,karbarane_daraye_dastresi},
-            name:'ذخیره دعوتنامه طراحی شده',
+            name:mode === 'draft'?'ذخیره دعوتنامه به عنوان پیشنویس':'ذخیره دعوتنامه طراحی شده',
             successMessage:true,
-            callback:()=>{onChange(model.id,model); onClose()}
+            callback:()=>{onChange(); onClose()}
         })
     }
     nav_layout(){
@@ -263,11 +264,11 @@ class TarahiDavatname extends Component{
         let {model} = this.state;
         let style1 = {height:100}
         let input_name = {input:{type:'text'},field:'value.name_davatname',label:'نام دعوتنامه :',validations:[['required']]};
-        let input_tarikhe_etebar = {input:{type:'datepicker',calendarType:'jalali'},field:'value.tarikhe_etebar',label:'تاریخ اعتبار دعوتنامه :',validations:[['required']]}
+        let input_tarikhe_etebar = {input:{type:'datepicker',calendarType:'jalali',close:true},field:'value.tarikhe_etebar',label:'تاریخ اعتبار دعوتنامه :',validations:[['required']]}
         let input_matne_payamak = {input:{type:'textarea',style:style1},field:'value.matne_payamak',label:'متن پیامک :',validations:[['required']]};
         let input_matne_davatname = {input:{type:'textarea',style:style1},field:'value.matne_davatname',label:'متن دعوتنامه :',validations:[['required']]}
-        let input_tarikhe_bargozari_az = {input:{type:'datepicker',unit:'hour',calendarType:'jalali'},label:'تاریخ برگزاری ایونت از',field:'value.az_tarikh'};
-        let input_tarikhe_bargozari_ta = {input:{type:'datepicker',unit:'hour',calendarType:'jalali'},label:'تاریخ برگزاری ایونت تا',field:'value.ta_tarikh'};
+        let input_tarikhe_bargozari_az = {input:{type:'datepicker',unit:'hour',calendarType:'jalali',close:true},label:'تاریخ برگزاری ایونت از',field:'value.az_tarikh'};
+        let input_tarikhe_bargozari_ta = {input:{type:'datepicker',unit:'hour',calendarType:'jalali',close:true},label:'تاریخ برگزاری ایونت تا',field:'value.ta_tarikh'};
         let input_ersal_be_landing = {input:{type:'checkbox',text:'ارسال مستقیم به لندینگ پیچ'},label:'.',field:'value.ersale_mostaghim'}
         let input_emkane_davat = {input:{type:'checkbox',text:'امکان دعوت از دوستان'},label:'.',field:'value.emkane_davat'}
         let input_landing = {input:{type:'text'},field:'value.landing_page',inlineLabel:'لندینگ پیج :',labelAttrs:{style:{width:160}}}
@@ -287,10 +288,15 @@ class TarahiDavatname extends Component{
                         style={{width:'100%',height:160,resize:'vertical',minHeight:100}} 
                         latitude={model.lat}
                         longitude={model.long}
-                        onSubmit={(lat,long)=>{
+                        onChange={(lat,long,address)=>{
                             model.lat = lat;
                             model.long = long;
                             this.setState({showMap:false,model})
+                        }}
+                        onChangeAddress={(address)=>{
+                            let {model} = this.state;
+                            let newModel = {...model,adrese_ghorfe:address}
+                            this.setState({model:newModel})
                         }}
                         title='انتخاب موقعیت'
                         search={true}
@@ -774,25 +780,57 @@ class DavatnameHa extends Component{
     static contextType = AppContext;
     state = {draft:false,total:0,pageNumber:1,pageSize:20,davatname_ha:[]}
     async fetchData(obj = {}){
-        let {pageNumber = this.state.pageNumber,pageSize = this.state.pageSize,draft = this.state.draft} = obj;
+        let {pageNumber = this.state.pageNumber,pageSize = this.state.pageSize,draft = this.state.draft,searchValue = this.state.searchValue} = obj;
         let {apis} = this.context;
-        let {davatname_ha,total} = await apis({api:'davatname_ha',parameter:{pageNumber,pageSize,is_draft:draft}});
-        this.setState({davatname_ha,total,pageNumber,pageSize,draft})
+        let {davatname_ha,total} = await apis({api:'davatname_ha',parameter:{pageNumber,pageSize,is_draft:draft,searchValue}});
+        this.setState({davatname_ha,total,pageNumber,pageSize,draft,searchValue})
     }
     componentDidMount(){
         this.fetchData()
     }
     remove(o){
-        let {apis} = this.context;
-        apis({api:'hazfe_davatname',parameter:o,callback:()=>{
-            let {davatname_ha} = this.state;
-            davatname_ha = davatname_ha.filter(({id})=>id !== o.id);
-            this.setState({davatname_ha});
-        }})
+        let {apis,rsa} = this.context;
+        rsa.addModal({
+            position:'center',
+            backdrop:{
+                attrs:{
+                    style:{background:'rgba(0,0,0,0.2)'}
+                }
+            },
+            header:{title:'حذف دعوتنامه'},
+            body:{
+                render:({close})=>'آیا از حذف این دعوتنامه اطمینان دارید',
+                attrs:{style:{padding:12}}
+            },
+            footer:{
+                buttons:[
+                    [
+                        'بله',
+                        {
+                            onClick:()=>{
+                                apis({api:'hazfe_davatname',parameter:o,callback:()=>{
+                                    let {davatname_ha} = this.state;
+                                    davatname_ha = davatname_ha.filter(({id})=>id !== o.id);
+                                    this.setState({davatname_ha});
+                                    rsa.removeModal()
+                                }})
+                            }
+                        }
+                    ],
+                    ['خیر',{onClick:()=>rsa.removeModal()}]
+                ]
+            }
+        })
+        
     }
     change(id,obj){
-        let {davatname_ha} = this.state;
-        this.setState({davatname_ha: davatname_ha.map((o)=>id===o.id?obj:o)})
+        if(!id && !obj){
+            this.fetchData();
+        }
+        else {
+            let {davatname_ha} = this.state;
+            this.setState({davatname_ha: davatname_ha.map((o)=>id===o.id?obj:o)})
+        }
     }
     nav_layout(){
         let {onClose} = this.props;
@@ -807,7 +845,7 @@ class DavatnameHa extends Component{
         }
     }
     tabs_layout(){
-        let {draft} = this.state;
+        let {draft,searchValue} = this.state;
         return {
             html:(
                 <AIOInput
@@ -815,6 +853,15 @@ class DavatnameHa extends Component{
                     options={[{text:'نهایی ها',value:false},{text:'پیشنویس ها',value:true}]}
                     value={draft}
                     onChange={(draft)=>this.fetchData({draft})}
+                    after={(
+                        <AIOInput
+                            type='text'
+                            after={<Icon path={mdiMagnify} size={1}/>}
+                            onChange={(searchValue)=>this.fetchData({searchValue})}
+                            value={searchValue}
+                            style={{background:'#f8f8f8'}}
+                        />
+                    )}
                 />
             )
         }
@@ -829,7 +876,7 @@ class DavatnameHa extends Component{
         }
     }
     list_layout(){
-        let {davatname_ha,total,pageNumber,pageSize} = this.state;
+        let {davatname_ha,total,pageNumber,pageSize,draft} = this.state;
         return {
             flex:1,
             html:(
@@ -844,7 +891,7 @@ class DavatnameHa extends Component{
                     rowsTemplate={(rows)=>{
                         return (
                             <div style={{flex:1,display:'inline-block',padding:'0 12px', overflowY:'auto'}}>
-                                {rows.map((o,i)=><DavatnameCard key={o.id} object={o} onRemove={()=>this.remove(o)} onChange={this.change.bind(this)}/>)}
+                                {rows.map((o,i)=><DavatnameCard key={o.id} draft={draft} object={o} onRemove={()=>this.remove(o)} onChange={this.change.bind(this)}/>)}
                             </div>
                         )
                     }}
@@ -1025,6 +1072,13 @@ class DavatnameCard extends Component{
             ]
         }
     }
+    draft_layout(){
+        let {draft} = this.props;
+        if(!draft){return false}
+        return {
+            html:'پیشنویس',align:'vh',size:18,className:'fs-10',style:{background:'#fec472'}
+        }
+    }
     render(){
         return (
             <RVD
@@ -1032,6 +1086,7 @@ class DavatnameCard extends Component{
                     style:{flex:'none',width:200,float:'right',margin:6,overflowY:'auto',borderRadius:12,background:'#fff'},
                     column:[
                         this.poster_layout(),
+                        this.draft_layout(),
                         this.days_layout(),
                         this.name_layout(),
                         this.date_layout('tarikhe_ijad'),

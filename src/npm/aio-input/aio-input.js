@@ -40,7 +40,7 @@ export default class AIOInput extends Component {
                 let { backdropAttrs, attrs, fixStyle, fitHorizontal, position = 'popover', openRelatedTo } = popover || {}
                 return {
                     rtl, position, attrs, id: 'popover',
-                    body: { render: () => <DatePicker {...this.props} /> },
+                    body: { render: (obj) => <DatePicker {...this.props} onClose={obj.close}/>},
                     backdrop: { attrs: backdropAttrs },
                     popover: { fixStyle, fitHorizontal, getTarget: () => $(dom.current), openRelatedTo }
                 }
@@ -137,17 +137,14 @@ export default class AIOInput extends Component {
             if (Pattern) { pattern = Pattern }
             else if (unit === 'month') { pattern = `{year}${splitter}{month}` }
             else if (unit === 'day') { pattern = `{year}${splitter}{month}${splitter}{day}` }
-            else if (unit === 'hour') { pattern = `{year}${splitter}{month}${splitter}{day} {hour} : 00` }
-            return AIODate().getDateByPattern({ date: list, pattern })
+            else if (unit === 'hour') { pattern = `{year}${splitter}{month}${splitter}{day} - {hour} : 00` }
+            return <div style={{direction:'ltr'}}>{AIODate().getDateByPattern({ date: list, pattern })}</div>
         }
         let calendarType = this.getProp('calendarType', 'gregorian')
         return this.getProp('placeholder', calendarType === 'gregorian' ? 'Select Date' : 'انتخاب تاریخ')
     }
     getProp(key, def) {
         let { type, caret, popover } = this.props;
-        if (key === 'attrs') {
-            if (['text', 'textarea', 'number', 'password', 'color'].indexOf(type) === -1) { return {} }
-        }
         let propsResult = this.props[key] === 'function' ? this.props[key]() : this.props[key];
         if (key === 'caret') { return caret === false ? false : (((type === 'button' && popover) || (type === 'select' || type === 'multiselect' || type === 'datepicker')) ? (caret || true) : false) }
         if (key === 'multiple') { return (type === 'multiselect') || (type === 'radio' && !!propsResult) || (type === 'slider' && !!propsResult) }
@@ -249,9 +246,10 @@ export default class AIOInput extends Component {
 }
 function Image(){
     let {getProp} = useContext(AIContext);
-    let [popup] = useState(new AIOPopup())
+    let [popup] = useState(new AIOPopup());
+    let value = getProp('value','');
+    let [url,setUrl] = useState();
     let dom = createRef()
-    let value = getProp('value');
     let width = getProp('width');
     let height = getProp('height');
     let onChange = getProp('onChange');
@@ -266,16 +264,27 @@ function Image(){
     //     fr.readAsDataURL(value);
     // }
     useEffect(()=>{
-        let src = $(dom.current).attr('src');
-        if(src === '[object File]'){
-            let fr = new FileReader();
-            fr.onload = function () {
-                $(dom.current).attr('src',fr.result)
-            }
-            fr.readAsDataURL(value);
+        if(typeof value === 'object'){
+            changeUrl(value)
+        }
+        else if(typeof value === 'string'){
+            if(url !== value){setUrl(value)}
+        }
+        else {
+            setUrl(false)
         }
         
     })
+    function changeUrl(file,callback = ()=>{}){
+        let fr = new FileReader();
+        fr.onload = function () {
+            if(url !== fr.result){
+                setUrl(fr.result);
+                callback(fr.result)
+            }
+        }
+        fr.readAsDataURL(file);
+    }
     function openPopup(){
         popup.addModal({
             header:{
@@ -298,23 +307,27 @@ function Image(){
             }
         })
     }
-    let IMG = value?(
+    let IMG = url?(
         <>
-            <img ref={dom} src={value} width={width} height={height} alt={''}/>
+            <img ref={dom} src={url} alt={''} style={{objectFit:'cover'}} width={width} height={height}/>
             {onRemove && <div onClick={(e)=>{e.stopPropagation(); e.preventDefault(); onRemove()}} className='aio-input-image-remove'><Icon path={mdiClose} size={1}/></div>}
             {preview && <div onClick={(e)=>{e.stopPropagation(); e.preventDefault(); openPopup()}} className='aio-input-image-preview'><Icon path={mdiImage} size={1}/></div>}
             {popup.render()}
         </>
     ):<span className='aio-input-image-placeholder'>{placeholder}</span>
+    if(!onChange){
+        return IMG
+    }
     return (
         <AIOInput
             type='file'
             center={true}
             text={IMG}
             style={{width:'100%',height:'100%',padding:0}}
-            onChange={onChange?(files)=>{
-                onChange(files[0].file)
-            }:undefined}
+            onChange={(files)=>{
+                let file = files[0].file
+                changeUrl(file,(url)=>onChange({file,url}));
+            }}
         />
     )
     
@@ -331,11 +344,13 @@ class InputSlider extends Component {
         let { getProp } = this.context;
         let value = getProp('value'), rtl = getProp('rtl');
         if(!Array.isArray(value)){value = [value]}
+        let disabled = getProp('disabled',false)
         let props = {
+            disabled,
             value,rtl,start:getProp('start'),end:getProp('end'),step:getProp('step'),min:getProp('min'),max:getProp('max'),
-            direction:getProp('direction',rtl ? 'left' : 'right'),showValue:getProp('showValue'),onChange:this.change.bind(this),
+            direction:getProp('direction',rtl ? 'left' : 'right'),showValue:getProp('showValue'),onChange:disabled?undefined:this.change.bind(this),
             pointStyle:getProp('pointStyle'),lineStyle:getProp('lineStyle'),fillStyle:getProp('fillStyle'),
-            labelStep:getProp('labelStep'),editLabel:getProp('editLabel'),labelRotate:getProp('labelRotate'),labelStyle:getProp('labelStyle'),
+            labelStep:getProp('labelStep'),editLabel:getProp('editLabel'),editValue:getProp('editValue'),labelRotate:getProp('labelRotate'),labelStyle:getProp('labelStyle'),
             scaleStep:getProp('scaleStep'),scaleStyle:getProp('scaleStyle'),getScaleHTML:getProp('getScaleHTML'),
             valueStyle:getProp('valueStyle')
         }
@@ -454,13 +469,13 @@ class Input extends Component {
     render() {
         let { getProp, type } = this.context;
         let { value = '' } = this.state;
-        let attrs = getProp('attrs');
+        let inputAttrs = getProp('inputAttrs',{});
         let disabled = getProp('disabled', false);
         let placeholder = getProp('placeholder');
         let spin = getProp('spin');
         this.onChange = getProp('onChange');
         let props = {
-            ...attrs, value, type, disabled, ref: this.dom, placeholder,
+            ...inputAttrs, value, type, disabled, ref: this.dom, placeholder,
             className: spin === false ? 'no-spin' : '',
             onChange: (e) => this.change(e.target.value)
         }
@@ -487,7 +502,9 @@ class Form extends Component {
         this.errors = {}
     }
     getValue() { return this.props.onChange ? (this.props.value || {}) : this.state.value }
-    getErrors() { return [...Object.keys(this.errors).filter((o) => !!this.errors[o]).map((o) => this.errors[o])] }
+    getErrors() { 
+        return [...Object.keys(this.errors).filter((o) => !!this.errors[o]).map((o) => this.errors[o])] 
+    }
     removeError(field) {
         let newErrors = {}
         for (let prop in this.errors) { if (prop !== field) { newErrors[prop] = this.errors[prop] } }
@@ -604,8 +621,19 @@ class Form extends Component {
         return { html: error, attrs, style, className: 'aio-input-form-error' + (className ? ' ' + className : '') }
     }
     componentDidMount() {
-        let { onChange = () => { } } = this.props;
-        onChange(this.getValue(), this.errors)
+        this.reportErrors()
+    }
+    componentDidUpdate(){
+        this.reportErrors()
+    }
+    reportErrors(){
+        let { getErrors} = this.props;
+        if(!getErrors){return}
+        let errors = this.getErrors();
+        if(JSON.stringify(errors) !== this.reportedErrors){
+            getErrors(errors);
+            this.reportedErrors = JSON.stringify(errors)
+        }
     }
     getAttrs(propsAttrs = {}, ownAttrs = {}) {
         let style = { ...propsAttrs.style, ...ownAttrs.style }
@@ -1459,7 +1487,10 @@ class DatePicker extends Component {
     static contextType = AIContext;
     render() {
         let { getProp } = this.context;
+        let {onClose} = this.props
         let props = {
+            onClose,
+            close: getProp('close', false),
             unit: getProp('unit', 'day'), calendarType: getProp('calendarType', 'gregorian'),
             disabled: getProp('disabled', false), value: getProp('value'),
             onChange: getProp('onChange', () => { }), onClear: getProp('onClear'),
@@ -1535,7 +1566,7 @@ class Calendar extends Component {
             translate: this.translate.bind(this),
             SetState: (obj) => this.setState(obj),
             onChange: ({ year, month, day, hour }) => {
-                let { onChange = () => { }, calendarType, unit, value } = this.props;
+                let { onChange = () => { }, calendarType, unit, value,close,onClose } = this.props;
                 let { months } = this.state;
                 let dateArray = [year, month, day, hour];
                 let jalaliDateArray = calendarType === 'gregorian' ? AIODate().toJalali({ date: dateArray }) : dateArray;
@@ -1558,7 +1589,8 @@ class Calendar extends Component {
                     months, jalaliDateArray, gregorianDateArray, dateArray, weekDay, weekDayIndex, dateString,
                     year, month, day, hour, monthString, jalaliMonthString, gregorianMonthString,
                 }
-                onChange(dateString, props)
+                onChange(dateString, props);
+                if(close){onClose()}
             }
         }
     }
@@ -1755,11 +1787,13 @@ class DPHeader extends Component {
 class DPHeaderDropdown extends Component {
     static contextType = DPContext;
     render() {
+        //این شرط فقط در حالت سال رخ میدهد در شرایطی که فقط یک سال قابل انتخاب است
+        if(this.props.options.length === 1){return this.props.options[0]}
         let { size, theme = [] } = this.context;
         let props = {
             ...this.props, search: false,
-            caret: false, type: 'select', popupAttrs: { style: { maxHeight: size * 1.2 } },
-            className: 'aio-input-datepicker-dropdown', popover: { attrs: { style: { maxHeight: 200 } } },
+            caret: false, type: 'select',
+            className: 'aio-input-datepicker-dropdown',
             optionStyle: { height: size / 6, background: theme[1], color: theme[0] }
         }
         return (<AIOInput {...props} />)
@@ -1980,8 +2014,8 @@ export class Slider extends Component{
     return obj
   }
   getClassName(){
-    let {attrs} = this.props,{className} = attrs;
-    return `aio-slider ${this.context.oriention}${className?' ' + className:''}`;
+    let {attrs,disabled} = this.props,{className} = attrs;
+    return `aio-slider ${this.context.oriention}${className?' ' + className:''}${disabled?' disabled':''}`;
   }
   render(){
     this.value = this.getValidValue();
