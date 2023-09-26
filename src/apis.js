@@ -45,6 +45,7 @@ export default function getResponse({ Axios, getState,helper }) {
     },
     // ********************* نیاز به تائید من **********************
     async niaz_be_taide_man() {
+      return {result:[]}
       // return [
       //     {davat_shode:'علی احمدی',davat_konande:'حسین رحمتی',name_davatname:'نمایشگاه صنعت برق',zamane_davat:'1401/08/10 ساعت 10:42',id:0},
       // ]
@@ -160,10 +161,8 @@ export default function getResponse({ Axios, getState,helper }) {
     },
 
     // ********************* لیست دعوتنامه ها **********************
-    async davatname_ha({ pageSize, pageNumber }) {
-      let url = `${invitationTemplateUrl}?limit=${pageSize}&offset=${
-        (pageNumber - 1) * pageSize
-      }`;
+    async davatname_ha({ pageSize, pageNumber,is_draft = false }) {
+      let url = `${invitationTemplateUrl}?limit=${pageSize}&offset=${(pageNumber - 1) * pageSize}&is_draft=${is_draft}`;
       let res;
       try {res = await Axios.get(url);} 
       catch (err) {
@@ -301,7 +300,7 @@ export default function getResponse({ Axios, getState,helper }) {
     },
 
     // ********************* ارسال تکی **********************
-    async ersale_taki({ model, davatname_haye_entekhab_shode }) {
+    async ersale_taki({ model, selected }) {
       //model: آبجکت پر شده در فرم مشخصات مدعو
       //nam(string)
       //name_khanevadegi(string)
@@ -309,13 +308,13 @@ export default function getResponse({ Axios, getState,helper }) {
       //jensiat('male' | 'female')
       //sherkat(string)
       //semat(string)
-      //davatname_haye_entekhab_shode: آرایه ای از آی دی دعوتنامه های انتخاب شده
+      //selected: آرایه ای از آی دی دعوتنامه های انتخاب شده
 
       //return 'خطایی رخ داد';
       let userInformation = getState().userInformation;
       let url = `${ersalTakiUrl}?username=${userInformation.username}`;
       let res,template_id = "";
-      if (davatname_haye_entekhab_shode.length === 0) {return {result:"لیست دعوتنامه خالی است"};}
+      if (selected.length === 0) {return {result:"لیست دعوتنامه خالی است"};}
       let gender = model.jensiat === "male"?"M":"F";
       let role = userInformation.roles.indexOf("admin") !== -1?"admin":"user";
 
@@ -326,7 +325,7 @@ export default function getResponse({ Axios, getState,helper }) {
         phone_number: model.shomare_tamas,
         gender: gender,
         username: userInformation.username, //باید اطلاعات یوزر را بگیرم
-        template_ids: davatname_haye_entekhab_shode, //davatname_haye_entekhab_shode
+        template_ids: selected, 
         role: role, // نقش کاربری که ارسال میکند
         user: userInformation,
       };
@@ -336,8 +335,8 @@ export default function getResponse({ Axios, getState,helper }) {
     },
 
     // ********************* ارسال گروهی **********************
-    async ersale_goroohi({ excel, davatname_haye_entekhab_shode }) {
-      //davatname_haye_entekhab_shode: آرایه ای از آی دی دعوتنامه های انتخاب شده
+    async ersale_goroohi({ excel, selected }) {
+      //selected: آرایه ای از آی دی دعوتنامه های انتخاب شده
       //excel(فایل اکسل آپلود شده)
       //return 'خطایی رخ داد';
 
@@ -357,8 +356,8 @@ export default function getResponse({ Axios, getState,helper }) {
       let url = `${excellImport}?username=${userInformation.username}`;
       let res,successMessage,errorMessage;
       let template_id = "";
-      if (davatname_haye_entekhab_shode.length === 0) {return {result:"لیست دعوتنامه خالی است"}}
-      // davatname_haye_entekhab_shode.map((o) =>{
+      if (selected.length === 0) {return {result:"لیست دعوتنامه خالی است"}}
+      // selected.map((o) =>{
       //     template_id += o
       //     template_id += ' '
       // })
@@ -366,7 +365,7 @@ export default function getResponse({ Axios, getState,helper }) {
       let formData = new FormData();
       formData.append("file", excel['file']);
       // formData.append('template_ids', template_id)
-      formData.append("template_ids", davatname_haye_entekhab_shode);
+      formData.append("template_ids", selected);
       formData.append("username", userInformation.username); // username باید از کاربر گرفته شود
       formData.append("role", role); // با توجه به نقش کاربری که دارد ارسال گروهی را انجام می دهد.
       try {res = await Axios.post(url, formData, {headers: {"Content-Type": "multipart/form-data"}});} 
@@ -427,19 +426,14 @@ export default function getResponse({ Axios, getState,helper }) {
     },
 
     // ********************* ارسال مجدد **********************
-    async ersale_mojadad(davatname_haye_entekhab_shode) {
-      //davatname_haye_entekhab_shode: آرایه ای از آی دی دعوتنامه های انتخاب شده
-      let ersale_mojadad_array = [];
-      for (let prop in davatname_haye_entekhab_shode) {
-        if (davatname_haye_entekhab_shode[prop] === true) {
-          ersale_mojadad_array.push(prop);
-        }
-      }
+    async ersale_mojadad(checks) {
+      //checks: آبجکتی از آی دی دعوتنامه های انتخاب شده
+      let list = Object.keys(checks).filter((id)=>checks[id] === true);
       try {
-        await Axios.post(`${sendAgain}`, {invite_ids: ersale_mojadad_array});
+        await Axios.post(`${sendAgain}`, {invite_ids: list});
         return {result:true};
       } 
-      catch (err) {return err.response.data && err.response.data.message?err.response.data.message:"خطای نامشخص";}
+      catch (err) {return {result:err.response.data && err.response.data.message?err.response.data.message:"خطای نامشخص"}}
     },
 
     // ************ارسال مجدد *****************

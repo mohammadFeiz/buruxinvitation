@@ -297,7 +297,7 @@ class MapHeader extends Component {
         let {apiKeys = {}} = rootProps;
         this.timeout = setTimeout(async () => {
             try{
-                let param = {headers: {'Api-Key': apiKeys.service,'Authorization': undefined}}
+                let param = {headers: {'Api-Key': apiKeys.service}}
                 let url = `https://api.neshan.org/v1/search?term=${searchValue}&lat=${latitude}&lng=${longitude}`;
                 this.setState({ loading: true })
                 let res = await Axios.get(url, param);

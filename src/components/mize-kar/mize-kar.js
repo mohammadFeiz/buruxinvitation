@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
 import RVD from './../../npm/react-virtual-dom/react-virtual-dom';
 import {Icon} from '@mdi/react';
-import { mdiToggleSwitch,mdiToggleSwitchOffOutline,mdiDotsHorizontal,mdiChevronLeft, mdiChevronDoubleDown,mdiFileExcel,mdiFile,mdiAccountCircleOutline, mdiDelete} from '@mdi/js';
+import { 
+    mdiToggleSwitch,mdiToggleSwitchOffOutline,mdiDotsHorizontal,mdiChevronLeft, mdiChevronDoubleDown,mdiFileExcel,mdiPencil,mdiAccountCircleOutline, mdiDelete,
+    mdiSend
+} from '@mdi/js';
 import GradientCard from '../gradient-card/gradient-card';
 import AIODate from './../../npm/aio-date/aio-date';
+import AIOPopup from '../../npm/aio-popup/aio-popup';
 import AIOInput from './../../npm/aio-input/aio-input';
 import AIOMap from './../../npm/aio-map/aio-map';
 import AppContext from '../../app-context';
@@ -11,18 +15,12 @@ export default class MizeKar extends Component {
     static contextType = AppContext;
     constructor(props){
         super(props);
-        this.state = {niaz_be_taide_man:[],checks:{},mode:false,davatname_ha:[],davatname_ha_total:0,pageNumber:1,pageSize:20}
+        this.state = {niaz_be_taide_man:[],checks:{},mode:false}
     }
     async niaz_be_taide_man(){
         let {apis} = this.context;
         let niaz_be_taide_man = await apis({api:'niaz_be_taide_man',def:[]});
         this.setState({niaz_be_taide_man})
-    }
-    async davatname_ha(obj = {}){
-        let {pageNumber = this.state.pageNumber,pageSize = this.state.pageSize} = obj;
-        let {apis} = this.context;
-        let {davatname_ha,total} = await apis({api:'davatname_ha',parameter:{pageNumber,pageSize}});
-        this.setState({davatname_ha,davatname_ha_total:total,pageNumber,pageSize})
     }
     async getBadges(){
         let {apis} = this.context;
@@ -31,7 +29,6 @@ export default class MizeKar extends Component {
     }
     componentDidMount(){
         this.niaz_be_taide_man();
-        this.davatname_ha();
         this.getBadges();
     }
     header_layout() {
@@ -48,11 +45,7 @@ export default class MizeKar extends Component {
                     row:[
                         {flex:1},
                         {html:<GradientCard type={'1'} onClick={(mode)=>this.setState({mode})} details={details[0]}/>},
-                        {html:<GradientCard type={'2'} onClick={async (mode)=>{
-                            await this.davatname_ha()
-                            this.setState({mode})
-                        }} details={details[1]}/>},
-                        {html:<GradientCard type={'3'} onClick={(mode)=>this.setState({mode})} details={details[2]}/>},
+                        {html:<GradientCard type={'2'} onClick={async (mode)=>this.setState({mode})} details={details[1]}/>},
                         {flex:1}
                     ]
                 },
@@ -60,11 +53,8 @@ export default class MizeKar extends Component {
                     show_xs:true,gap:24,align:'h',className:'p-h-24',
                     column:[
                         {html:<GradientCard type={'1'} mode='xs' onClick={(mode)=>this.setState({mode})} details={details[0]}/>,style:{width:'100%'}},
-                        {html:<GradientCard type={'2'} mode='xs' onClick={async (mode)=>{
-                            await this.davatname_ha()
-                            this.setState({mode})
-                        }} details={details[1]}/>,style:{width:'100%'}},
-                        {html:<GradientCard type={'3'} mode='xs' onClick={(mode)=>this.setState({mode})} details={details[2]}/>,style:{width:'100%'}},
+                        {html:<GradientCard type={'2'} mode='xs' onClick={async (mode)=>this.setState({mode})} details={details[1]}/>,style:{width:'100%'}},
+                        
                     ]
                 }
             ]
@@ -136,41 +126,11 @@ export default class MizeKar extends Component {
             ]
         }
     }
-    onRemove(o){
-        let {davatname_ha} = this.state;
-        davatname_ha = davatname_ha.filter(({id})=>id !== o.id);
-        this.setState({davatname_ha});
-    }
-    change_davatname_ha(id,obj){
-        let {davatname_ha} = this.state;
-        this.setState({davatname_ha: davatname_ha.map((o)=>{
-            if (id===o.id){
-                return obj 
-            }
-            else{
-                return o
-            }
-        })})
-    }
+    
     render() {
-        let {mode,davatname_ha,pageNumber,pageSize,davatname_ha_total} = this.state;
-        let {addPopup} = this.context;
-        if(mode === 'tarahi_davatname'){return <TarahiDavatname onClose={()=>this.setState({mode:false})} change_davatname_ha={this.change_davatname_ha.bind(this)}/>}
-        if(mode === 'ersale_davatname'){return <ErsaleDavatname onClose={()=>this.setState({mode:false})} davatname_ha={davatname_ha}/>}
-        if(mode === 'davatname_ha'){
-            return (
-                <DavatnameHa 
-                    onClose={()=>this.setState({mode:false})} 
-                    davatname_ha={davatname_ha}
-                    total={davatname_ha_total}
-                    onRemove={this.onRemove.bind(this)}
-                    pageNumber={pageNumber}
-                    pageSize={pageSize}
-                    onChangePaging={(obj)=>this.davatname_ha(obj)} 
-                    change_davatname_ha={this.change_davatname_ha.bind(this)}
-                />
-            )
-        }
+        let {mode} = this.state;
+        if(mode === 'tarahi_davatname'){return <TarahiDavatname onClose={()=>this.setState({mode:false})}/>}
+        if(mode === 'davatname_ha'){return (<DavatnameHa onClose={()=>this.setState({mode:false})}/>)}
         return (
             <RVD
                 layout={{
@@ -193,7 +153,6 @@ export default class MizeKar extends Component {
         )
     }
 }
-
 class TarahiDavatname extends Component{
     static contextType = AppContext;
     constructor(props){
@@ -220,21 +179,21 @@ class TarahiDavatname extends Component{
             emkane_davat:false,
         }
     }
-    async save(mode){
-        let {apis,setConfirm} = this.context;
-        let {onClose,change_davatname_ha} = this.props;
+    save(mode){
+        let {apis,rsa} = this.context;
+        let {onClose,onChange} = this.props;
         let {model,karbarane_daraye_dastresi} = this.state;
         if(mode !== 'draft' && (!model.name_davatname || !model.tarikhe_etebar)){
-            setConfirm({type:'error',text:'اطلاعات مورد نیاز را وارد کنید'})
+            rsa.addAlert({type:'error',text:'اطلاعات مورد نیاز را وارد کنید'})
             return;
         }
-        let res = await apis({api:'zakhire_tarahi_davatname',parameter:{mode,model,karbarane_daraye_dastresi}})
-        if(typeof res === 'string'){setConfirm({type:'error',text:'ذخیره دعوتنامه طراحی شده با خطا روبرو شد',subtext:res})}
-        else{
-            change_davatname_ha(model.id,model)
-            setConfirm({type:'success',text:'ذخیره دعوتنامه طراحی شده با موفقیت انجام شد'})
-            onClose()
-        }
+        apis({
+            api:'zakhire_tarahi_davatname',
+            parameter:{mode,model,karbarane_daraye_dastresi},
+            name:'ذخیره دعوتنامه طراحی شده',
+            successMessage:true,
+            callback:()=>{onChange(model.id,model); onClose()}
+        })
     }
     nav_layout(){
         let {onClose,model} = this.props;
@@ -466,10 +425,6 @@ class TarahiDavatname extends Component{
         )
     }
 }
-
-
-
-
 class ErsaleDavatname extends Component{
     static contextType = AppContext;
     constructor(props){
@@ -477,7 +432,7 @@ class ErsaleDavatname extends Component{
         this.state = {
             tab:'0',
             model:{...this.initModel()},
-            davatname_haye_entekhab_shode:[],
+            selected:[],
             niaz_be_taide_man:[],
             checks:[],
             excel:false,
@@ -503,29 +458,18 @@ class ErsaleDavatname extends Component{
         this.setState({niaz_be_taide_man,linke_template_excel})
     }
     async send(){
-        let {apis,setConfirm} = this.context;
-        let {onClose} = this.props;
-        let {model,davatname_haye_entekhab_shode,excel,tab} = this.state;
+        let {apis,rsa} = this.context;
+        let {model,selected,excel,tab} = this.state;
         if(tab === '0'){
             if(!model.nam || !model.name_khanevadegi || !model.jensiat){alert('اطلاعات مورد نیاز را وارد کنید'); return;}
-            let res = await apis({api:'ersale_taki',parameter:{model,davatname_haye_entekhab_shode}})
-            if(typeof res === 'string'){setConfirm({type:'error',text:'ارسال دعوتنامه تکی با خطا روبرو شد',subtext:res})}
-            else{
-                setConfirm({type:'success',text:'ارسال دعوتنامه تکی با موفقیت انجام شد'})
-                onClose()
-            }
+            apis({api:'ersale_taki',parameter:{model,selected},name:'ارسال دعوتنامه تکی',successMessage:true,callback:()=>rsa.removeModal()})
         }
         if(tab === '1'){
             if(!excel){alert('فایل اکسل را آپلود کنید'); return;}
-            let res = await apis({api:'ersale_goroohi',parameter:{davatname_haye_entekhab_shode,excel}})
-            if(typeof res === 'string'){setConfirm({type:'error',text:'ارسال دعوتنامه گروهی با خطا روبرو شد',subtext:res})}
-            else{
-                let {successLength,errorList} = res;
-                setConfirm({type:'success',text:'ارسال دعوتنامه گروهی با موفقیت انجام شد'});
+            apis({api:'ersale_goroohi',parameter:{selected,excel},name:'ارسال دعوتنامه گروهی',successMessage:true,callback:({successLength,errorList})=>{
                 this.setState({successLength,errorList})
-            }
+            }})
         }
-        
     }
     async approve(state){
         let {apis,setConfirm} = this.context;
@@ -542,29 +486,9 @@ class ErsaleDavatname extends Component{
             setConfirm({type:'success',text:`${state?'تایید':'عدم تایید'} با موفقیت انجام شد`})
         }
     }
-    nav_layout(){
-        let {onClose} = this.props;
-        let {tab} = this.state;
-        return {
-            size:48,gap:6,className:'margin-0-24 bgFFF round8 padding-0-12',align:'v',
-            row:[
-                {html:'میز کار',className:'color8C9CA3 size18',align:'v',attrs:{onClick:()=>onClose()}},
-                {html:<Icon path={mdiChevronLeft} size={0.8}/>,align:'v'},
-                {html:'ارسال دعوتنامه',className:'size18 color108ABE bold',align:'v'},
-                {flex:1},                
-                {show:tab !== '2',html:'ارسال',className:'color0094D4 size14 bold',attrs:{onClick:()=>this.send()}},
-                {show:tab === '2',html:'تایید',className:'color0094D4 size14 bold',attrs:{onClick:()=>this.approve(true)}},
-                {html:<div style={{width:1,height:20}} className='bg0094D4'></div>,align:'vh'},
-                {show:tab === '2',html:'عدم تایید',className:'colorC92828 size14 bold',attrs:{onClick:()=>this.approve(false)}},
-                {show:tab !== '2',html:'خروج',className:'colorC92828 size14 bold',attrs:{onClick:()=>onClose()}},
-                
-            ]
-        }
-    }
     tabs_layout(){
         let {tab} = this.state;
         return {
-            className:'margin-0-24 bgFFF round8 padding-0-12',
             html:(
                 <AIOInput 
                     type='tabs'
@@ -575,6 +499,19 @@ class ErsaleDavatname extends Component{
                     ]}
                     value={tab}
                     onChange={(tab)=>this.setState({tab})}
+                    after={(
+                        <RVD
+                            layout={{
+                                size:48,gap:12,className:'margin-0-24 bgFFF round8 padding-0-12',align:'v',
+                                row:[
+                                    {flex:1},                
+                                    {show:tab !== '2',html:'ارسال',className:'color0094D4 size14 bold',attrs:{onClick:()=>this.send()}},
+                                    {show:tab === '2',html:'تایید',className:'color0094D4 size14 bold',attrs:{onClick:()=>this.approve(true)}},
+                                    {show:tab === '2',html:'عدم تایید',className:'colorC92828 size14 bold',attrs:{onClick:()=>this.approve(false)}}
+                                ]
+                            }}
+                        />
+                    )}
                 />
             )
         }
@@ -634,52 +571,6 @@ class ErsaleDavatname extends Component{
             )
         }
     }
-    entekhab_layout(){
-        let {davatname_ha = [] } = this.props;
-        let {davatname_haye_entekhab_shode,tab} = this.state;
-        if(tab === '2'){return false}
-        return {
-            className:'bgFFF margin-0-24 round8',
-            html:(
-                <AIOInput
-                    className='bgFFF'
-                    style={{width:'100%',height:36}}
-                    type='multiselect'
-                    popupWidth='fit'
-                    text='انتخاب از لیست دعوتنامه ها'
-                    value={davatname_haye_entekhab_shode}
-                    options={davatname_ha.filter((o)=>o.is_active ===true && o.is_draft === false)}
-                    optionText='option.name'
-                    optionValue='option.id'
-                    popupAttrs={{style:{maxHeight:300}}}
-                    onChange={(davatname_haye_entekhab_shode)=>this.setState({davatname_haye_entekhab_shode})}
-                />
-            )
-        }
-    }
-    // async downloadTemplate() {
-    //     let {linke_template_excel} = this.state;
-    //     let url = linke_template_excel;
-    //     let name = 'main_template_v1.xlsx'
-    //     fetch(url, {
-    //       mode: 'no-cors',
-    
-    //     })
-    //       .then(resp => resp.blob())
-    //       .then(blob => {
-    //         let url = window.URL.createObjectURL(blob);
-    //         let a = document.createElement('a');
-    //         a.style.display = 'none';
-    //         //a.download = url.replace(/^.*[\\\/]/, '');
-    //         a.href = url;
-    //         a.download = name;
-    //         document.body.appendChild(a);
-    //         a.click();
-    //         window.URL.revokeObjectURL(url);
-    //       })
-    //       .catch(() => alert('oh no!'));
-    
-    // }
     async downloadTemplate() {
         let { linke_template_excel } = this.state;
         let url = linke_template_excel;
@@ -701,7 +592,7 @@ class ErsaleDavatname extends Component{
       }
     excel_layout(){
         let {excel,tab,successLength,errorList,files} = this.state;
-        let {addPopup,apis,removePopup,setConfirm} = this.context;
+        let {rsa,apis} = this.context;
         if(tab !== '1'){return false}
         return {
             flex:1,scroll:'v',
@@ -755,23 +646,25 @@ class ErsaleDavatname extends Component{
                 {
                     show:errorList !== false && errorList.length !== 0,
                     html:this.getSuccessButton(`${errorList.length} مورد دارای خطا`,'#FFC5B9',()=>{
-                        addPopup({
-                            type:'fullscreen',
-                            title:`موارد خطا (${errorList.length} مورد)`,
-                            content:()=>{
-                                return (
-                                    <Khata_haye_ersal model={JSON.parse(JSON.stringify(errorList))} onSubmit={async (model)=>{
-                                        let res = await apis({api:'ersale_mojadade_khatahaye_excel',parameter:{model}});
-                                        if(res === true){removePopup()}
-                                        if(typeof res === 'string'){
-                                            setConfirm({type:'error',text:'خطا',subtext:res});
-                                            return;
-                                        }
-                                        let {errorList,successLength} = res;
-                                        this.setState({errorList,successLength});
-                                        removePopup();
-                                    }}/>
-                                )
+                        rsa.addModal({
+                            position:'fullscreen',
+                            header:{title:`موارد خطا (${errorList.length} مورد)`},
+                            body:{
+                                render:()=>{
+                                    return (
+                                        <Khata_haye_ersal model={JSON.parse(JSON.stringify(errorList))} onSubmit={async (model)=>{
+                                            let res = await apis({api:'ersale_mojadade_khatahaye_excel',parameter:{model}});
+                                            if(res === true){rsa.removeModal()}
+                                            if(typeof res === 'string'){
+                                                rsa.addAlert({type:'error',text:'خطا',subtext:res});
+                                                return;
+                                            }
+                                            let {errorList,successLength} = res;
+                                            this.setState({errorList,successLength});
+                                            rsa.removeModal();
+                                        }}/>
+                                    )
+                                }
                             }
                         })
                     }),align:'h'},
@@ -824,25 +717,16 @@ class ErsaleDavatname extends Component{
         return (
             <RVD
                 layout={{
+                    flex:1,className:'ofy-auto',
+                    style:{background:'#f8f8f8'},
                     column:[
-                        {size:12},
-                        this.nav_layout(),
-                        {size:12},
-                        {
-                            flex:1,scroll:'v',
-                            column:[
-                                this.tabs_layout(),
-                                this.splitter_layout('انتخاب دعوتنامه',tab !== '2'),
-                                this.entekhab_layout(),
-                                this.splitter_layout('مشخصات مدعو',tab === '0'),
-                                this.form_layout(),
-                                this.splitter_layout('مشخصات مدعوین',tab === '1'),
-                                this.excel_layout(),
-                                this.table_layout(),
-                                {size:60}
-                            ]
-                        }
-                        
+                        this.tabs_layout(),
+                        this.splitter_layout('مشخصات مدعو',tab === '0'),
+                        this.form_layout(),
+                        this.splitter_layout('مشخصات مدعوین',tab === '1'),
+                        this.excel_layout(),
+                        this.table_layout(),
+                        {size:60}
                     ]
                 }}
             />
@@ -888,6 +772,28 @@ class Khata_haye_ersal extends Component{
 }
 class DavatnameHa extends Component{
     static contextType = AppContext;
+    state = {draft:false,total:0,pageNumber:1,pageSize:20,davatname_ha:[]}
+    async fetchData(obj = {}){
+        let {pageNumber = this.state.pageNumber,pageSize = this.state.pageSize,draft = this.state.draft} = obj;
+        let {apis} = this.context;
+        let {davatname_ha,total} = await apis({api:'davatname_ha',parameter:{pageNumber,pageSize,is_draft:draft}});
+        this.setState({davatname_ha,total,pageNumber,pageSize,draft})
+    }
+    componentDidMount(){
+        this.fetchData()
+    }
+    remove(o){
+        let {apis} = this.context;
+        apis({api:'hazfe_davatname',parameter:o,callback:()=>{
+            let {davatname_ha} = this.state;
+            davatname_ha = davatname_ha.filter(({id})=>id !== o.id);
+            this.setState({davatname_ha});
+        }})
+    }
+    change(id,obj){
+        let {davatname_ha} = this.state;
+        this.setState({davatname_ha: davatname_ha.map((o)=>id===o.id?obj:o)})
+    }
     nav_layout(){
         let {onClose} = this.props;
         return {
@@ -895,8 +801,22 @@ class DavatnameHa extends Component{
             row:[
                 {html:'میز کار',className:'color8C9CA3 size18',align:'v',attrs:{onClick:()=>onClose()}},
                 {html:<Icon path={mdiChevronLeft} size={0.8}/>,align:'v'},
-                {html:'دعوتنامه ها',className:'size18 color108ABE bold',align:'v'}
+                {html:'دعوتنامه ها',className:'size18 color108ABE bold',align:'v'},
+                
             ]
+        }
+    }
+    tabs_layout(){
+        let {draft} = this.state;
+        return {
+            html:(
+                <AIOInput
+                    type='tabs'
+                    options={[{text:'نهایی ها',value:false},{text:'پیشنویس ها',value:true}]}
+                    value={draft}
+                    onChange={(draft)=>this.fetchData({draft})}
+                />
+            )
         }
     }
     splitter_layout(text){
@@ -909,22 +829,14 @@ class DavatnameHa extends Component{
         }
     }
     list_layout(){
-        let {davatname_ha,onRemove,change_davatname_ha,pageNumber,pageSize,total} = this.props;
+        let {davatname_ha,total,pageNumber,pageSize} = this.state;
         return {
             flex:1,
             html:(
                 <AIOInput
                     paging={{
-                        size:pageSize,
-                        number:pageNumber,
-                        length:total,
-                        serverSide:true,
-                        onChange:({size,number})=>{
-                            let {onChangePaging} = this.props;
-                            let res = {pageNumber:number,pageSize:size}
-                            if(res.pageNumber < 1){return}
-                            onChangePaging(res)
-                        }
+                        size:pageSize,number:pageNumber,length:total,serverSide:true,
+                        onChange:({size,number})=>this.fetchData({pageNumber:number,pageSize:size})
                     }}
                     type='table'
                     rows={davatname_ha}
@@ -932,7 +844,7 @@ class DavatnameHa extends Component{
                     rowsTemplate={(rows)=>{
                         return (
                             <div style={{flex:1,display:'inline-block',padding:'0 12px', overflowY:'auto'}}>
-                                {rows.map((o,i)=><DavatnameCard key={o.id} object={o} onRemove={()=>onRemove(o)} change_davatname_ha={change_davatname_ha}/>)}
+                                {rows.map((o,i)=><DavatnameCard key={o.id} object={o} onRemove={()=>this.remove(o)} onChange={this.change.bind(this)}/>)}
                             </div>
                         )
                     }}
@@ -954,6 +866,7 @@ class DavatnameHa extends Component{
                     column:[
                         {size:12},
                         this.nav_layout(),
+                        this.tabs_layout(),
                         {size:12},
                         {
                             flex:1,scroll:'v',
@@ -967,15 +880,13 @@ class DavatnameHa extends Component{
         )
     }
 }
-
-
 class DavatnameCard extends Component{
     static contextType = AppContext;
     poster(){
         let {object} = this.props;
         let {poster} = object;
         return (
-            <label onClick={()=>this.addPopup()} style={{width:'100%',background:'#ddd',display:'flex',alignItems:'center',justifyContent:'center'}}>
+            <label style={{width:'100%',background:'#ddd',display:'flex',alignItems:'center',justifyContent:'center'}}>
                 {
                     !poster &&
                     <svg width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1004,9 +915,27 @@ class DavatnameCard extends Component{
         }
     }
     days_layout(){
-        let {object} = this.props;
+        let {object,onRemove} = this.props;
         let {etebar} = object;
-        return {size:24,align:'v',html:etebar,className:'size10 color605E5C padding-0-6 bold', style:{color:etebar === 'منقضی شده' ? "red": undefined}}
+        return {
+            row:[
+                {flex:1,align:'v',html:etebar,className:'size10 color605E5C padding-0-6 bold', style:{color:etebar === 'منقضی شده' ? "red": undefined}},
+                {
+                    size:24,align:'vh',
+                    html:(
+                        <AIOInput
+                            type='select' caret={false}
+                            text={<Icon path={mdiDotsHorizontal} size={.8}/>}
+                            options={[
+                                {text:'ویرایش',before:<Icon path={mdiPencil} size={.6}/>,onClick:()=>this.editPopup()},
+                                {show:object.is_active === true && object.is_draft === false,text:'ارسال',before:<Icon path={mdiSend} size={.6}/>,onClick:()=>this.sendPopup()},
+                                {text:'حذف',before:<Icon path={mdiDelete} size={.6}/>,onClick:()=>onRemove()},
+                            ]}
+                        />
+                    )
+                }
+            ]
+        }
     }
     date_layout(type){
         let {object} = this.props;
@@ -1021,23 +950,38 @@ class DavatnameCard extends Component{
             ]
         }
     }
-    addPopup(){
+    editPopup(){
+        let {rsa} = this.context;
+        let {object,onChange} = this.props;
+        rsa.addModal({
+            header:{title:'ویرایش دعوتنامه'},
+            body:{
+                render:()=>{
+                    return (
+                        <div style={{background:'#f8f8f8',overflow:'hidden',height:'100%'}} className='msf'>
+                            <TarahiDavatname onClose={()=>rsa.removeModal()} model={object} onChange={onChange}/>
+                        </div>
+                    )
+                }
+            }
+        })
+    }
+    sendPopup(){
+        let {rsa} = this.context;
         let {object} = this.props;
-        let {addPopup,removePopup} = this.context;
-        let {change_davatname_ha} = this.props;
-        addPopup({
-            title:'ویرایش دعوتنامه',
-            content:()=>{
-                return (
-                    <div style={{background:'#f8f8f8',overflow:'hidden',height:'100%'}} className='msf'>
-                        <TarahiDavatname onClose={()=>removePopup()} model={object} change_davatname_ha={change_davatname_ha}/>
-                    </div>
-                )
+        rsa.addModal({
+            header:{title:'ارسال دعوتنامه',subtitle:object.name},
+            body:{
+                render:()=>{
+                    return (
+                        <ErsaleDavatname/>
+                    )
+                }
             }
         })
     }
     active_layout(){
-        let {object,change_davatname_ha} = this.props;
+        let {object,onChange} = this.props;
         let {apis} = this.context;
         return {
             row:[
@@ -1052,29 +996,24 @@ class DavatnameCard extends Component{
                             }}
                         />
                     ),align:'v',
-                    attrs:{
-                        onClick:async ()=>{
-                            let res = await apis({api:'taghire_davatname',parameter:{object,state:!object.faal}})
-                            if(res === true){
-                                object.faal = !object.faal;
-                                change_davatname_ha(object.id,object)
-                            }
+                    onClick:async ()=>{
+                        let res = await apis({api:'taghire_davatname',parameter:{object,state:!object.faal}})
+                        if(res === true){
+                            object.faal = !object.faal;
+                            onChange(object.id,object)
                         }
                     }
+                    
                 },
                 {
                     html:object.faal?'فعال':'غیر فعال',className:'color005478 size10 bold padding-0-6',align:'v'
-                },
-                {flex:1},
-                {html:'ویرایش',className:'color005478 size10 bold padding-0-6',onClick:()=>this.addPopup()}
+                }
             ]
         }
     }
-    footer_layout(){
-        let {apis} = this.context;
+    access_layout(){
         let {object} = this.props;
         let {dastresi_ha} = object;
-        let {onRemove} = this.props;
         return {
              className:'size10 color005478 bold padding-0-6',align:'v',
             row:[
@@ -1082,14 +1021,7 @@ class DavatnameCard extends Component{
                 {size:4},
                 {html:dastresi_ha.length},
                 {size:4},
-                {html:'نفر دسترسی'},
-                {flex:1},
-                {html:<Icon path={mdiDelete} size={0.7}/>,className:'bgC92828 colorFFF round4',attrs:{
-                    onClick:async ()=>{
-                        let res = await apis({api:'hazfe_davatname',parameter:object})
-                        if(res === true){onRemove()}
-                    }
-                }}
+                {html:'نفر دسترسی'}
             ]
         }
     }
@@ -1104,10 +1036,8 @@ class DavatnameCard extends Component{
                         this.name_layout(),
                         this.date_layout('tarikhe_ijad'),
                         this.date_layout('tarikhe_etebar'),
-                        {size:12},
-                        this.active_layout(),
                         {size:6},
-                        this.footer_layout(),
+                        {row:[this.access_layout(),{flex:1},this.active_layout()]},
                         {size:12}
                     ]
                 }}

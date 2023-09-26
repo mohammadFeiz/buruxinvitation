@@ -158,3 +158,22 @@ button{
 .aio-input-option{
   font-size:12px;
 }
+
+.aio-input-form .aio-input{
+  background:#f1f2f3;
+  border:none !important;
+  border-radius:6px;
+}
+.aio-input-tabs{
+  background:#fff !important;
+  margin:12px 24px;
+  width:calc(100% - 48px) !important;
+  border-radius:8px !important;
+  padding-bottom:6px !important;
+}
+.aio-input-tabs-option.active{
+  color:#5DBBE8 !important;
+}
+.aio-input-tabs-option.active:after{
+  background:#5DBBE8 !important;
+}
